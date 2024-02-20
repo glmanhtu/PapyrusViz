@@ -106,7 +106,7 @@
                 thumbnailContainer.appendChild(thumbnail);
 
                 // Add click event listener to display full-size image
-                thumbnail.addEventListener('click', () => {
+                thumbnail.addEventListener('dblclick', () => {
                   if (thumbnail.ref == undefined) {
                     const fullImage = new Image();
                     fullImage.src = 'file://' + file;
@@ -115,6 +115,9 @@
                     board.appendChild(fullImage);
                     thumbnail.ref = fullImage;
                     dragElement(fullImage);
+                    fullImage.addEventListener('click', () => {
+                      setActiveComponent(fullImage);
+                    })
                   } else {
                     setActiveComponent(thumbnail.ref);
                   }
