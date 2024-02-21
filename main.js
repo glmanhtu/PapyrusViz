@@ -1,6 +1,8 @@
 const { app, BrowserWindow, dialog, ipcMain, Menu } = require('electron');
 const path = require('node:path')
 
+const currentProject = null;
+
 function createWindow() {
   const win = new BrowserWindow({
     width: 1500,
@@ -20,6 +22,12 @@ function createWindow() {
       var size   = win.getSize();
       win.webContents.send('resized', size);
   });
+
+  const child = new BrowserWindow({ parent: win, modal: true, show: false })
+  child.loadFile(path.join('dialogs', 'welcome', 'main.html'))
+  child.once('ready-to-show', () => {
+    child.show()
+  })
 }
 
 app.whenReady().then(createWindow);
@@ -32,6 +40,10 @@ app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow();
   }
+});
+
+ipcMain.on('get-current-project', async (event) => {
+  event.reply('current-project', currentProject)
 });
 
 ipcMain.on('open-file-dialog', async (event) => {
