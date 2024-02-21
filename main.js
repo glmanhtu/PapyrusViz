@@ -1,5 +1,5 @@
 const { app, BrowserWindow, dialog, ipcMain, Menu } = require('electron');
-const path = require('path');
+const path = require('node:path')
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -7,6 +7,7 @@ function createWindow() {
     height: 1000,
     // autoHideMenuBar: true,
     webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: true,
       contextIsolation: false,
       webSecurity: false
@@ -14,6 +15,11 @@ function createWindow() {
   });
 
   win.loadFile('index.html');
+
+  win.on('resize', function () {
+      var size   = win.getSize();
+      win.webContents.send('resized', size);
+  });
 }
 
 app.whenReady().then(createWindow);

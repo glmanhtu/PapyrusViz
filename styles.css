@@ -1,0 +1,34 @@
+html,
+body {
+    height: 100%;
+    margin: 0;
+}
+
+.full-height {
+    height: 100%;
+}
+
+#activated-component {
+    border: 2px solid green;
+}
+
+#board-column {
+    width: 100%;
+    border: 2px dashed #ccc;
+    overflow: scroll;
+    position: relative;
+}
+
+#board img {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+}
+
+#thumbnail-column {
+    overflow-y: scroll; /* Enable vertical scrolling if needed */
+}
+
+#thumbnail-column img {
+    max-height: 200px;
+}
