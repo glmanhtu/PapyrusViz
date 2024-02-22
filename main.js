@@ -2,6 +2,7 @@ const { app, BrowserWindow, dialog, ipcMain, Menu } = require('electron');
 const path = require('node:path')
 const fs = require('fs');
 
+
 const currentProject = null;
 let currentDlg = null;
 let win = null;
@@ -65,6 +66,10 @@ app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow();
   }
+});
+
+ipcMain.on('open-message-dialog', async (event, args) => {
+
 });
 
 ipcMain.on('open-welcome-dialog', async (event) => {

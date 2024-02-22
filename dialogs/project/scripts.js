@@ -1,5 +1,6 @@
 let $ = jQuery = require('jquery');
 const { ipcRenderer } = require('electron');
+const fs = require('fs');
 
 
 function cancel() {
@@ -19,7 +20,12 @@ ipcRenderer.on('selected-dir', (event, args) => {
 
 $('#projectCreation').on('submit', (e) => {
     const projectName = $('#projName').val();
-    const datasetPath = $('#inputDataset').val();
     const projectPath = $('#inputLocation').val();
+    let isDirExists = fs.existsSync(projectPath) && fs.lstatSync(projectPath).isDirectory();
+    if (!isDirExists) {
+        
+    }
+    const datasetPath = $('#inputDataset').val();
+
     e.preventDefault();
 });
