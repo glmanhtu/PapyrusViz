@@ -16,3 +16,10 @@ ipcRenderer.on('selected-dir', (event, args) => {
     $(`#${targetId}`).val(dir[0]);
     $(`#${targetId}`).next('.custom-file-label').html(dir[0]);
 });
+
+$('#projectCreation').on('submit', (e) => {
+    const projectName = $('#projName').val();
+    const datasetPath = $('#inputDataset').val();
+    const projectPath = $('#inputLocation').val();
+    e.preventDefault();
+});

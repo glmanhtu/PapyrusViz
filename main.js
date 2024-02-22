@@ -40,6 +40,7 @@ function openDialog(dialogPath, width=800, height=600) {
             show: false,  
             width: width,
             height: height,
+            transparent: true,
             autoHideMenuBar: true,
             closable: false,
             frame: false,
