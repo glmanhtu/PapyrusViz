@@ -6,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Project Management</title>
     <!-- Bootstrap CSS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <link href="../../node_modules/@fortawesome/fontawesome-free/css/all.css" rel="stylesheet">
     <link href="./styles.css" rel="stylesheet">
 </head>
 
@@ -16,9 +16,9 @@
     <div class="container">
         <h1>Papyrus Projects</h1>
         <div class="d-flex justify-content-center">
-            <button type="button" class="btn btn-primary btn-sm btn-create"><i class="fas fa-plus-circle mr-2"></i> Create a New
+            <button type="button" class="btn btn-success btn-sm btn-create" onclick="createProject()"><i class="fas fa-plus-circle mr-2"></i> Create a New
                 Project</button>
-            <button type="button" class="btn btn-info btn-sm btn-open"><i class="fas fa-folder-open mr-2"></i> Open an Existing
+            <button type="button" class="btn btn-primary btn-sm btn-open"><i class="fas fa-folder-open mr-2"></i> Open an Existing
                 Project</button>
         </div>
 

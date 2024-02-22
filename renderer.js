@@ -8,6 +8,7 @@
 
 const { ipcRenderer } = require('electron');
 const fs = require('fs');
+let $ = jQuery = require('jquery');
 
 ipcRenderer.on('selected-files', (event, files) => {
     const thumbnailContainer = document.getElementById('thumbnail-container');

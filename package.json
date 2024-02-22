@@ -4,7 +4,7 @@
   "description": "Visualize papyrus fragments and allow user to reassemble them",
   "main": "main.js",
   "scripts": {
-    "start": "electron .",
+    "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make"
   },
@@ -21,6 +21,9 @@
     "electron": "^29.0.0"
   },
   "dependencies": {
-    "electron-squirrel-startup": "^1.0.0"
+    "@fortawesome/fontawesome-free": "^6.5.1",
+    "bootstrap": "^4.5.3",
+    "electron-squirrel-startup": "^1.0.0",
+    "jquery": "^3.7.1"
   }
 }

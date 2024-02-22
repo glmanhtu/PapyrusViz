@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Management</title>
+    <!-- Bootstrap CSS -->
+    <link href="../../node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="../../node_modules/@fortawesome/fontawesome-free/css/all.css" rel="stylesheet">
+    <link href="./styles.css" rel="stylesheet">
+    <script>require('bootstrap');</script>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Create Project</h1>
+        <form>
+            <div class="form-group row">
+                <label for="inputName" class="col-sm-3 col-form-label">Name</label>
+                <div class="col-sm-9">
+                <input type="email" class="form-control form-control-sm" id="inputName" placeholder="Project name">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="inputDataset" class="col-sm-3 col-form-label">Image dataset</label>
+                <div class="col-sm-9">
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input form-control-sm" id="inputDataset" webkitdirectory="" directory="" multiple>
+                        <label class="custom-file-label col-form-label-sm" for="inputDataset">Choose a folder</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="inputLocation" class="col-sm-3 col-form-label">Project location</label>
+                <div class="col-sm-9">
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input form-control-sm" id="inputLocation" webkitdirectory="" directory="" multiple>
+                        <label class="custom-file-label col-form-label-sm" for="inputLocation">Choose a folder</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" style="height: 100px;"></div>
+
+            <div class="form-group row">
+                <div class="col-sm-12 text-right">
+                    <button type="submit" class="btn btn-success btn-sm">Create</button>
+                    <button type="submit" class="btn btn-secondary btn-sm" onclick="cancel()">Cancel</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Bootstrap JS (optional) -->
+    <script src="./scripts.js"></script>
+</body>
+
+</html>
