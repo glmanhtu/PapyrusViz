@@ -8,7 +8,7 @@
     <!-- Bootstrap CSS -->
     <link href="../../node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
-    <link href="../../node_modules/@fortawesome/fontawesome-free/css/all.css" rel="stylesheet">
+    <link href="../../node_modules/@fortawesome/fontawesome-free/css/fontawesome.min.css" rel="stylesheet">
     <link href="./styles.css" rel="stylesheet">
     <script>require('bootstrap');</script>
 </head>
@@ -26,8 +26,8 @@
             <div class="form-group row">
                 <label for="inputDataset" class="col-sm-3 col-form-label">Image dataset</label>
                 <div class="col-sm-9">
-                    <div class="custom-file">
-                        <input type="file" class="custom-file-input form-control-sm" id="inputDataset" webkitdirectory="" directory="" multiple>
+                    <div class="custom-file" onclick="selectFolder('inputDataset')">
+                        <input class="custom-file-input form-control-sm" id="inputDataset">
                         <label class="custom-file-label col-form-label-sm" for="inputDataset">Choose a folder</label>
                     </div>
                 </div>
@@ -36,8 +36,8 @@
             <div class="form-group row">
                 <label for="inputLocation" class="col-sm-3 col-form-label">Project location</label>
                 <div class="col-sm-9">
-                    <div class="custom-file">
-                        <input type="file" class="custom-file-input form-control-sm" id="inputLocation" webkitdirectory="" directory="" multiple>
+                    <div class="custom-file" onclick="selectFolder('inputLocation')">
+                        <input class="custom-file-input form-control-sm" id="inputLocation">
                         <label class="custom-file-label col-form-label-sm" for="inputLocation">Choose a folder</label>
                     </div>
                 </div>

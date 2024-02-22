@@ -71,7 +71,7 @@ ipcMain.on('open-welcome-dialog', async (event) => {
 });
 
 ipcMain.on('open-create-project', async (event) => {
-    openDialog(path.join('dialogs', 'project', 'main.html'), 800, 450)
+    openDialog(path.join('dialogs', 'project', 'main.html'), 800, 460)
 });
 
 ipcMain.on('get-current-project', async (event) => {
@@ -86,5 +86,15 @@ ipcMain.on('open-file-dialog', async (event) => {
 
   if (!result.canceled) {
     event.reply('selected-files', result.filePaths);
+  }
+});
+
+ipcMain.on('open-dir-dialog', async (event, args) => {
+  const result = await dialog.showOpenDialog({
+    properties: ['openDirectory'],
+  });
+
+  if (!result.canceled) {
+    event.reply('selected-dir', [result.filePaths, args]);
   }
 });
