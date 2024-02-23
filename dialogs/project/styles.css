@@ -13,3 +13,7 @@
         margin-bottom: 50px;
         text-align: center;
     }
+
+    .custom-file-input {
+        cursor: pointer;
+    }

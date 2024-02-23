@@ -45,6 +45,7 @@ function openDialog(dialogPath, width=800, height=600) {
             transparent: true,
             autoHideMenuBar: true,
             frame: false,
+            // useContentSize: true,
             webPreferences: {
                 nodeIntegration: true,
                 contextIsolation: false,
