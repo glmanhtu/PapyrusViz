@@ -21,11 +21,31 @@ ipcRenderer.on('selected-dir', (event, args) => {
 $('#projectCreation').on('submit', (e) => {
     const projectName = $('#projName').val();
     const projectPath = $('#inputLocation').val();
-    let isDirExists = fs.existsSync(projectPath) && fs.lstatSync(projectPath).isDirectory();
-    if (!isDirExists) {
-        
-    }
     const datasetPath = $('#inputDataset').val();
-
+    
+    ipcRenderer.send('proj:create-project', {
+        'projName': projectName,
+        'projPath': projectPath,
+        'datasetPath': datasetPath
+    });
     e.preventDefault();
+});
+
+ipcRenderer.on('proj:starting', (event, args) => {
+    $('#projectCreation').css('display', 'none');
+    $("#projectCreationProgress").css('display', 'block');
+});
+
+ipcRenderer.on('proj:progress', (event, args) => {
+    const name = args['name'];
+    const desc = args['desc'];
+    const currentVal = args['current'];
+
+    $('#progressTitle').html(name);
+    $('#progressDesc').html(desc);
+    $('#progressBar').css('width', currentVal+'%').attr('aria-valuenow', currentVal); 
+});
+
+ipcRenderer.on('proj:finished', (event, args) => {
+    
 });
