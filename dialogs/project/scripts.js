@@ -47,5 +47,5 @@ ipcRenderer.on('proj:progress', (event, args) => {
 });
 
 ipcRenderer.on('proj:finished', (event, args) => {
-    
+    $('#openProject').css('display', 'block');
 });
