@@ -21,7 +21,7 @@ class DialogsController {
           
         ipcMain.on('dialogs:open-dir-dialog', async (event, args) => {
             const result = await dialog.showOpenDialog({
-                properties: ['openDirectory'],
+                properties: ['openDirectory', 'createDirectory'],
             });
           
             if (!result.canceled) {

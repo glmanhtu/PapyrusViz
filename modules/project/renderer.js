@@ -7,12 +7,12 @@ function cancel() {
 }
 
 function selectFolder(targetId) {
-    ipcRenderer.send('open-dir-dialog', targetId);
+    ipcRenderer.send('dialogs:open-dir-dialog', {'target': targetId});
 }
 
 ipcRenderer.on('selected-dir', (event, args) => {
     const dir = args[0];
-    const targetId = args[1];
+    const targetId = args[1]['target'];
     $(`#${targetId}`).val(dir[0]);
     $(`#${targetId}`).next('.custom-file-label').html(dir[0]);
 });

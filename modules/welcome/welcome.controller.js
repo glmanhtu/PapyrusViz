@@ -8,7 +8,7 @@ class WelcomeController {
         this.mainWin = mainWin
         
         this.ipcMain.on('welcome:open-welcome-dialog', async (event) => {
-            dialogUtils.openDialog(pathUtils.fromRoot('modules', 'welcome', 'main.html'), this.mainWin)
+            dialogUtils.openDialog(pathUtils.fromRoot('modules', 'welcome', 'index.html'), this.mainWin)
         });
     }
 
