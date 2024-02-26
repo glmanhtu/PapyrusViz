@@ -1,10 +1,9 @@
 let $ = jQuery = require('jquery');
 const { ipcRenderer } = require('electron');
-const fs = require('fs');
 
 
 function cancel() {
-    ipcRenderer.send('open-welcome-dialog');
+    ipcRenderer.send('welcome:open-welcome-dialog');
 }
 
 function selectFolder(targetId) {

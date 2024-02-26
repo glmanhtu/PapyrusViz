@@ -67,7 +67,7 @@ function getActiveComponent() {
 }
 
 function openDialog() {
-    ipcRenderer.send('open-file-dialog');
+    ipcRenderer.send('dialogs:open-images-dialog');
 }
 
 function rotateLeft(step=5) {
