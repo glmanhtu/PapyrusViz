@@ -7,16 +7,48 @@ const pathUtils = require('../utils/path.utils')
 
 class ProjectController {
     constructor(ipcMain, mainWin) {
-        this.ipcMain = ipcMain
-        this.mainWin = mainWin
+        this.ipcMain = ipcMain;
+        this.mainWin = mainWin;
+        this.project = {};
         
         ipcMain.on('proj:create-project', this.createProject);
 
+        ipcMain.on('proj:open-project', this.openProject);
+
         ipcMain.on('proj:open-create-project', async (event) => {
+            dialogUtils.openDialog(pathUtils.fromRoot('modules', 'project', 'dialogs', 'create', 'index.html'), this.mainWin)
+        });
+
+        ipcMain.on('proj:open-welcome-dialog', async (event) => {
             dialogUtils.openDialog(pathUtils.fromRoot('modules', 'project', 'index.html'), this.mainWin)
         });
+
+        ipcMain.handle('proj:get-current-project', this.getCurrentProject);
+    }
+
+    async getCurrentProject(event, args) {
+        return this.project;
     }
     
+    async openProject(event, args) {
+        const projLocation = args['projPath'];
+        if (!self.projectExists(projLocation)) {
+            return dialogUtils.errorDialog(this.mainWin, 'Unnable to open project', `There is no project in the selected folder!`);
+        }
+        this.project = JSON.parse(fs.readFileSync('file', 'utf8'));
+        dialogUtils.closeCurrentDialog();
+        this.ipcMain.emit('main:reload', this.project);
+    }
+
+    projectExists(projLocation) {
+        const isProjPathExists = fs.existsSync(projLocation) && fs.lstatSync(projLocation).isDirectory();
+        if (isProjPathExists) {
+            if (fs.lstatSync(path.join(projLocation, 'project.json')).isFile()) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     async createProject(event, args) {
         const projLocation = args['projPath'];

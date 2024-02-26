@@ -1,0 +1,19 @@
+    body {
+        background-color: #1e1e1e; /* Dark background color */
+        color: #fff; /* Light text color */
+        font-family: Arial, sans-serif;
+    }
+
+    .container {
+        padding: 20px;
+    }
+
+    h1 {
+        font-weight: 700;
+        margin-bottom: 50px;
+        text-align: center;
+    }
+
+    .custom-file-input {
+        cursor: pointer;
+    }

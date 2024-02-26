@@ -3,11 +3,16 @@ const { BrowserWindow, dialog } = require('electron');
 
 let currentDlg = null;
 
-module.exports.openDialog = function(dialogPath, win, width=800, height=600) {
+
+module.exports.closeCurrentDialog = function() {
     if (currentDlg) {
         currentDlg.close();
         currentDlg = null;
     }
+}
+
+module.exports.openDialog = function(dialogPath, win, width=800, height=600) {
+    this.closeCurrentDialog();
 
     currentDlg = new BrowserWindow({ 
             parent: win, 

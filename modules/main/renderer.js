@@ -10,6 +10,11 @@ const { ipcRenderer } = require('electron');
 const fs = require('fs');
 let $ = jQuery = require('jquery');
 
+async () => {
+    const project = await ipcRenderer.invoke('proj:get-current-project');
+    console.log(project);
+}
+
 ipcRenderer.on('selected-files', (event, files) => {
     const thumbnailContainer = document.getElementById('thumbnail-container');
     const board = document.getElementById('board');

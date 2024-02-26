@@ -1,7 +1,6 @@
 const { app, BrowserWindow, dialog, ipcMain, Menu } = require('electron');
 const path = require('node:path')
 const {ProjectController} = require('./modules/project/project.controller');
-const {WelcomeController} = require('./modules/welcome/welcome.controller');
 const {DialogsController} = require('./modules/dialogs/dialogs.controller');
 const {MainController} = require('./modules/main/main.controller');
 
@@ -29,10 +28,9 @@ function createWindow() {
     new MainController(ipcMain, win),
     new DialogsController(ipcMain, win),
     new ProjectController(ipcMain, win),
-    new WelcomeController(ipcMain, win),
   ]
 
-  ipcMain.emit('welcome:open-welcome-dialog');
+  ipcMain.emit('proj:open-welcome-dialog');
 }
 
 app.whenReady().then(createWindow);

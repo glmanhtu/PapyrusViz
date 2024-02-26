@@ -1,19 +1,46 @@
-    body {
-        background-color: #1e1e1e; /* Dark background color */
-        color: #fff; /* Light text color */
-        font-family: Arial, sans-serif;
-    }
+body {
+    background-color: #1e1e1e; /* Dark background color */
+    color: #fff; /* Light text color */
+    font-family: Arial, sans-serif;
+}
 
-    .container {
-        padding: 20px;
-    }
+.container {
+    padding: 20px;
+}
 
-    h1 {
-        font-weight: 700;
-        margin-bottom: 50px;
-        text-align: center;
-    }
+h1 {
+    font-weight: 700;
+    margin-bottom: 30px;
+    text-align: center;
+}
 
-    .custom-file-input {
-        cursor: pointer;
-    }
+.btn-create {
+    margin-right: 10px;
+}
+
+.recent-projects {
+    margin-top: 20px;
+}
+
+.recent-projects h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.project-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.project-list li {
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.project-list li:last-child {
+    border-bottom: none;
+}
+
+.project-list li span {
+    font-size: 16px;
+}
