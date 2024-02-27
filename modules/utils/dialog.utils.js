@@ -11,6 +11,23 @@ module.exports.closeCurrentDialog = function() {
     }
 }
 
+module.exports.getCurrentDialog = function() {
+    return currentDlg;
+}
+
+module.exports.confirmDialog = function(win, title, content) {
+    const result = dialog.showMessageBoxSync(win, {
+        'type': 'question',
+        'title': title,
+        'message': content,
+        'buttons': [
+            'Yes',
+            'No'
+        ]
+    });
+    return result === 0;
+}
+
 module.exports.openDialog = function(dialogPath, win, width=800, height=600) {
     this.closeCurrentDialog();
 

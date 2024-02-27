@@ -27,6 +27,7 @@ class ProjectController {
         ipcMain.handle('proj:get-current-project', this.getCurrentProject.bind(this));
 
         ipcMain.handle('proj:get-projects', this.getProjects.bind(this));
+        ipcMain.handle('proj:del-project', this.delProject.bind(this));
     }
 
     async getCurrentProject(event, args) {
@@ -46,6 +47,22 @@ class ProjectController {
         this.project = JSON.parse(fs.readFileSync(path.join(projLocation, 'project.json'), 'utf-8'));
         dialogUtils.closeCurrentDialog();
         this.ipcMain.emit('main:reload', this.project);
+    }
+
+
+    async delProject(event, args) {
+        const projLocation = args['projPath'];
+        if (this.projectExists(projLocation)) {
+            if (dialogUtils.confirmDialog(dialogUtils.getCurrentDialog() || this.mainWin, 'Confirmation', 'Are you sure ? This can not be undone !')) {
+                const appData = dataUtils.readAppData();
+                appData.projects = appData.projects.filter(item => item.projPath !== projLocation);
+                dataUtils.writeAppData(appData);
+                fs.rmSync(projLocation, { recursive: true, force: true });
+                return true;
+            }
+            return false;
+        }
+        return true;
     }
 
     addProject(projectData) {
@@ -70,7 +87,7 @@ class ProjectController {
         const projectData = {...args};
         projectData.images = {}
         projectData.createdAt = Date.now();
-        projectData.assembled = []
+        projectData.assembled = [{'name': 'Assembling image #1', 'images': [], 'createdAt': Date.now()}];
 
 
         // Parameter validation

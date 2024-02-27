@@ -16,6 +16,7 @@ let $ = jQuery = require('jquery');
     const project = await ipcRenderer.invoke('proj:get-current-project');
     console.log(project);
     
+    $('#proj-name').html(`Project: ${project.projName}`);
     for (const [key, imgInfo] of Object.entries(project.images)) {
         const thumbnail = new Image();
         thumbnail.src = 'file://' + imgInfo.thumbnails;

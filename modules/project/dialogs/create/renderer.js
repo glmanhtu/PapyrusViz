@@ -10,11 +10,6 @@ function selectFolder(targetId) {
     ipcRenderer.send('dialogs:open-dir-dialog', {'target': targetId});
 }
 
-function openProject() {
-    const projectPath = $('#inputLocation').val();
-    ipcRenderer.send('proj:open-project', {'projPath': projectPath});
-}
-
 ipcRenderer.on('selected-dir', (event, args) => {
     const dir = args[0];
     const targetId = args[1]['target'];
@@ -51,5 +46,8 @@ ipcRenderer.on('proj:progress', (event, args) => {
 });
 
 ipcRenderer.on('proj:finished', (event, args) => {
-    $('#openProject').css('display', 'block');
+    const projectPath = $('#inputLocation').val();
+    $('#openProject').css('display', 'block').on('click', function() {
+        ipcRenderer.send('proj:open-project', {'projPath': projectPath});
+    });
 });
