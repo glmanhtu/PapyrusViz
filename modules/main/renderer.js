@@ -20,6 +20,7 @@ let $ = jQuery = require('jquery');
     for (const [key, imgInfo] of Object.entries(project.images)) {
         const thumbnail = new Image();
         thumbnail.src = 'file://' + imgInfo.thumbnails;
+        thumbnail.dataset.imgId = key;
         thumbnail.className = 'img-thumbnail row';
         thumbnail.style.cursor = 'pointer';
         thumbnailContainer.appendChild(thumbnail);
@@ -27,53 +28,34 @@ let $ = jQuery = require('jquery');
         // Add click event listener to display full-size image
         thumbnail.addEventListener('dblclick', () => {
             if (thumbnail.ref == undefined) {
-            const fullImage = new Image();
-            fullImage.src = 'file://' + imgInfo.path;
-            setActiveComponent(fullImage);
-            board.appendChild(fullImage);
-            thumbnail.ref = fullImage;
-            dragElement(fullImage);
-            fullImage.addEventListener('click', () => {
+                const fullImage = new Image();
+                fullImage.dataset.imgId = key;
+                fullImage.src = 'file://' + imgInfo.path;
                 setActiveComponent(fullImage);
-            })
+                board.appendChild(fullImage);
+                thumbnail.ref = fullImage;
+                dragElement(fullImage);
+                fullImage.addEventListener('click', () => {
+                    setActiveComponent(fullImage);
+                })
             } else {
                 setActiveComponent(thumbnail.ref);
             }
         });
     };
+
+    for (const [key, assembledInfo] of Object.entries(project.assembled)) {
+        const tab = $('#assembling-tab-template').clone().css('display', 'list-item');
+        const tabA = tab.children('a');
+        tabA.html(assembledInfo.name);
+        if (assembledInfo.activated) {
+            tabA.addClass('active');
+        }
+        tabA.attr(`data-assembledId`, key);
+        tab.prependTo('#assembling-tabs');
+    }
+
 })();
-
-ipcRenderer.on('selected-files', (event, files) => {
-    const thumbnailContainer = document.getElementById('thumbnail-container');
-    const board = document.getElementById('board');
-
-    thumbnailContainer.innerHTML = ''; // Clear existing thumbnails
-
-    files.forEach(file => {
-        const thumbnail = new Image();
-        thumbnail.src = 'file://' + file;
-        thumbnail.className = 'img-thumbnail row';
-        thumbnail.style.cursor = 'pointer';
-        thumbnailContainer.appendChild(thumbnail);
-
-        // Add click event listener to display full-size image
-        thumbnail.addEventListener('dblclick', () => {
-            if (thumbnail.ref == undefined) {
-            const fullImage = new Image();
-            fullImage.src = 'file://' + file;
-            setActiveComponent(fullImage);
-            board.appendChild(fullImage);
-            thumbnail.ref = fullImage;
-            dragElement(fullImage);
-            fullImage.addEventListener('click', () => {
-                setActiveComponent(fullImage);
-            })
-            } else {
-                setActiveComponent(thumbnail.ref);
-            }
-        });
-    });
-});
 
 repeatActionOnHold('i', () => zoomIn(0.01));
 repeatActionOnHold('o', () => zoomOut(0.01));
@@ -153,6 +135,7 @@ function dragElement(elmnt) {
         // get the mouse cursor position at startup:
         pos3 = e.clientX;
         pos4 = e.clientY;
+        setActiveComponent(elmnt);
         document.onmouseup = closeDragElement;
         // call a function whenever the cursor moves:
         document.onmousemove = elementDrag;

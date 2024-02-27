@@ -1,7 +1,7 @@
 const fs = require('fs');
 const sharp = require('sharp');
 const path = require('node:path');
-const { v4: uuidv4 } = require('uuid');
+// const { v4: uuidv4 } = require('uuid');
 const dialogUtils = require('../utils/dialog.utils');
 const pathUtils = require('../utils/path.utils')
 const dataUtils = require('../utils/data.utils')
@@ -53,7 +53,7 @@ class ProjectController {
     async delProject(event, args) {
         const projLocation = args['projPath'];
         if (this.projectExists(projLocation)) {
-            if (dialogUtils.confirmDialog(dialogUtils.getCurrentDialog() || this.mainWin, 'Confirmation', 'Are you sure ? This can not be undone !')) {
+            if (dialogUtils.confirmDialog(dialogUtils.getCurrentDialog() || this.mainWin, 'Confirmation', 'Are you sure ? This can not be undone!')) {
                 const appData = dataUtils.readAppData();
                 appData.projects = appData.projects.filter(item => item.projPath !== projLocation);
                 dataUtils.writeAppData(appData);
@@ -87,7 +87,8 @@ class ProjectController {
         const projectData = {...args};
         projectData.images = {}
         projectData.createdAt = Date.now();
-        projectData.assembled = [{'name': 'Assembling image #1', 'images': [], 'createdAt': Date.now()}];
+        projectData.assembled = { 0: {'name': 'Assembling image #1', 'activated': true, 'images': [], 'createdAt': Date.now()}};
+        projectData.assembledCount = 1;
 
 
         // Parameter validation
@@ -114,19 +115,19 @@ class ProjectController {
         const getFilesRecursively = (directory, level=0) => {
             const filesInDirectory = fs.readdirSync(directory);
             for (let i = 0; i < filesInDirectory.length; i++) {
-            const absolute = path.join(directory, filesInDirectory[i]);
-            if (fs.statSync(absolute).isDirectory()) {
-                getFilesRecursively(absolute, level + 1);
-            } else {
-                const fileExt = absolute.split('.').pop().toLowerCase();
-                if (['jpg', 'jpeg', 'png'].includes(fileExt)) {
-                images.push(absolute);
+                const absolute = path.join(directory, filesInDirectory[i]);
+                if (fs.statSync(absolute).isDirectory()) {
+                    getFilesRecursively(absolute, level + 1);
+                } else {
+                    const fileExt = absolute.split('.').pop().toLowerCase();
+                    if (['jpg', 'jpeg', 'png'].includes(fileExt)) {
+                    images.push(absolute);
+                    }
                 }
-            }
-            if (level === 0) {
-                const per = (i + 1) * 10 / filesInDirectory.length;
-                event.reply('proj:progress', {'name': "Step 2/3 - Collecting images...", 'desc': `Collected ${images.length} images...`, 'current': 5 + per});
-            }
+                if (level === 0) {
+                    const per = (i + 1) * 10 / filesInDirectory.length;
+                    event.reply('proj:progress', {'name': "Step 2/3 - Collecting images...", 'desc': `Collected ${images.length} images...`, 'current': 5 + per});
+                }
             }
         };
 
@@ -144,8 +145,7 @@ class ProjectController {
 
             const per = (i + 1) * 90 / images.length;
             event.reply('proj:progress', {'name': "Step 3/3 - Generating thumbnails...", 'desc': `Generated ${i + 1}/${images.length} thumbnails images...`, 'current': 15 + per});
-            const imageId = uuidv4();
-            projectData.images[imageId] = {
+            projectData.images[i] = {
                 'path': images[i],
                 'thumbnails': thumbnailPath,
                 'width': metadata.width,
@@ -154,6 +154,7 @@ class ProjectController {
                 'size': metadata.size,
             };
         }
+        projectData.imagesCount = images.length;
 
         // Finished
         fs.writeFileSync(path.join(projLocation, 'project.json'), JSON.stringify(projectData));
