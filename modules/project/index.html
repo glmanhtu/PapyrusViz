@@ -24,14 +24,24 @@
 
         <div class="recent-projects mt-5">
             <h2>Recent Projects</h2>
-            <ul class="project-list">
-                <li><span>Project 1</span></li>
-                <li><span>Project 2</span></li>
-                <li><span>Project 3</span></li>
-                <li><span>Project 4</span></li>
-                <li><span>Project 5</span></li>
-                <li><span>Project 6</span></li>
-            </ul>
+            <table class="table table-sm table-dark">
+                <tbody id="proj-list">
+                  <tr id="proj-template" style="display: none;">
+                    <th scope="row" class="proj-name">Test 1</td>
+                    <td colspan="2" class="proj-path">/Users/mvu/Downloads/demo_images</td>
+                    <td>
+                        <div class="text-right d-flex justify-content-end" >
+                            <button type="button" class="btn btn-outline-success btn-sm mr-1 proj-open">Open</button> 
+                            <button type="button" class="btn btn-outline-danger btn-sm proj-del">X</button>
+                        </div>
+                    </td>
+                  </tr>
+
+                  <tr id="no-proj" style="display: none;">
+                    <td colspan="4">No project was found!</td>
+                  </tr>
+                </tbody>
+              </table>
         </div>
     </div>
 

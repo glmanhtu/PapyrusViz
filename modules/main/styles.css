@@ -8,13 +8,17 @@ body {
     height: 100%;
 }
 
+.main-component {
+    padding-right: 5px !important;
+    padding-left: 5px !important;
+}
+
 #activated-component {
     border: 2px solid green;
 }
 
-#board-column {
+#board {
     width: 100%;
-    border: 2px dashed #ccc;
     overflow: scroll;
     position: relative;
 }
@@ -25,10 +29,28 @@ body {
     left: 10px;
 }
 
-#thumbnail-column {
+#thumbnail-container {
     overflow-y: scroll; /* Enable vertical scrolling if needed */
 }
 
-#thumbnail-column img {
+#thumbnail-container img {
     max-height: 200px;
 }
+
+/* navbar */
+.navbar-primary .navbar { background:#9f58b5; border-bottom:none; }
+.navbar-primary .navbar .nav > li > a {color: #501762;}
+.navbar-primary .navbar .nav > li > a:hover {color: #fff; background-color: #8e49a3;}
+.navbar-primary .navbar .nav .active > a,.navbar .nav .active > a:hover {color: #fff; background-color: #501762;}
+.navbar-primary .navbar .nav li > a .caret, .tnav .navbar .nav li > a:hover .caret {border-top-color: #fff;border-bottom-color: #fff;}
+.navbar-primary .navbar .nav > li.dropdown.open.active > a:hover {}
+.navbar-primary .navbar .nav > li.dropdown.open > a {color: #fff;background-color: #9f58b5;border-color: #fff;}
+.navbar-primary .navbar .nav > li.dropdown.open.active > a:hover .caret, .tnav .navbar .nav > li.dropdown.open > a .caret {border-top-color: #fff;}
+.navbar-primary .navbar .navbar-brand {color:#fff;}
+.navbar-primary .navbar .nav.pull-right {margin-left: 10px; margin-right: 0;}
+.navbar-xs .navbar-primary .navbar { min-height:28px; height: 28px; }
+.navbar-xs .navbar-primary .navbar .navbar-brand{ padding: 0px 12px;font-size: 16px;line-height: 28px; }
+.navbar-xs .navbar-primary .navbar .navbar-nav > li > a {  padding-top: 0px; padding-bottom: 0px; line-height: 28px; }
+.navbar-sm .navbar-primary .navbar { min-height:40px; height: 40px; }
+.navbar-sm .navbar-primary .navbar .navbar-brand{ padding: 0px 12px;font-size: 16px;line-height: 40px; }
+.navbar-sm .navbar-primary .navbar .navbar-nav > li > a {  padding-top: 0px; padding-bottom: 0px; line-height: 40px; }

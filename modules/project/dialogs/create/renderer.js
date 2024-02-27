@@ -3,7 +3,7 @@ const { ipcRenderer } = require('electron');
 
 
 function cancel() {
-    ipcRenderer.send('welcome:open-welcome-dialog');
+    ipcRenderer.send('proj:open-welcome-dialog');
 }
 
 function selectFolder(targetId) {

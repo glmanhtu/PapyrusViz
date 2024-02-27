@@ -8,10 +8,6 @@ class MainController {
         this.mainWin = mainWin
 
         mainWin.loadFile(pathUtils.fromRoot('modules', 'main', 'index.html'));
-        
-        // mainWin.webContents.once('did-finish-load', (e) => {
-            
-        // });
 
         ipcMain.on('main:reload', (event, args) => {
             mainWin.reload();

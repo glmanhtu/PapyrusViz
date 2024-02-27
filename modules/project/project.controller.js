@@ -4,6 +4,7 @@ const path = require('node:path');
 const { v4: uuidv4 } = require('uuid');
 const dialogUtils = require('../utils/dialog.utils');
 const pathUtils = require('../utils/path.utils')
+const dataUtils = require('../utils/data.utils')
 
 class ProjectController {
     constructor(ipcMain, mainWin) {
@@ -11,9 +12,9 @@ class ProjectController {
         this.mainWin = mainWin;
         this.project = {};
         
-        ipcMain.on('proj:create-project', this.createProject);
+        ipcMain.on('proj:create-project', this.createProject.bind(this));
 
-        ipcMain.on('proj:open-project', this.openProject);
+        ipcMain.on('proj:open-project', this.openProject.bind(this));
 
         ipcMain.on('proj:open-create-project', async (event) => {
             dialogUtils.openDialog(pathUtils.fromRoot('modules', 'project', 'dialogs', 'create', 'index.html'), this.mainWin)
@@ -23,21 +24,34 @@ class ProjectController {
             dialogUtils.openDialog(pathUtils.fromRoot('modules', 'project', 'index.html'), this.mainWin)
         });
 
-        ipcMain.handle('proj:get-current-project', this.getCurrentProject);
+        ipcMain.handle('proj:get-current-project', this.getCurrentProject.bind(this));
+
+        ipcMain.handle('proj:get-projects', this.getProjects.bind(this));
     }
 
     async getCurrentProject(event, args) {
         return this.project;
     }
+
+    async getProjects(event, args) {
+        const appData = dataUtils.readAppData();
+        return appData.projects;
+    }
     
     async openProject(event, args) {
         const projLocation = args['projPath'];
-        if (!self.projectExists(projLocation)) {
+        if (!this.projectExists(projLocation)) {
             return dialogUtils.errorDialog(this.mainWin, 'Unnable to open project', `There is no project in the selected folder!`);
         }
-        this.project = JSON.parse(fs.readFileSync('file', 'utf8'));
+        this.project = JSON.parse(fs.readFileSync(path.join(projLocation, 'project.json'), 'utf-8'));
         dialogUtils.closeCurrentDialog();
         this.ipcMain.emit('main:reload', this.project);
+    }
+
+    addProject(projectData) {
+        const appData = dataUtils.readAppData();
+        appData.projects.push(projectData)
+        dataUtils.writeAppData(appData);
     }
 
     projectExists(projLocation) {
@@ -124,6 +138,7 @@ class ProjectController {
 
         // Finished
         fs.writeFileSync(path.join(projLocation, 'project.json'), JSON.stringify(projectData));
+        this.addProject(args);
         event.reply('proj:finished');
     }
 }

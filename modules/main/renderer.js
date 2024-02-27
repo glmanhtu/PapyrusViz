@@ -10,10 +10,38 @@ const { ipcRenderer } = require('electron');
 const fs = require('fs');
 let $ = jQuery = require('jquery');
 
-async () => {
+(async () => {
+    const thumbnailContainer = document.getElementById('thumbnail-container');
+    const board = document.getElementById('board');
     const project = await ipcRenderer.invoke('proj:get-current-project');
     console.log(project);
-}
+    
+    for (const [key, imgInfo] of Object.entries(project.images)) {
+        const thumbnail = new Image();
+        thumbnail.src = 'file://' + imgInfo.thumbnails;
+        thumbnail.className = 'img-thumbnail row';
+        thumbnail.style.cursor = 'pointer';
+        thumbnailContainer.appendChild(thumbnail);
+
+        // Add click event listener to display full-size image
+        thumbnail.addEventListener('dblclick', () => {
+            if (thumbnail.ref == undefined) {
+            const fullImage = new Image();
+            fullImage.src = 'file://' + imgInfo.path;
+            fullImage.className = 'img-fluid';
+            setActiveComponent(fullImage);
+            board.appendChild(fullImage);
+            thumbnail.ref = fullImage;
+            dragElement(fullImage);
+            fullImage.addEventListener('click', () => {
+                setActiveComponent(fullImage);
+            })
+            } else {
+                setActiveComponent(thumbnail.ref);
+            }
+        });
+    };
+})();
 
 ipcRenderer.on('selected-files', (event, files) => {
     const thumbnailContainer = document.getElementById('thumbnail-container');
@@ -55,8 +83,8 @@ repeatActionOnHold('l', () => rotateLeft(1));
 
 ipcRenderer.on('resized', (event, size) => {
     var height = size[1];
-    document.getElementById('thumbnail-column').style.height = `${height - 100}px`;
-    document.getElementById('board-column').style.height = `${height - 100}px`;
+    document.getElementById('thumbnail-container').style.height = `${height - 150}px`;
+    document.getElementById('board').style.height = `${height - 150}px`;
 });
 
 function setActiveComponent(comp) {

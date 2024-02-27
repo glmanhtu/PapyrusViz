@@ -1,5 +1,5 @@
 body {
-    background-color: #1e1e1e; /* Dark background color */
+    background-color: #343a40; /* Dark background color */
     color: #fff; /* Light text color */
     font-family: Arial, sans-serif;
 }
@@ -20,6 +20,8 @@ h1 {
 
 .recent-projects {
     margin-top: 20px;
+    height: 300px;
+    overflow-y: auto;
 }
 
 .recent-projects h2 {
@@ -27,20 +29,9 @@ h1 {
     margin-bottom: 10px;
 }
 
-.project-list {
-    list-style: none;
-    padding-left: 0;
-}
 
-.project-list li {
-    padding: 5px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.project-list li:last-child {
-    border-bottom: none;
-}
-
-.project-list li span {
-    font-size: 16px;
+.table-dark td, .table-dark th, .table-dark thead th {
+    border-top: none;
+    border-bottom: 1px solid;
+    border-color: #454d55;
 }
