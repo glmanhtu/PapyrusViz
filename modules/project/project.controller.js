@@ -68,6 +68,10 @@ class ProjectController {
         const projLocation = args['projPath'];
         const datasetLocation = args['datasetPath'];
         const projectData = {...args};
+        projectData.images = {}
+        projectData.createdAt = Date.now();
+        projectData.assembled = []
+
 
         // Parameter validation
         const isProjPathExists = fs.existsSync(projLocation) && fs.lstatSync(projLocation).isDirectory();
@@ -110,8 +114,6 @@ class ProjectController {
         };
 
         getFilesRecursively(datasetLocation);
-
-        projectData.images = {}
 
         // Step 3: Generate image thumbnails
         fs.mkdirSync(path.join(projLocation, 'thumbnails')); 

@@ -28,7 +28,6 @@ let $ = jQuery = require('jquery');
             if (thumbnail.ref == undefined) {
             const fullImage = new Image();
             fullImage.src = 'file://' + imgInfo.path;
-            fullImage.className = 'img-fluid';
             setActiveComponent(fullImage);
             board.appendChild(fullImage);
             thumbnail.ref = fullImage;
@@ -61,7 +60,6 @@ ipcRenderer.on('selected-files', (event, files) => {
             if (thumbnail.ref == undefined) {
             const fullImage = new Image();
             fullImage.src = 'file://' + file;
-            fullImage.className = 'img-fluid';
             setActiveComponent(fullImage);
             board.appendChild(fullImage);
             thumbnail.ref = fullImage;
@@ -83,8 +81,8 @@ repeatActionOnHold('l', () => rotateLeft(1));
 
 ipcRenderer.on('resized', (event, size) => {
     var height = size[1];
-    document.getElementById('thumbnail-container').style.height = `${height - 150}px`;
-    document.getElementById('board').style.height = `${height - 150}px`;
+    document.getElementById('thumbnail-container').style.height = `${height - 140}px`;
+    document.getElementById('board').style.height = `${height - 140}px`;
 });
 
 function setActiveComponent(comp) {
