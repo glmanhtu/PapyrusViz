@@ -43,33 +43,53 @@ function addImageToBoard(imgId) {
     return fullImage;
 }
 
+function addAssemblingToTabs(key) {
+    const assembledInfo = project.assembled[key];
+    const tab = $('#assembling-tab-template').clone().css('display', 'list-item');
+    const tabA = tab.children('a');
+    tabA.html(assembledInfo.name + '<span>●</span>');
+    tabA.addClass('assembling-tab');
+    if (assembledInfo.activated) {
+        tabA.addClass('active');
+        tabA.attr('id', 'current-assembling');
+        drawAssembledImage(assembledInfo.images);
+    }
+    tabA.attr(`data-assembledId`, key);
+    tabA.on('click', function() {
+        const prevActiv = getActiveAssembling();
+        const prevActivId = prevActiv.attr('data-assembledId');
+        const activId = $(this).attr('data-assembledId')
+        if (activId !== prevActivId) {
+            prevActiv.removeClass('active');
+            prevActiv.removeAttr('id');
+            $(this).attr('id', 'current-assembling');
+            $(this).addClass('active');
+            project.assembled[prevActivId].activated = false;
+            project.assembled[activId].activated = true;
+            drawAssembledImage(project.assembled[key].images);
+        }
+    });
+    tab.appendTo('#assembling-tabs');
+    return tab;
+}
+
+function createAssembling() {
+    const assembleId = project.assembledCount;
+    const assemblingInfo = {'name': `Assembling #${assembleId + 1}`, 'activated': true, 'images': {}, 'imagesCount': 0, 'createdAt': Date.now()};
+    project.assembled[assembleId] = assemblingInfo;
+    project.assembledCount += 1;
+    const tab = addAssemblingToTabs(assembleId);
+    tab.children('a').trigger('click');
+    alertUnsaved();
+}
+
 ipcRenderer.on('project-loaded', async (event, projPath) => {
     project = await ipcRenderer.invoke('proj:get-project', {'projPath': projPath});
     projectPath = projPath;
     const thumbnailContainer = document.getElementById('thumbnail-container');
 
     for (const [key, assembledInfo] of Object.entries(project.assembled)) {
-        const tab = $('#assembling-tab-template').clone().css('display', 'list-item');
-        const tabA = tab.children('a');
-        tabA.html(assembledInfo.name + '<span>●</span>');
-        tabA.addClass('assembling-tab');
-        if (assembledInfo.activated) {
-            tabA.addClass('active');
-            tabA.attr('id', 'current-assembling');
-            drawAssembledImage(assembledInfo.images);
-        }
-        tabA.attr(`data-assembledId`, key);
-        tabA.on('click', function() {
-            const prevActiv = getActiveAssembling();
-            if ($(this).attr('data-assembledId') !== prevActiv.attr('data-assembledId')) {
-                prevActiv.removeClass('active');
-                prevActiv.removeAttr('id');
-                $(this).attr('id', 'current-assembling');
-                $(this).addClass('active');
-                drawAssembledImage(project.assembled[key].images);
-            }
-        });
-        tab.appendTo('#assembling-tabs');
+        addAssemblingToTabs(key);
     }
     
     $('#proj-name').html(`Project: ${project.projName}`);
@@ -196,6 +216,11 @@ function zoomIn(step=0.1) {
 
 function zoomOut(step=0.1) {
     return zoomIn(-step);
+}
+
+function exportImg() {
+    const rect = document.querySelector('#board').getBoundingClientRect();
+    ipcRenderer.send('main:export-img', {x: parseInt(rect.left), y: parseInt(rect.top), width: parseInt(rect.width), height: parseInt(rect.height)});
 }
 
 function dragElement(elmnt) {

@@ -8,9 +8,9 @@ let $ = jQuery = require('jquery');
         $('#no-proj').css('display', 'table-row');
     } else {
         $('#no-proj').css('display', 'none');
-        let counter = 0;
-        projects.forEach(project => {
-            const projId = `proj-${counter}`;
+        for (let i = projects.length - 1; i >= 0; i -= 1) {
+            const project = projects[i];
+            const projId = `proj-${i}`;
             let projTemplate = $('#proj-template').clone().css('display', 'table-row').attr('id', projId);
             projTemplate.children('.proj-name').html(project['projName']);
             projTemplate.children('.proj-path').html(project['projPath']);
@@ -25,8 +25,7 @@ let $ = jQuery = require('jquery');
                 });
             })
             projTemplate.appendTo('#proj-list');
-            counter += 1;
-        });
+        }
     }
 })();
 

@@ -102,9 +102,8 @@ class ProjectController {
         projectData.createdAt = Date.now();
         projectData.assembled = { 
             0: {'name': 'Assembling #1', 'activated': true, 'images': {}, 'imagesCount': 0, 'createdAt': Date.now()},
-            1: {'name': 'Assembling #2', 'activated': false, 'images': {}, 'imagesCount': 0, 'createdAt': Date.now()}
         };
-        projectData.assembledCount = 2;
+        projectData.assembledCount = 1;
 
 
         // Parameter validation

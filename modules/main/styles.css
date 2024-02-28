@@ -19,15 +19,15 @@ body {
 
 #board {
     width: 100%;
-    overflow: scroll;
+    /* overflow: scroll; */
     position: relative;
 }
 
 
 #board img {
     position: absolute;
-    top: 10px;
-    left: 10px;
+    /* top: 10px; */
+    /* left: 10px; */
 }
 
 #thumbnail-container {
@@ -40,6 +40,10 @@ body {
 
 .card-header {
     padding: 0.5rem 1.25rem 0.75rem 1.25rem !important;
+}
+
+.card-body {
+    overflow: auto;
 }
 
 .nav-link {
@@ -61,4 +65,8 @@ body {
 
 .nav-link .unsaved {
     color: red;
+}
+
+.board-img {
+    transform-origin: left top;
 }
