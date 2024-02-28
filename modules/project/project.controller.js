@@ -10,7 +10,6 @@ class ProjectController {
     constructor(ipcMain, mainWin) {
         this.ipcMain = ipcMain;
         this.mainWin = mainWin;
-        this.project = {};
         
         ipcMain.on('proj:create-project', this.createProject.bind(this));
 
@@ -24,14 +23,29 @@ class ProjectController {
             dialogUtils.openDialog(pathUtils.fromRoot('modules', 'project', 'index.html'), this.mainWin)
         });
 
-        ipcMain.handle('proj:get-current-project', this.getCurrentProject.bind(this));
-
         ipcMain.handle('proj:get-projects', this.getProjects.bind(this));
+        ipcMain.handle('proj:get-project', this.getProject.bind(this));
+        ipcMain.handle('proj:save-project', this.saveProject.bind(this));
         ipcMain.handle('proj:del-project', this.delProject.bind(this));
     }
+    
+    async saveProject(event, args) {
+        const projLocation = args['projPath'];
+        if (!this.projectExists(projLocation)) {
+            dialogUtils.errorDialog(this.mainWin, 'Unnable to save project', `There is no project in the selected folder!`);
+            return false;
+        }
+        const project = args['project'];
+        fs.writeFileSync(path.join(projLocation, 'project.json'), JSON.stringify(project)); 
+        return true;
+    }
 
-    async getCurrentProject(event, args) {
-        return this.project;
+    async getProject(event, args) {
+        const projLocation = args['projPath'];
+        if (!this.projectExists(projLocation)) {
+            return dialogUtils.errorDialog(this.mainWin, 'Unnable to open project', `There is no project in the selected folder!`);
+        }
+        return JSON.parse(fs.readFileSync(path.join(projLocation, 'project.json'), 'utf-8'));
     }
 
     async getProjects(event, args) {
@@ -44,9 +58,8 @@ class ProjectController {
         if (!this.projectExists(projLocation)) {
             return dialogUtils.errorDialog(this.mainWin, 'Unnable to open project', `There is no project in the selected folder!`);
         }
-        this.project = JSON.parse(fs.readFileSync(path.join(projLocation, 'project.json'), 'utf-8'));
         dialogUtils.closeCurrentDialog();
-        this.ipcMain.emit('main:reload', this.project);
+        this.ipcMain.emit('main:reload', projLocation);
     }
 
 
@@ -87,8 +100,11 @@ class ProjectController {
         const projectData = {...args};
         projectData.images = {}
         projectData.createdAt = Date.now();
-        projectData.assembled = { 0: {'name': 'Assembling image #1', 'activated': true, 'images': [], 'createdAt': Date.now()}};
-        projectData.assembledCount = 1;
+        projectData.assembled = { 
+            0: {'name': 'Assembling #1', 'activated': true, 'images': {}, 'imagesCount': 0, 'createdAt': Date.now()},
+            1: {'name': 'Assembling #2', 'activated': false, 'images': {}, 'imagesCount': 0, 'createdAt': Date.now()}
+        };
+        projectData.assembledCount = 2;
 
 
         // Parameter validation

@@ -9,12 +9,68 @@
 const { ipcRenderer } = require('electron');
 const fs = require('fs');
 let $ = jQuery = require('jquery');
+let project = null;
+let projectPath = null;
 
-(async () => {
-    const thumbnailContainer = document.getElementById('thumbnail-container');
+
+function drawAssembledImage(images) {
     const board = document.getElementById('board');
-    const project = await ipcRenderer.invoke('proj:get-current-project');
-    console.log(project);
+    board.innerHTML = '';
+    for (const [imgId, imageTransforms] of Object.entries(images)) {
+        const fullImage = addImageToBoard(imgId);
+        fullImage.style.zIndex = imageTransforms['zIndex'];
+        const rotation = imageTransforms['rotation'] || 0;
+        const scale = imageTransforms['scale'] || 1;
+        fullImage.style.transform = `scale(${scale}) rotate(${rotation}deg)`;
+        fullImage.style.top = imageTransforms['top'] + 'px' || '10px';
+        fullImage.style.left = imageTransforms['left'] + 'px' || '10px';
+    } 
+}
+
+function addImageToBoard(imgId) {
+    const board = document.getElementById('board');
+    const imgInfo = project.images[imgId]
+    const fullImage = new Image();
+    fullImage.dataset.imgId = imgId;
+    fullImage.src = 'file://' + imgInfo.path;
+    fullImage.setAttribute('class', 'board-img')
+    setActiveImage(fullImage);
+    board.appendChild(fullImage);
+    dragElement(fullImage);
+    fullImage.addEventListener('click', () => {
+        setActiveImage(fullImage);
+    });
+    return fullImage;
+}
+
+ipcRenderer.on('project-loaded', async (event, projPath) => {
+    project = await ipcRenderer.invoke('proj:get-project', {'projPath': projPath});
+    projectPath = projPath;
+    const thumbnailContainer = document.getElementById('thumbnail-container');
+
+    for (const [key, assembledInfo] of Object.entries(project.assembled)) {
+        const tab = $('#assembling-tab-template').clone().css('display', 'list-item');
+        const tabA = tab.children('a');
+        tabA.html(assembledInfo.name + '<span>●</span>');
+        tabA.addClass('assembling-tab');
+        if (assembledInfo.activated) {
+            tabA.addClass('active');
+            tabA.attr('id', 'current-assembling');
+            drawAssembledImage(assembledInfo.images);
+        }
+        tabA.attr(`data-assembledId`, key);
+        tabA.on('click', function() {
+            const prevActiv = getActiveAssembling();
+            if ($(this).attr('data-assembledId') !== prevActiv.attr('data-assembledId')) {
+                prevActiv.removeClass('active');
+                prevActiv.removeAttr('id');
+                $(this).attr('id', 'current-assembling');
+                $(this).addClass('active');
+                drawAssembledImage(project.assembled[key].images);
+            }
+        });
+        tab.appendTo('#assembling-tabs');
+    }
     
     $('#proj-name').html(`Project: ${project.projName}`);
     for (const [key, imgInfo] of Object.entries(project.images)) {
@@ -27,35 +83,21 @@ let $ = jQuery = require('jquery');
 
         // Add click event listener to display full-size image
         thumbnail.addEventListener('dblclick', () => {
-            if (thumbnail.ref == undefined) {
-                const fullImage = new Image();
-                fullImage.dataset.imgId = key;
-                fullImage.src = 'file://' + imgInfo.path;
-                setActiveComponent(fullImage);
-                board.appendChild(fullImage);
-                thumbnail.ref = fullImage;
-                dragElement(fullImage);
-                fullImage.addEventListener('click', () => {
-                    setActiveComponent(fullImage);
-                })
+            const board = $('#board');
+            let fullImage = board.children(`*[data-img-id=${key}]`);
+            if (fullImage.length === 0) {
+                fullImage = addImageToBoard(key);
+                const activeAssembling = project.assembled[getActiveAssemblingId()];
+                activeAssembling.imagesCount += 1;
+                activeAssembling.images[key] = {'zIndex': activeAssembling.imagesCount};
+                fullImage.style.zIndex = activeAssembling.imagesCount;
+                alertUnsaved();
             } else {
-                setActiveComponent(thumbnail.ref);
+                setActiveImage(fullImage.get()[0]);
             }
         });
     };
-
-    for (const [key, assembledInfo] of Object.entries(project.assembled)) {
-        const tab = $('#assembling-tab-template').clone().css('display', 'list-item');
-        const tabA = tab.children('a');
-        tabA.html(assembledInfo.name);
-        if (assembledInfo.activated) {
-            tabA.addClass('active');
-        }
-        tabA.attr(`data-assembledId`, key);
-        tab.prependTo('#assembling-tabs');
-    }
-
-})();
+});
 
 repeatActionOnHold('i', () => zoomIn(0.01));
 repeatActionOnHold('o', () => zoomOut(0.01));
@@ -68,16 +110,55 @@ ipcRenderer.on('resized', (event, size) => {
     document.getElementById('board').style.height = `${height - 140}px`;
 });
 
-function setActiveComponent(comp) {
-    prevActiv = getActiveComponent();
+function save() {
+    ipcRenderer.invoke('proj:save-project', {'projPath': projectPath, 'project': project}).then((result) => {
+        if (result) {
+            $('.assembling-tab').each(function(i, element) {
+                const assembledStatus = $(this).children('span');
+                if (assembledStatus.hasClass('unsaved')) {
+                    assembledStatus.removeClass('unsaved');
+                    assembledStatus.addClass('saved');
+                }
+            })
+        }
+    });
+}
+
+function getActiveAssembling() {
+    return $('#current-assembling');
+}
+
+function getActiveAssemblingId() {
+    return getActiveAssembling().attr('data-assembledId');
+}
+
+function alertUnsaved() {
+    getActiveAssembling().children('span').addClass('unsaved');
+}
+
+function setActiveAssemblingChanges(imageId, name, value) {
+    const activeAssembling = project.assembled[getActiveAssemblingId()];
+    const imageChange = activeAssembling.images[imageId];
+    imageChange[name] = value;
+    alertUnsaved();
+}
+
+function getActiveAssemblingChanges(imageId, name) {
+    const activeAssembling = project.assembled[getActiveAssemblingId()];
+    const imageChange = activeAssembling.images[imageId];
+    return imageChange[name];
+}
+
+function setActiveImage(comp) {
+    prevActiv = getActiveImage();
     if (prevActiv != null) {
         prevActiv.setAttribute('id', '');
     }
-    comp.setAttribute('id', 'activated-component');
+    comp.setAttribute('id', 'activated-image');
 }
 
-function getActiveComponent() {
-    return document.getElementById('activated-component');
+function getActiveImage() {
+    return document.getElementById('activated-image');
 }
 
 function openDialog() {
@@ -85,44 +166,36 @@ function openDialog() {
 }
 
 function rotateLeft(step=5) {
-    const image = getActiveComponent()
+    const image = getActiveImage()
     if (image) {
-        const rotation = parseInt(image.dataset.rotation || 0) - step;
-        const scale = parseFloat(image.dataset.scale || 1);
+        const imageId = parseInt(image.dataset.imgId);
+        const rotation = (getActiveAssemblingChanges(imageId, 'rotation') || 0) - step;
+        const scale = parseFloat(getActiveAssemblingChanges(imageId, 'scale') || 1);
         image.style.transform = `scale(${scale}) rotate(${rotation}deg)`;
-        image.dataset.rotation = rotation;
+        setActiveAssemblingChanges(imageId, 'rotation', rotation);
     }
 }
 
 function rotateRight(step=5) {
-    const image = getActiveComponent()
-    if (image) {
-        const rotation = parseInt(image.dataset.rotation || 0) + step;
-        const scale = parseFloat(image.dataset.scale || 1);
-        image.style.transform = `scale(${scale}) rotate(${rotation}deg)`;
-        image.dataset.rotation = rotation;
-    }
+    return rotateLeft(-step);
 }
 
 function zoomIn(step=0.1) {
-    const image = getActiveComponent()
+    const image = getActiveImage()
     if (image) {
-        const rotation = parseInt(image.dataset.rotation || 0);
-        const scale = parseFloat(image.dataset.scale || 1) + step;
+        const imageId = parseInt(image.dataset.imgId);
+        const rotation = (getActiveAssemblingChanges(imageId, 'rotation') || 0);
+        const scale = parseFloat(getActiveAssemblingChanges(imageId, 'scale') || 1) + step;
+        if (scale < 0.05) {
+            scale = 0.05;
+        }
         image.style.transform = `scale(${scale}) rotate(${rotation}deg)`;
-
-        image.dataset.scale = scale;
+        setActiveAssemblingChanges(imageId, 'scale', scale);
     }
 }
 
 function zoomOut(step=0.1) {
-    const image = getActiveComponent()
-    if (image) {
-        const rotation = parseInt(image.dataset.rotation || 0);
-        const scale = parseFloat(image.dataset.scale || 1) - step;
-        image.style.transform = `scale(${scale}) rotate(${rotation}deg)`;
-        image.dataset.scale = scale;
-    }
+    return zoomIn(-step);
 }
 
 function dragElement(elmnt) {
@@ -135,7 +208,7 @@ function dragElement(elmnt) {
         // get the mouse cursor position at startup:
         pos3 = e.clientX;
         pos4 = e.clientY;
-        setActiveComponent(elmnt);
+        setActiveImage(elmnt);
         document.onmouseup = closeDragElement;
         // call a function whenever the cursor moves:
         document.onmousemove = elementDrag;
@@ -153,6 +226,9 @@ function dragElement(elmnt) {
         elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
         elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
         elmnt.style.cursor = "move";
+        const imageId = parseInt(elmnt.dataset.imgId);
+        setActiveAssemblingChanges(imageId, 'top', elmnt.offsetTop - pos2);
+        setActiveAssemblingChanges(imageId, 'left', elmnt.offsetLeft - pos1);
     }
 
     function closeDragElement() {

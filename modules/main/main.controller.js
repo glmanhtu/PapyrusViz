@@ -9,8 +9,8 @@ class MainController {
 
         mainWin.loadFile(pathUtils.fromRoot('modules', 'main', 'index.html'));
 
-        ipcMain.on('main:reload', (event, args) => {
-            mainWin.reload();
+        ipcMain.on('main:reload', (projPath) => {
+            mainWin.webContents.postMessage('project-loaded', projPath);
         });
     }
 
