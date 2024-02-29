@@ -7,11 +7,11 @@ const {MainController} = require('./modules/main/main.controller');
 
 function createWindow() {
   const win = new BrowserWindow({
-    width: 1500,
-    height: 1000,
+    width: 1350,
+    height: 850,
     minWidth: 1300,
     minHeight: 800,
-    // autoHideMenuBar: true,
+    autoHideMenuBar: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: true,
