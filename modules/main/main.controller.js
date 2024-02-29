@@ -1,7 +1,11 @@
 const path = require('node:path');
 const fs = require('fs');
+const { Menu } = require('electron')
 const dialogUtils = require('../utils/dialog.utils');
 const pathUtils = require('../utils/path.utils')
+
+const isMac = process.platform === 'darwin'
+
 
 class MainController {
     constructor(ipcMain, mainWin) {
@@ -23,6 +27,29 @@ class MainController {
               }).catch(error => {
                 console.log(error)
               });
+        });
+
+        ipcMain.on('main:img-context-menu', (event) => {
+          const template = [
+            {
+              label: 'To Front',
+              click: () => { event.sender.send('main:menu:img-to-front') }
+            },
+            {
+              label: 'To Back',
+              click: () => { event.sender.send('main:menu:img-to-back') }
+            },
+            { type: 'separator' },
+            {
+              label: 'Delete',
+              accelerator: 'Backspace',
+              click: () => { event.sender.send('main:menu:img-delete') }
+            },
+            { type: 'separator' },
+            { label: 'Find similarities', accelerator: 'CmdOrCtrl+F'}
+          ]
+          const menu = Menu.buildFromTemplate(template)
+          menu.popup({ window: mainWin })
         });
     }
 

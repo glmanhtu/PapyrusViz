@@ -14,7 +14,7 @@ body {
 }
 
 #activated-image {
-    border: 2px solid green;
+    box-shadow: rgb(85, 91, 255) 0px 0px 0px 3px, rgb(31, 193, 27) 0px 0px 0px 6px;
 }
 
 #board {
@@ -65,8 +65,4 @@ body {
 
 .nav-link .unsaved {
     color: red;
-}
-
-.board-img {
-    transform-origin: left top;
 }

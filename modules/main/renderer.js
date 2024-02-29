@@ -121,6 +121,70 @@ ipcRenderer.on('project-loaded', async (event, projPath) => {
     };
 });
 
+window.addEventListener('contextmenu', (e) => {
+  e.preventDefault();
+  if (e.target.className == 'board-img') {
+    setActiveImage(e.target);
+    ipcRenderer.send('main:img-context-menu');
+  }
+});
+
+ipcRenderer.on('main:menu:img-delete', (event, args) => {
+    const image = getActiveImage()
+    if (image) {
+        const imageId = parseInt(image.dataset.imgId);
+        const activeAssembling = project.assembled[getActiveAssemblingId()];
+        delete activeAssembling.images[imageId];
+        image.remove();
+        alertUnsaved();
+    }
+});
+
+ipcRenderer.on('main:menu:img-to-front', (event, args) => {
+    const image = getActiveImage()
+    if (image) {
+        const imageId = parseInt(image.dataset.imgId);
+        const imgZIndex = parseInt(image.style.zIndex);
+        let zIndexes = [];
+        $('.board-img').each(function(i, element) {
+            const elementZIndex = parseInt(element.style.zIndex);
+            if (elementZIndex > imgZIndex) {
+                zIndexes.push(elementZIndex);
+                const domElementImgId = parseInt(element.dataset.imgId);
+                setActiveAssemblingChanges(domElementImgId, 'zIndex', elementZIndex - 1);
+                element.style.zIndex = elementZIndex - 1; 
+            }
+        });
+        const maxZIndex = Math.max(...zIndexes);
+        setActiveAssemblingChanges(imageId, 'zIndex', maxZIndex);
+        image.style.zIndex = maxZIndex;
+        alertUnsaved();
+    }
+});
+
+
+ipcRenderer.on('main:menu:img-to-back', (event, args) => {
+    const image = getActiveImage()
+    if (image) {
+        const imageId = parseInt(image.dataset.imgId);
+        const imgZIndex = parseInt(image.style.zIndex);
+        let zIndexes = [];
+        $('.board-img').each(function(i, element) {
+            const elementZIndex = parseInt(element.style.zIndex);
+            if (elementZIndex < imgZIndex) {
+                zIndexes.push(elementZIndex);
+                const domElementImgId = parseInt(element.dataset.imgId);
+                setActiveAssemblingChanges(domElementImgId, 'zIndex', elementZIndex + 1);
+                element.style.zIndex = elementZIndex + 1; 
+            }
+        });
+        const minZIndex = Math.min(...zIndexes);
+        setActiveAssemblingChanges(imageId, 'zIndex', minZIndex);
+        image.style.zIndex = minZIndex;
+        alertUnsaved();
+    }
+});
+
 repeatActionOnHold('i', () => zoomIn(0.01));
 repeatActionOnHold('o', () => zoomOut(0.01));
 repeatActionOnHold('r', () => rotateRight(1));
@@ -211,7 +275,7 @@ function zoomIn(step=0.1) {
     if (image) {
         const imageId = parseInt(image.dataset.imgId);
         const rotation = (getActiveAssemblingChanges(imageId, 'rotation') || 0);
-        const scale = parseFloat(getActiveAssemblingChanges(imageId, 'scale') || 1) + step;
+        let scale = parseFloat(getActiveAssemblingChanges(imageId, 'scale') || 1) + step;
         if (scale < 0.05) {
             scale = 0.05;
         }
@@ -235,6 +299,9 @@ function dragElement(elmnt) {
 
     function dragMouseDown(e) {
         e = e || window.event;
+        if (e.button && e.button == 2) {
+            return;
+        }
         e.preventDefault();
         // get the mouse cursor position at startup:
         pos3 = e.clientX;
