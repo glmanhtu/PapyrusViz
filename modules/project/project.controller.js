@@ -136,13 +136,10 @@ class ProjectController {
                 } else {
                     const fileExt = absolute.split('.').pop().toLowerCase();
                     if (['jpg', 'jpeg', 'png'].includes(fileExt)) {
-                    images.push(absolute);
+                        images.push(absolute);
                     }
                 }
-                if (level === 0) {
-                    const per = (i + 1) * 10 / filesInDirectory.length;
-                    event.reply('proj:progress', {'name': "Step 2/3 - Collecting images...", 'desc': `Collected ${images.length} images...`, 'current': 5 + per});
-                }
+                event.reply('proj:progress', {'name': "Step 2/3 - Collecting images...", 'desc': `Collected ${images.length} images...`, 'current': 10});
             }
         };
 

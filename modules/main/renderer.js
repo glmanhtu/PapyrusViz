@@ -126,8 +126,8 @@ repeatActionOnHold('l', () => rotateLeft(1));
 
 ipcRenderer.on('resized', (event, size) => {
     var height = size[1];
-    document.getElementById('thumbnail-container').style.height = `${height - 140}px`;
-    document.getElementById('board').style.height = `${height - 140}px`;
+    document.getElementById('thumbnail-container').style.height = `${height - 110}px`;
+    document.getElementById('board').style.height = `${height - 110}px`;
 });
 
 function save() {
