@@ -47,16 +47,16 @@ body {
 }
 
 .nav-link {
-    padding: .3rem 1.6rem .3rem 1rem !important;
+    padding: .3rem 1rem .3rem 1rem !important;
     color: #495057;
     position: relative;
 }
 
 .nav-link span {
-    font-size: x-small;
+    font-size: small;
     position: absolute;
-    top: 33%;
-    right: 10px;
+    top: 25%;
+    right: 9px;
 }
 
 .nav-link .saved {
@@ -86,4 +86,17 @@ figcaption {
     border: 1px solid #dee2e6;
     cursor: pointer;
     border-radius: 0.25rem;
+}
+
+.thumbnail-tabs {
+    display: flex;
+    flex-direction: row;
+}
+
+.thumbnail-tabs .nav-item {
+    flex: 1 1 auto;
+}
+
+.assembling-tab {
+    padding: 0.3rem 1.3rem 0.3rem 1rem !important;
 }
