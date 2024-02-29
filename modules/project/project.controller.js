@@ -159,6 +159,7 @@ class ProjectController {
             event.reply('proj:progress', {'name': "Step 3/3 - Generating thumbnails...", 'desc': `Generated ${i + 1}/${images.length} thumbnails images...`, 'current': 15 + per});
             projectData.images[i] = {
                 'path': images[i],
+                'name': path.basename(images[i]),
                 'thumbnails': thumbnailPath,
                 'width': metadata.width,
                 'height': metadata.height,

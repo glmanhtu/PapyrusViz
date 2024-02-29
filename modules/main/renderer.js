@@ -34,6 +34,7 @@ function addImageToBoard(imgId) {
     fullImage.dataset.imgId = imgId;
     fullImage.src = 'file://' + imgInfo.path;
     fullImage.setAttribute('class', 'board-img')
+    fullImage.title = imgInfo.name;
     setActiveImage(fullImage);
     board.appendChild(fullImage);
     dragElement(fullImage);
@@ -88,7 +89,7 @@ function createAssembling() {
 ipcRenderer.on('project-loaded', async (event, projPath) => {
     project = await ipcRenderer.invoke('proj:get-project', {'projPath': projPath});
     projectPath = projPath;
-    const thumbnailContainer = document.getElementById('thumbnail-container');
+    const thumbnailContainer = $('#thumbnail-container');
 
     for (const [key, assembledInfo] of Object.entries(project.assembled)) {
         addAssemblingToTabs(key);
@@ -96,15 +97,16 @@ ipcRenderer.on('project-loaded', async (event, projPath) => {
     
     $('#proj-name').html(`Project: ${project.projName}`);
     for (const [key, imgInfo] of Object.entries(project.images)) {
-        const thumbnail = new Image();
-        thumbnail.src = 'file://' + imgInfo.thumbnails;
-        thumbnail.dataset.imgId = key;
-        thumbnail.className = 'img-thumbnail row';
-        thumbnail.style.cursor = 'pointer';
-        thumbnailContainer.appendChild(thumbnail);
+        const thumbnail = $('#thumbnail-template').clone().css('display', 'block').removeAttr('id');
+        thumbnail.children('img')
+                .attr('src', 'file://' + imgInfo.thumbnails)
+                .attr('data-img-id', key);
+        thumbnail.children('figcaption')
+                .html(imgInfo.name);
+        thumbnail.appendTo(thumbnailContainer);
 
         // Add click event listener to display full-size image
-        thumbnail.addEventListener('dblclick', () => {
+        thumbnail.on('dblclick', () => {
             const board = $('#board');
             let fullImage = board.children(`*[data-img-id=${key}]`);
             if (fullImage.length === 0) {
