@@ -45,7 +45,9 @@ function addImageToBoard(imgId) {
 
 function addAssemblingToTabs(key) {
     const assembledInfo = project.assembled[key];
-    const tab = $('#assembling-tab-template').clone().css('display', 'list-item');
+    const tab = $('#assembling-tab-template').clone()
+        .removeAttr('id')
+        .css('display', 'list-item');
     const tabA = tab.children('a');
     tabA.html(assembledInfo.name + '<span>●</span>');
     tabA.addClass('assembling-tab');
@@ -126,8 +128,11 @@ repeatActionOnHold('l', () => rotateLeft(1));
 
 ipcRenderer.on('resized', (event, size) => {
     var height = size[1];
-    document.getElementById('thumbnail-container').style.height = `${height - 110}px`;
-    document.getElementById('board').style.height = `${height - 110}px`;
+    const boardRect = document.querySelector('#board').getBoundingClientRect();
+    const drawingAreaHeight = height - parseInt(boardRect.y) - 10;
+
+    document.getElementById('thumbnail-container').style.height = `${drawingAreaHeight}px`;
+    document.getElementById('board').style.height = `${drawingAreaHeight}px`;
 });
 
 function save() {
