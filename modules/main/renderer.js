@@ -129,7 +129,8 @@ repeatActionOnHold('l', () => rotateLeft(1));
 ipcRenderer.on('resized', (event, size) => {
     var height = size[1];
     const boardRect = document.querySelector('#board').getBoundingClientRect();
-    const drawingAreaHeight = height - parseInt(boardRect.y) - 10;
+    const navRect = document.querySelector('#proj-nav').getBoundingClientRect();
+    const drawingAreaHeight = height - parseInt(boardRect.y + 0.2 * navRect.height);
 
     document.getElementById('thumbnail-container').style.height = `${drawingAreaHeight}px`;
     document.getElementById('board').style.height = `${drawingAreaHeight}px`;
