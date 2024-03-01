@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Management</title>
+    <!-- Bootstrap CSS -->
+    <link href="../../../../node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="../../../../node_modules/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+    <link href="./styles.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container mt-4">
+        <h1>Create Similarity Matrix Matching</h1>
+        <form class="was-validated mt-3" id="similarityCreation">
+            <div class="form-group row">
+                <label for="matching-name" class="col-sm-3 col-form-label">Name</label>
+                <div class="col-sm-9">
+                <input type="text" class="form-control form-control-sm" id="matching-name" placeholder="Matching name" required>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="similarity-file" class="col-sm-3 col-form-label">Similarity matrix file</label>
+                <div class="col-sm-9">
+                    <div class="custom-file" onclick="selectFile('similarity-file')">
+                        <input class="custom-file-input form-control-sm" id="similarity-file" required>
+                        <label class="custom-file-label col-form-label-sm" for="similarity-file">Choose a csv file</label>
+                    </div>
+                </div>
+            </div>
+            
+            <fieldset class="form-group">
+                <div class="row">
+                  <legend class="col-form-label col-sm-3 pt-0">Matching method</legend>
+                  <div class="col-sm-9">
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="match-method" value="file" checked>
+                      <label class="form-check-label" for="gridRadios1" title="The column names of the similarity matrix are matched with the image file names.">
+                        File name 
+                      </label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="match-method" value="path">
+                      <label class="form-check-label" for="gridRadios2" title="The column names of the similarity matrix are matched with a folder in file names.">
+                        File path
+                      </label>
+                    </div>
+                    <div class="form-check disabled form-group">
+                      <input class="form-check-input" type="radio" name="match-method" value="regex" disabled>
+                      <label class="form-check-label" for="gridRadios3">
+                        Regular express:
+                      </label>
+                      <input type="text" class="form-control form-control-sm" placeholder="Eg: *NAME*.png" disabled>
+                    </div>
+                  </div>
+                </div>
+              </fieldset>
+
+            <div class="form-group row mt-5">
+                <div class="col-sm-12 text-right">
+                    <button type="submit" class="btn btn-success btn-sm">Create</button>
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="cancel()">Cancel</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Bootstrap JS (optional) -->
+    <script src="./renderer.js"></script>
+</body>
+
+</html>

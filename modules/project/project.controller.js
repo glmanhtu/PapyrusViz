@@ -23,6 +23,22 @@ class ProjectController {
             dialogUtils.openDialog(pathUtils.fromRoot('modules', 'project', 'index.html'), this.mainWin)
         });
 
+        ipcMain.on('proj:create-matching', async (event, args) => {
+            const projPath = args['projPath'];
+            const matchingName = args['matchingName'];
+            const matchingFile = args['matchingFile'];
+            const matchingMethod = args['matchingMethod'];
+            const project = await this.getProject(event, args);
+            project.matching = {
+                'matchingName': matchingName,
+                'matchingFile': matchingFile,
+                'matchingMethod': matchingMethod
+            }
+            await this.saveProject(event, {'projPath': projPath, 'project': project});
+            dialogUtils.closeCurrentDialog();
+            this.ipcMain.emit('main:reload', projPath);
+        });
+
         ipcMain.handle('proj:get-projects', this.getProjects.bind(this));
         ipcMain.handle('proj:get-project', this.getProject.bind(this));
         ipcMain.handle('proj:save-project', this.saveProject.bind(this));

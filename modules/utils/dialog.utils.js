@@ -28,7 +28,7 @@ module.exports.confirmDialog = function(win, title, content) {
     return result === 0;
 }
 
-module.exports.openDialog = function(dialogPath, win, width=800, height=600) {
+module.exports.openDialog = function(dialogPath, win, width=800, height=600, projPath=null) {
     this.closeCurrentDialog();
 
     currentDlg = new BrowserWindow({ 
@@ -48,8 +48,12 @@ module.exports.openDialog = function(dialogPath, win, width=800, height=600) {
         })
     currentDlg.loadFile(dialogPath);
     currentDlg.once('ready-to-show', () => {
+        if (projPath) {
+            currentDlg.webContents.send('project-path', projPath);
+        }
         currentDlg.show();
     });
+    return currentDlg;
 }
 
 module.exports.errorDialog = function(win, title, content) {

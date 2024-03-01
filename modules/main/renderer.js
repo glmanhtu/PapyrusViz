@@ -104,9 +104,19 @@ ipcRenderer.on('project-loaded', async (event, projPath) => {
     project = await ipcRenderer.invoke('proj:get-project', {'projPath': projPath});
     projectPath = projPath;
     const thumbnailContainer = $('#thumbnails');
+    thumbnailContainer.html('');
+    $('.assembling-tab').each(function(i, e) {
+        e.remove();
+    });
 
     for (const [key, assembledInfo] of Object.entries(project.assembled)) {
         addAssemblingToTabs(key);
+    }
+
+    if (project.matching) {
+        $('#no-similarity').css('display', 'none');
+        $('#has-similarity').css('display', 'flex')
+            .children('#matching-name').val(project.matching.matchingName);
     }
     
     $('#proj-name').html(`Project: ${project.projName}`);
@@ -176,11 +186,6 @@ ipcRenderer.on('main:menu:img-to-front', (event, args) => {
         image.style.zIndex = maxZIndex;
         alertUnsaved();
     }
-});
-
-ipcRenderer.on('selected-similarity', (event, args) => {
-    similarityPath = args[0];
-    
 });
 
 ipcRenderer.on('main:menu:img-to-back', (event, args) => {
@@ -276,7 +281,8 @@ function getActiveImage() {
 }
 
 function selectSimilarityMatrix() {
-    ipcRenderer.send('dialogs:open-file-dialog');
+    save();
+    ipcRenderer.send('main:open-create-similarity', {projectPath});
 }
 
 function openDialog() {

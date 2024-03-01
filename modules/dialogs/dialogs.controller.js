@@ -19,14 +19,14 @@ class DialogsController {
             }
         });
 
-        ipcMain.on('dialogs:open-file-dialog', async (event) => {
+        ipcMain.on('dialogs:open-file-dialog', async (event, args) => {
             const result = await dialog.showOpenDialog({
               properties: ['openFile'],
-              filters: [{ name: 'Similarity Matrix', extensions: ['csv'] }]
+              filters: [{ name: 'Images', extensions: args['filters'] }]
             });
           
             if (!result.canceled) {
-              event.reply('selected-similarity', result.filePaths);
+              event.reply('selected-file', [result.filePaths, args]);
             }
         });
           
@@ -38,6 +38,10 @@ class DialogsController {
             if (!result.canceled) {
                 event.reply('selected-dir', [result.filePaths, args]);
             }
+        });
+
+        ipcMain.on('dialogs:close', async (event, args) => {
+            dialogUtils.closeCurrentDialog();
         });
     }
 

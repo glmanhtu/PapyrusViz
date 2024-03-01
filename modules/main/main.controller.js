@@ -2,7 +2,8 @@ const path = require('node:path');
 const fs = require('fs');
 const { Menu } = require('electron')
 const dialogUtils = require('../utils/dialog.utils');
-const pathUtils = require('../utils/path.utils')
+const pathUtils = require('../utils/path.utils');
+const { event } = require('jquery');
 
 const isMac = process.platform === 'darwin'
 
@@ -17,6 +18,7 @@ class MainController {
         ipcMain.on('main:reload', (projPath) => {
             mainWin.webContents.postMessage('project-loaded', projPath);
         });
+
 
         ipcMain.on('main:export-img', async (event, args) => {
             mainWin.webContents.capturePage(args).then(data => {
@@ -50,6 +52,10 @@ class MainController {
           ]
           const menu = Menu.buildFromTemplate(template)
           menu.popup({ window: mainWin })
+        });
+
+        ipcMain.on('main:open-create-similarity', async (event, projPath) => {
+          const dlg = dialogUtils.openDialog(pathUtils.fromRoot('modules', 'main', 'dialogs', 'similarity', 'index.html'), this.mainWin, 800, 600, projPath);
         });
     }
 
