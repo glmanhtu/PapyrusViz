@@ -11,6 +11,7 @@ const fs = require('fs');
 let $ = jQuery = require('jquery');
 let project = null;
 let projectPath = null;
+let similarityPath = null;
 
 const board = document.getElementById('board');
 board.addEventListener('click', () => {
@@ -95,7 +96,7 @@ function createAssembling() {
 ipcRenderer.on('project-loaded', async (event, projPath) => {
     project = await ipcRenderer.invoke('proj:get-project', {'projPath': projPath});
     projectPath = projPath;
-    const thumbnailContainer = $('#thumbnail-container');
+    const thumbnailContainer = $('#thumbnails');
 
     for (const [key, assembledInfo] of Object.entries(project.assembled)) {
         addAssemblingToTabs(key);
