@@ -18,6 +18,17 @@ class DialogsController {
               event.reply('selected-files', result.filePaths);
             }
         });
+
+        ipcMain.on('dialogs:open-file-dialog', async (event) => {
+            const result = await dialog.showOpenDialog({
+              properties: ['openFile'],
+              filters: [{ name: 'Similarity Matrix', extensions: ['csv'] }]
+            });
+          
+            if (!result.canceled) {
+              event.reply('selected-similarity', result.filePaths);
+            }
+        });
           
         ipcMain.on('dialogs:open-dir-dialog', async (event, args) => {
             const result = await dialog.showOpenDialog({

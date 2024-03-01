@@ -8,7 +8,9 @@
 
 const { ipcRenderer } = require('electron');
 const fs = require('fs');
+const { event } = require('jquery');
 let $ = jQuery = require('jquery');
+require('bootstrap');
 let project = null;
 let projectPath = null;
 let similarityPath = null;
@@ -17,6 +19,11 @@ const board = document.getElementById('board');
 board.addEventListener('click', () => {
     clearActiveImage();
 });
+
+$('#thumbnail-column .thumbnail-tabs a').on('click', function (e) {
+    e.preventDefault()
+    $(this).tab('show')
+  })
 
 function drawAssembledImage(images) {
     const board = document.getElementById('board');
@@ -171,6 +178,10 @@ ipcRenderer.on('main:menu:img-to-front', (event, args) => {
     }
 });
 
+ipcRenderer.on('selected-similarity', (event, args) => {
+    similarityPath = args[0];
+    
+});
 
 ipcRenderer.on('main:menu:img-to-back', (event, args) => {
     const image = getActiveImage()
@@ -262,6 +273,10 @@ function clearActiveImage() {
 
 function getActiveImage() {
     return document.getElementById('activated-image');
+}
+
+function selectSimilarityMatrix() {
+    ipcRenderer.send('dialogs:open-file-dialog');
 }
 
 function openDialog() {

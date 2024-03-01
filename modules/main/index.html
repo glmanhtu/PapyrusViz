@@ -43,19 +43,32 @@
                 <div class="card-header">
                   <ul class="nav nav-tabs card-header-tabs thumbnail-tabs">
                     <li class="nav-item">
-                      <a class="nav-link active" href="#">Images</a>
+                      <a class="nav-link active" href="#thumbnails" role="tab" aria-controls="thumbnails" aria-selected="true">Images</a>
                     </li>
                     <li class="nav-item">
-                      <a class="nav-link" href="#">Similarity</a>
+                      <a class="nav-link" href="#similarity" role="tab" aria-controls="similarity" aria-selected="false">Similarity</a>
                     </li>
                   </ul>
                 </div>
                 <div class="card-body" id="thumbnail-container" style="height: 710px;">
-                  <div id="thumbnails">
-                    <figure class="figure row" id="thumbnail-template" style="display: none;">
-                      <img src="..." class="figure-img img-fluid img-thumbnail">
-                      <figcaption class="figure-caption">A caption for the above image.</figcaption>
-                    </figure>
+                  <div class="tab-content">
+                    <div class="tab-pane active" id="thumbnails" role="tabpanel">
+                      <figure class="figure row" id="thumbnail-template" style="display: none;">
+                        <img src="..." class="figure-img img-fluid img-thumbnail">
+                        <figcaption class="figure-caption">A caption for the above image.</figcaption>
+                      </figure>
+                    </div>
+
+
+                    <div class="tab-pane" id="similarity" role="tabpanel">
+                    <form>
+                      <div class="form-group">
+                        <label>No similarity matrix found!</label>
+                        
+                        <button type="button" class="btn btn-success btn-sm me-2" onclick="selectSimilarityMatrix()">Select a file</button>
+                      </div>
+                    </form>
+                    </div>
                   </div>
                 </div>
               </div>
