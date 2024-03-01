@@ -150,22 +150,27 @@ class ProjectController {
         for (let i = 0; i < images.length; i++) {
             const thumbnailPath = path.join(projLocation, 'thumbnails', `${i}.jpg`)
             const image = sharp(images[i]);
-            await image
-            .resize({height: 200})
-            .toFile(thumbnailPath);
-            const metadata = await image.metadata();
+            try {
+                await image
+                .resize({height: 200})
+                .flatten({ background: { r: 255, g: 255, b: 255 } })
+                .toFile(thumbnailPath);
+                const metadata = await image.metadata();
 
-            const per = (i + 1) * 90 / images.length;
-            event.reply('proj:progress', {'name': "Step 3/3 - Generating thumbnails...", 'desc': `Generated ${i + 1}/${images.length} thumbnails images...`, 'current': 15 + per});
-            projectData.images[i] = {
-                'path': images[i],
-                'name': path.basename(images[i]),
-                'thumbnails': thumbnailPath,
-                'width': metadata.width,
-                'height': metadata.height,
-                'format': metadata.format,
-                'size': metadata.size,
-            };
+                const per = (i + 1) * 90 / images.length;
+                event.reply('proj:progress', {'name': "Step 3/3 - Generating thumbnails...", 'desc': `Generated ${i + 1}/${images.length} thumbnails images...`, 'current': 15 + per});
+                projectData.images[i] = {
+                    'path': images[i],
+                    'name': path.basename(images[i]),
+                    'thumbnails': thumbnailPath,
+                    'width': metadata.width,
+                    'height': metadata.height,
+                    'format': metadata.format,
+                    'size': metadata.size,
+                };
+            } catch (e) {
+                event.reply('proj:error', {'name': "Unnable to read " + images[i] + ', Ignoring...' });
+            }
         }
         projectData.imagesCount = images.length;
 

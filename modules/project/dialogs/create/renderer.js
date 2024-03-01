@@ -45,6 +45,13 @@ ipcRenderer.on('proj:progress', (event, args) => {
     $('#progressBar').css('width', currentVal+'%').attr('aria-valuenow', currentVal); 
 });
 
+ipcRenderer.on('proj:error', (event, args) => {
+    const name = args['name'];
+
+    $('#project-error').css('display', 'block').html($('#project-error').html() + '\n' + name);
+    
+});
+
 ipcRenderer.on('proj:finished', (event, args) => {
     const projectPath = $('#inputLocation').val();
     $('#openProject').css('display', 'block').on('click', function() {

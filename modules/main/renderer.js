@@ -12,6 +12,10 @@ let $ = jQuery = require('jquery');
 let project = null;
 let projectPath = null;
 
+const board = document.getElementById('board');
+board.addEventListener('click', () => {
+    clearActiveImage();
+});
 
 function drawAssembledImage(images) {
     const board = document.getElementById('board');
@@ -38,7 +42,9 @@ function addImageToBoard(imgId) {
     setActiveImage(fullImage);
     board.appendChild(fullImage);
     dragElement(fullImage);
-    fullImage.addEventListener('click', () => {
+    fullImage.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         setActiveImage(fullImage);
     });
     return fullImage;
@@ -196,7 +202,7 @@ ipcRenderer.on('resized', (event, size) => {
     var height = size[1];
     const boardRect = document.querySelector('#board').getBoundingClientRect();
     const navRect = document.querySelector('#proj-nav').getBoundingClientRect();
-    const drawingAreaHeight = height - parseInt(boardRect.y + 0.2 * navRect.height);
+    const drawingAreaHeight = height - parseInt(boardRect.y + 0.6 * navRect.height);
 
     document.getElementById('thumbnail-container').style.height = `${drawingAreaHeight}px`;
     document.getElementById('board').style.height = `${drawingAreaHeight}px`;
@@ -242,11 +248,15 @@ function getActiveAssemblingChanges(imageId, name) {
 }
 
 function setActiveImage(comp) {
-    prevActiv = getActiveImage();
-    if (prevActiv != null) {
-        prevActiv.setAttribute('id', '');
-    }
+    clearActiveImage();
     comp.setAttribute('id', 'activated-image');
+}
+
+function clearActiveImage() {
+    prevActiv = getActiveImage();
+    if (prevActiv) {
+        prevActiv.removeAttribute('id');
+    }
 }
 
 function getActiveImage() {
