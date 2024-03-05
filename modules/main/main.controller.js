@@ -34,6 +34,14 @@ class MainController {
         ipcMain.on('main:img-context-menu', (event, args) => {
           const imageId = args['imageId'];
           const matching = args['matching'];
+          const switchVersions = args['switchVersions'];
+          const subMenuVersion = [];
+          switchVersions.forEach(element => {
+            subMenuVersion.push({
+              'label': element['name'],
+              click: () => {event.reply('main:menu:switch-image', {'imageId': imageId, 'toImage': element['imgId']})}
+            })
+          });
           const template = [
             {
               label: 'To Front',
@@ -55,6 +63,11 @@ class MainController {
               accelerator: 'CmdOrCtrl+F',
               enabled: matching !== undefined,
               click: () => {event.reply('main:menu:img-find-similarity', args)}
+            },
+            {
+              label: 'Switch version',
+              enabled: switchVersions.length > 0,
+              submenu: subMenuVersion
             }
           ]
           const menu = Menu.buildFromTemplate(template)

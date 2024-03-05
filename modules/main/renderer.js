@@ -13,7 +13,7 @@ let $ = jQuery = require('jquery');
 require('bootstrap');
 let project = null;
 let projectPath = null;
-let similarityPath = null;
+let imagePaths = {};
 
 const board = document.getElementById('board');
 board.addEventListener('click', () => {
@@ -23,17 +23,20 @@ board.addEventListener('click', () => {
 $('#thumbnail-column .thumbnail-tabs a').on('click', function (e) {
     e.preventDefault()
     $(this).tab('show')
-  })
+});
 
 function drawAssembledImage(images) {
     const board = document.getElementById('board');
     board.innerHTML = '';
     for (const [imgId, imageTransforms] of Object.entries(images)) {
+        const image = project.images[parseInt(imgId)];
         const fullImage = addImageToBoard(imgId);
         fullImage.style.zIndex = imageTransforms['zIndex'];
         const rotation = imageTransforms['rotation'] || 0;
         const scale = imageTransforms['scale'] || 1;
-        fullImage.style.transform = `scale(${scale}) rotate(${rotation}deg)`;
+        fullImage.style.transform = `rotate(${rotation}deg)`;
+        fullImage.width = Math.round(scale * image.width);
+        fullImage.height = Math.round(scale * image.height);
         fullImage.style.top = imageTransforms['top'] + 'px' || '10px';
         fullImage.style.left = imageTransforms['left'] + 'px' || '10px';
     } 
@@ -63,7 +66,9 @@ function addImageToBoard(imgId) {
     const fullImage = new Image();
     fullImage.dataset.imgId = imgId;
     fullImage.src = 'file://' + imgInfo.path;
-    fullImage.setAttribute('class', 'board-img')
+    fullImage.setAttribute('class', 'board-img');
+    fullImage.width = imgInfo.width;
+    fullImage.height = imgInfo.height;
     fullImage.title = imgInfo.name;
     setActiveImage(fullImage);
     board.appendChild(fullImage);
@@ -118,27 +123,21 @@ function createAssembling() {
     alertUnsaved();
 }
 
-ipcRenderer.on('project-loaded', async (event, projPath) => {
-    project = await ipcRenderer.invoke('proj:get-project', {'projPath': projPath});
-    projectPath = projPath;
-    const thumbnailContainer = $('#thumbnails');
+function loadThumbnails() {
+    const thumbnailContainer = $('#thumbnail-images');
     thumbnailContainer.html('');
-    $('.assembling-tab').each(function(i, e) {
-        e.remove();
-    });
 
-    for (const [key, assembledInfo] of Object.entries(project.assembled)) {
-        addAssemblingToTabs(key);
+    const selectedDir = document.getElementById("root-dirs").value;
+    if (selectedDir !== project.rootDirs.selected) {
+        project.rootDirs.selected = selectedDir; 
     }
 
-    if (project.matching) {
-        $('#no-similarity').css('display', 'none');
-        $('#has-similarity').css('display', 'flex');
-        $('#matching-name').val(project.matching.matchingName);
-    }
-    
-    $('#proj-name').html(`Project: ${project.projName}`);
+    imagePaths = {};
     for (const [key, imgInfo] of Object.entries(project.images)) {
+        imagePaths[imgInfo.path] = parseInt(key);
+        if (!imgInfo.path.includes(selectedDir)) {
+            continue;
+        }
         const thumbnail = $('#thumbnail-template').clone()
             .css('display', 'block')
             .removeAttr('id')
@@ -152,6 +151,36 @@ ipcRenderer.on('project-loaded', async (event, projPath) => {
 
         addThumbnailEvent(thumbnail);
     };
+}
+
+ipcRenderer.on('project-loaded', async (event, projPath) => {
+    project = await ipcRenderer.invoke('proj:get-project', {'projPath': projPath});
+    projectPath = projPath;
+    $('.assembling-tab').each(function(i, e) {
+        e.remove();
+    });
+
+    project.rootDirs.available.forEach(root => {
+        let isSelected = false;
+        if (project.rootDirs.selected === root.path) {
+            isSelected = true;
+        }
+        $('#root-dirs').append(new Option(root.name, root.path, isSelected, isSelected));
+    });
+
+    for (const [key, assembledInfo] of Object.entries(project.assembled)) {
+        addAssemblingToTabs(key);
+    }
+
+    if (project.matching) {
+        $('#no-similarity').css('display', 'none');
+        $('#has-similarity').css('display', 'flex');
+        $('#matching-name').val(project.matching.matchingName);
+    }
+    
+    $('#proj-name').html(`Project: ${project.projName}`);
+
+    loadThumbnails();
 });
 
 window.addEventListener('contextmenu', (e) => {
@@ -160,8 +189,37 @@ window.addEventListener('contextmenu', (e) => {
     setActiveImage(e.target);
     const imageId = parseInt(e.target.dataset.imgId);
     const matching = project.matching;
-    ipcRenderer.send('main:img-context-menu', {imageId: imageId, matching: matching});
+    const imgPath = e.target.src;
+    const switchVersions = [];
+    let imgRoot = "";
+    project.rootDirs.available.forEach(root => {
+        if (imgPath.includes(root.path) && root.path !== "") {
+            imgRoot = root.path;
+        }
+    });
+    const subImgPath = imgPath.split(imgRoot)[1];
+    project.rootDirs.available.forEach(root => {
+        if (imgRoot !== root.path) {
+            const subDirImgPath = root.path + subImgPath;
+            const imgId = imagePaths[subDirImgPath];
+            if (imgId) {
+                switchVersions.push({'name': root.name, 'imgId': imgId})
+            }
+        }
+    });
+    ipcRenderer.send('main:img-context-menu', {imageId: imageId, matching: matching, switchVersions: switchVersions});
   }
+});
+
+ipcRenderer.on('main:menu:switch-image', (event, args) => {
+    const imgId = args['imageId'];
+    const toImageId = args['toImage'];
+    const activeAssembling = project.assembled[getActiveAssemblingId()];
+    activeAssembling.images[toImageId] = activeAssembling.images[imgId];
+    delete activeAssembling.images[imgId];
+    drawAssembledImage(activeAssembling.images);
+    setActiveImage($(`.board-img[data-img-id="${toImageId}"]`).get()[0]);
+    alertUnsaved();
 });
 
 ipcRenderer.on('main:menu:img-delete', (event, args) => {
@@ -341,8 +399,7 @@ function rotateLeft(step=5) {
     if (image) {
         const imageId = parseInt(image.dataset.imgId);
         const rotation = (getActiveAssemblingChanges(imageId, 'rotation') || 0) - step;
-        const scale = parseFloat(getActiveAssemblingChanges(imageId, 'scale') || 1);
-        image.style.transform = `scale(${scale}) rotate(${rotation}deg)`;
+        image.style.transform = `rotate(${rotation}deg)`;
         setActiveAssemblingChanges(imageId, 'rotation', rotation);
     }
 }
@@ -352,15 +409,15 @@ function rotateRight(step=5) {
 }
 
 function zoomIn(step=0.1) {
-    const image = getActiveImage()
+    const image = getActiveImage();
     if (image) {
         const imageId = parseInt(image.dataset.imgId);
-        const rotation = (getActiveAssemblingChanges(imageId, 'rotation') || 0);
         let scale = parseFloat(getActiveAssemblingChanges(imageId, 'scale') || 1) + step;
         if (scale < 0.05) {
             scale = 0.05;
         }
-        image.style.transform = `scale(${scale}) rotate(${rotation}deg)`;
+        image.width = Math.round(scale * project.images[imageId].width);
+        image.height = Math.round(scale * project.images[imageId].height);
         setActiveAssemblingChanges(imageId, 'scale', scale);
     }
 }

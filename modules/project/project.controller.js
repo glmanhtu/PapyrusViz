@@ -180,11 +180,15 @@ class ProjectController {
 
         // Step 2: Get image files
         const images = [];
+        const topLvSubdir = [];
         const getFilesRecursively = (directory, level=0) => {
             const filesInDirectory = fs.readdirSync(directory);
             for (let i = 0; i < filesInDirectory.length; i++) {
                 const absolute = path.join(directory, filesInDirectory[i]);
                 if (fs.statSync(absolute).isDirectory()) {
+                    if (level === 0) {
+                        topLvSubdir.push({'name': filesInDirectory[i], 'path': absolute});
+                    }
                     getFilesRecursively(absolute, level + 1);
                 } else {
                     const fileExt = absolute.split('.').pop().toLowerCase();
@@ -197,6 +201,8 @@ class ProjectController {
         };
 
         getFilesRecursively(datasetLocation);
+        topLvSubdir.push({'name': 'All Images', 'path': ''});
+        projectData.rootDirs = {'available': topLvSubdir, 'selected': null};
 
         // Step 3: Generate image thumbnails
         fs.mkdirSync(path.join(projLocation, 'thumbnails')); 
