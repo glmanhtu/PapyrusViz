@@ -63,12 +63,24 @@
                         
                         <button type="button" class="btn btn-success btn-sm me-2" onclick="selectSimilarityMatrix()">Select a file</button>
                       </div>
-                      <div class="input-group input-group-sm" id="has-similarity" title="Matching name">
-                        <div class="input-group-prepend">
-                          <div class="input-group-text"><i class="fa-solid fa-arrow-down-wide-short"></i></div>
+                      <div class="input-group input-group-sm mb-3" id="has-similarity" title="Matching name">
+                          <div class="input-group-prepend">
+                            <div class="input-group-text"><i class="fa-solid fa-arrow-down-wide-short"></i></div>
+                          </div>
+                          <input type="text" class="form-control form-control-sm" id="matching-name" readonly>
                         </div>
-                        <input type="text" class="form-control" id="matching-name" readonly>
-                      </div>
+                        <figure class="figure row" id="matching-query" style="display: none;">
+                          <img src="..." class="figure-img img-fluid img-thumbnail">
+                          <figcaption class="figure-caption">A caption for the above image.</figcaption>
+                        </figure>
+                        <div id="matched-results">
+
+                        </div>
+
+                        <figure class="figure row" id="matching-result-template" style="display: none;">
+                          <img src="..." class="figure-img img-fluid img-thumbnail">
+                          <figcaption class="figure-caption">A caption for the above image.</figcaption>
+                        </figure>
                     </form>
                     
                       <figure class="figure row" id="thumbnail-template" style="display: none;">

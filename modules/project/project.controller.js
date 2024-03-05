@@ -4,7 +4,9 @@ const path = require('node:path');
 // const { v4: uuidv4 } = require('uuid');
 const dialogUtils = require('../utils/dialog.utils');
 const pathUtils = require('../utils/path.utils')
-const dataUtils = require('../utils/data.utils')
+const dataUtils = require('../utils/data.utils');
+const csv = require('@fast-csv/parse');
+
 
 class ProjectController {
     constructor(ipcMain, mainWin) {
@@ -21,6 +23,41 @@ class ProjectController {
 
         ipcMain.on('proj:open-welcome-dialog', async (event) => {
             dialogUtils.openDialog(pathUtils.fromRoot('modules', 'project', 'index.html'), this.mainWin)
+        });
+
+        ipcMain.on('proj:find-matching', async (event, args) => {
+            const imageId = args['imageId'];
+            const project = await this.getProject(event, args);
+            const img = project.images[imageId];
+            const result = {'queryImg': imageId, 'matches': []};
+            const readStream = fs.createReadStream(project.matching.matchingFile)
+            readStream 
+                .on('end', function() {
+                    event.reply('main:matching:results', result);
+                })
+                .on('close', function(err) {
+                    event.reply('main:matching:results', result);
+                })
+                .pipe(csv.parse({ headers: true }))
+                .on("data", function (row) {
+                    if (project.matching.matchingMethod === 'file') {
+                        if (img.name.includes(row[''])) {
+                            const matches = [];
+                            for (const [fragId, distance] of Object.entries(row)) {
+                                if (fragId === '') {
+                                    continue;
+                                }
+                                for (const [targetImgId, targetImg] of Object.entries(project.images)) {
+                                    if (targetImg.name.includes(fragId) && parseInt(targetImgId) !== imageId) {
+                                        matches.push({'imgId': targetImgId, 'distance': parseFloat(distance)});
+                                    }
+                                }
+                            }
+                            result['matches'] = matches.sort((a, b) => a['distance'] - b['distance']);
+                            readStream.destroy();
+                        }
+                    }
+                });
         });
 
         ipcMain.on('proj:create-matching', async (event, args) => {

@@ -100,3 +100,7 @@ figcaption {
 .assembling-tab {
     padding: 0.3rem 1.3rem 0.3rem 1rem !important;
 }
+
+#matching-query {
+    border: 1px solid green;
+}

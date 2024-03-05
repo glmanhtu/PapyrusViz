@@ -39,6 +39,24 @@ function drawAssembledImage(images) {
     } 
 }
 
+function addThumbnailEvent(thumbnail) {
+    thumbnail.on('dblclick', () => {
+        const board = $('#board');
+        const key = $(thumbnail).attr('data-img-id');
+        let fullImage = board.children(`*[data-img-id=${key}]`);
+        if (fullImage.length === 0) {
+            fullImage = addImageToBoard(key);
+            const activeAssembling = project.assembled[getActiveAssemblingId()];
+            activeAssembling.imagesCount += 1;
+            activeAssembling.images[key] = {'zIndex': activeAssembling.imagesCount};
+            fullImage.style.zIndex = activeAssembling.imagesCount;
+            alertUnsaved();
+        } else {
+            setActiveImage(fullImage.get()[0]);
+        }
+    });
+}
+
 function addImageToBoard(imgId) {
     const board = document.getElementById('board');
     const imgInfo = project.images[imgId]
@@ -115,35 +133,24 @@ ipcRenderer.on('project-loaded', async (event, projPath) => {
 
     if (project.matching) {
         $('#no-similarity').css('display', 'none');
-        $('#has-similarity').css('display', 'flex')
-            .children('#matching-name').val(project.matching.matchingName);
+        $('#has-similarity').css('display', 'flex');
+        $('#matching-name').val(project.matching.matchingName);
     }
     
     $('#proj-name').html(`Project: ${project.projName}`);
     for (const [key, imgInfo] of Object.entries(project.images)) {
-        const thumbnail = $('#thumbnail-template').clone().css('display', 'block').removeAttr('id');
+        const thumbnail = $('#thumbnail-template').clone()
+            .css('display', 'block')
+            .removeAttr('id')
+            .attr('data-img-id', key);
+
         thumbnail.children('img')
-                .attr('src', 'file://' + imgInfo.thumbnails)
-                .attr('data-img-id', key);
+                .attr('src', 'file://' + imgInfo.thumbnails);
         thumbnail.children('figcaption')
                 .html(imgInfo.name);
         thumbnail.appendTo(thumbnailContainer);
 
-        // Add click event listener to display full-size image
-        thumbnail.on('dblclick', () => {
-            const board = $('#board');
-            let fullImage = board.children(`*[data-img-id=${key}]`);
-            if (fullImage.length === 0) {
-                fullImage = addImageToBoard(key);
-                const activeAssembling = project.assembled[getActiveAssemblingId()];
-                activeAssembling.imagesCount += 1;
-                activeAssembling.images[key] = {'zIndex': activeAssembling.imagesCount};
-                fullImage.style.zIndex = activeAssembling.imagesCount;
-                alertUnsaved();
-            } else {
-                setActiveImage(fullImage.get()[0]);
-            }
-        });
+        addThumbnailEvent(thumbnail);
     };
 });
 
@@ -151,7 +158,9 @@ window.addEventListener('contextmenu', (e) => {
   e.preventDefault();
   if (e.target.className == 'board-img') {
     setActiveImage(e.target);
-    ipcRenderer.send('main:img-context-menu');
+    const imageId = parseInt(e.target.dataset.imgId);
+    const matching = project.matching;
+    ipcRenderer.send('main:img-context-menu', {imageId: imageId, matching: matching});
   }
 });
 
@@ -208,6 +217,44 @@ ipcRenderer.on('main:menu:img-to-back', (event, args) => {
         image.style.zIndex = minZIndex;
         alertUnsaved();
     }
+});
+
+
+ipcRenderer.on('main:menu:img-find-similarity', async (event, args) => {
+    const imageId = args['imageId'];
+    const matchedImgs = ipcRenderer.send('proj:find-matching', {'projPath': projectPath, 'imageId': imageId});
+});
+
+ipcRenderer.on('main:matching:results', async (event, args) => {
+    $('.thumbnail-tabs a[href="#similarity"]').tab('show');
+    const queryImg = project.images[args['queryImg']];
+    const matches = args['matches'];
+    const queryDom = $('#matching-query').css('display', 'block');
+    queryDom.children('img').attr('src', queryImg.path);
+    queryDom.children('figcaption').html(queryImg.name);
+
+    const matchesContainer = $('#matched-results');
+    matchesContainer.html('');
+    let rank = 0;
+    let prevDistance = 0;
+    matches.forEach(matchedImgResult => {
+        const matchedImgId = parseInt(matchedImgResult['imgId']);
+        const matchedImgDistance = matchedImgResult['distance'];
+        if (matchedImgDistance > prevDistance) {
+            prevDistance = matchedImgDistance;
+            rank += 1;
+        }
+        const matchedImg = project.images[matchedImgId];
+        const matchedItem = $('#matching-result-template').clone()
+            .removeAttr('id')
+            .css('display', 'block')
+            .attr('data-img-id', matchedImgId);
+        matchedItem.children('img')
+            .attr('src', matchedImg.path);
+        matchedItem.children('figcaption').html('#' + rank + ' ' + matchedImg.name);
+        matchedItem.appendTo(matchesContainer);
+        addThumbnailEvent(matchedItem);
+    }); 
 });
 
 repeatActionOnHold('i', () => zoomIn(0.01));

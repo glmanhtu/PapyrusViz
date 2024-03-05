@@ -31,24 +31,31 @@ class MainController {
               });
         });
 
-        ipcMain.on('main:img-context-menu', (event) => {
+        ipcMain.on('main:img-context-menu', (event, args) => {
+          const imageId = args['imageId'];
+          const matching = args['matching'];
           const template = [
             {
               label: 'To Front',
-              click: () => { event.sender.send('main:menu:img-to-front') }
+              click: () => { event.reply('main:menu:img-to-front', args) }
             },
             {
               label: 'To Back',
-              click: () => { event.sender.send('main:menu:img-to-back') }
+              click: () => { event.reply('main:menu:img-to-back', args) }
             },
             { type: 'separator' },
             {
               label: 'Delete',
               accelerator: 'Backspace',
-              click: () => { event.sender.send('main:menu:img-delete') }
+              click: () => { event.reply('main:menu:img-delete', args) }
             },
             { type: 'separator' },
-            { label: 'Find similarities', accelerator: 'CmdOrCtrl+F'}
+            { 
+              label: 'Find similarities', 
+              accelerator: 'CmdOrCtrl+F',
+              enabled: matching !== undefined,
+              click: () => {event.reply('main:menu:img-find-similarity', args)}
+            }
           ]
           const menu = Menu.buildFromTemplate(template)
           menu.popup({ window: mainWin })
