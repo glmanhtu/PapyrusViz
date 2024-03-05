@@ -9,7 +9,8 @@ class DialogsController {
         this.mainWin = mainWin
         
         ipcMain.on('dialogs:open-images-dialog', async (event) => {
-            const result = await dialog.showOpenDialog({
+          const currDialog = dialogUtils.getCurrentDialog() || this.mainWin;
+            const result = await dialog.showOpenDialog(currDialog, {
               properties: ['openFile', 'multiSelections'],
               filters: [{ name: 'Images', extensions: ['jpg', 'jpeg', 'png'] }]
             });
@@ -20,7 +21,8 @@ class DialogsController {
         });
 
         ipcMain.on('dialogs:open-file-dialog', async (event, args) => {
-            const result = await dialog.showOpenDialog({
+          const currDialog = dialogUtils.getCurrentDialog() || this.mainWin;
+            const result = await dialog.showOpenDialog(currDialog, {
               properties: ['openFile'],
               filters: [{ name: 'Images', extensions: args['filters'] }]
             });
@@ -31,7 +33,8 @@ class DialogsController {
         });
           
         ipcMain.on('dialogs:open-dir-dialog', async (event, args) => {
-            const result = await dialog.showOpenDialog({
+          const currDialog = dialogUtils.getCurrentDialog() || this.mainWin;
+            const result = await dialog.showOpenDialog(currDialog, {
                 properties: ['openDirectory', 'createDirectory'],
             });
           

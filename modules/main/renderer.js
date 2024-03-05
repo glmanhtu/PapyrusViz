@@ -10,6 +10,7 @@ const { ipcRenderer } = require('electron');
 const fs = require('fs');
 const { event } = require('jquery');
 let $ = jQuery = require('jquery');
+require('jquery-lazy');
 require('bootstrap');
 let project = null;
 let projectPath = null;
@@ -144,13 +145,22 @@ function loadThumbnails() {
             .attr('data-img-id', key);
 
         thumbnail.children('img')
-                .attr('src', 'file://' + imgInfo.thumbnails);
+                .attr('data-src', 'file://' + imgInfo.thumbnails)
+                .addClass('lazy');
         thumbnail.children('figcaption')
                 .html(imgInfo.name);
         thumbnail.appendTo(thumbnailContainer);
 
         addThumbnailEvent(thumbnail);
     };
+    $("img.lazy").Lazy({
+        scrollDirection: 'vertical',
+        chainable: false,
+        effect: "fadeIn",
+        effectTime: 1000,
+        threshold: 500,
+        appendScroll: $('#thumbnail-container')
+    });
 }
 
 ipcRenderer.on('project-loaded', async (event, projPath) => {

@@ -39,7 +39,7 @@ module.exports.openDialog = function(dialogPath, win, width=800, height=600, pro
             height: height,
             transparent: true,
             autoHideMenuBar: true,
-            frame: false,
+            // frame: false,
             // useContentSize: true,
             webPreferences: {
                 nodeIntegration: true,
