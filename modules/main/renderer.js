@@ -26,6 +26,22 @@ $('#thumbnail-column .thumbnail-tabs a').on('click', function (e) {
     $(this).tab('show')
 });
 
+$('#thumbnail-column').on('dblclick', 'figure', function() {
+    const board = $('#board');
+    const key = $(this).attr('data-img-id');
+    let fullImage = board.children(`*[data-img-id=${key}]`);
+    if (fullImage.length === 0) {
+        fullImage = addImageToBoard(key);
+        const activeAssembling = project.assembled[getActiveAssemblingId()];
+        activeAssembling.imagesCount += 1;
+        activeAssembling.images[key] = {'zIndex': activeAssembling.imagesCount};
+        fullImage.style.zIndex = activeAssembling.imagesCount;
+        alertUnsaved();
+    } else {
+        setActiveImage(fullImage.get()[0]);
+    }
+})
+
 function drawAssembledImage(images) {
     const board = document.getElementById('board');
     board.innerHTML = '';
@@ -43,23 +59,6 @@ function drawAssembledImage(images) {
     } 
 }
 
-function addThumbnailEvent(thumbnail) {
-    thumbnail.on('dblclick', () => {
-        const board = $('#board');
-        const key = $(thumbnail).attr('data-img-id');
-        let fullImage = board.children(`*[data-img-id=${key}]`);
-        if (fullImage.length === 0) {
-            fullImage = addImageToBoard(key);
-            const activeAssembling = project.assembled[getActiveAssemblingId()];
-            activeAssembling.imagesCount += 1;
-            activeAssembling.images[key] = {'zIndex': activeAssembling.imagesCount};
-            fullImage.style.zIndex = activeAssembling.imagesCount;
-            alertUnsaved();
-        } else {
-            setActiveImage(fullImage.get()[0]);
-        }
-    });
-}
 
 function addImageToBoard(imgId) {
     const board = document.getElementById('board');
@@ -151,13 +150,12 @@ function loadThumbnails() {
                 .html(imgInfo.name);
         thumbnail.appendTo(thumbnailContainer);
 
-        addThumbnailEvent(thumbnail);
     };
     $("img.lazy").Lazy({
         scrollDirection: 'vertical',
         chainable: false,
         effect: "fadeIn",
-        effectTime: 1000,
+        effectTime: 200,
         threshold: 500,
         appendScroll: $('#thumbnail-container')
     });
@@ -318,11 +316,20 @@ ipcRenderer.on('main:matching:results', async (event, args) => {
             .css('display', 'block')
             .attr('data-img-id', matchedImgId);
         matchedItem.children('img')
-            .attr('src', matchedImg.path);
+            .addClass('lazy')
+            .attr('data-src', matchedImg.path);
         matchedItem.children('figcaption').html('#' + rank + ' ' + matchedImg.name);
         matchedItem.appendTo(matchesContainer);
-        addThumbnailEvent(matchedItem);
     }); 
+
+    $("img.lazy").Lazy({
+        scrollDirection: 'vertical',
+        chainable: false,
+        effect: "fadeIn",
+        effectTime: 200,
+        threshold: 500,
+        appendScroll: $('#thumbnail-container')
+    });
 });
 
 repeatActionOnHold('i', () => zoomIn(0.01));

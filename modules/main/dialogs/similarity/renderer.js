@@ -14,11 +14,13 @@ $('#similarityCreation').on('submit', (e) => {
     const matchingName = $('#matching-name').val();
     const matchingFile = $('#similarity-file').val();
     const matchingMethod = $('input[name=match-method]:checked', '#similarityCreation').val()
+    const matrixType = $('input[name=matrix-type]:checked', '#similarityCreation').val()
     
     ipcRenderer.send('proj:create-matching', {
         'projPath': projPath,
         'matchingName': matchingName,
         'matchingFile': matchingFile,
+        'matrixType': matrixType,
         'matchingMethod': matchingMethod
     });
     e.preventDefault();

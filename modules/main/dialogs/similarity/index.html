@@ -23,7 +23,7 @@
                 </div>
             </div>
             <div class="form-group row">
-                <label for="similarity-file" class="col-sm-3 col-form-label">Similarity matrix file</label>
+                <label for="similarity-file" class="col-sm-3 col-form-label">Matrix file</label>
                 <div class="col-sm-9">
                     <div class="custom-file" onclick="selectFile('similarity-file')">
                         <input class="custom-file-input form-control-sm" id="similarity-file" required>
@@ -31,6 +31,26 @@
                     </div>
                 </div>
             </div>
+
+            <fieldset class="form-group">
+                <div class="row">
+                  <legend class="col-form-label col-sm-3 pt-0">Matrix type</legend>
+                  <div class="col-sm-9">
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="matrix-type" value="similarity" checked>
+                      <label class="form-check-label" for="gridRadios1" title="The column names of the similarity matrix are matched with the image file names.">
+                        Similarity matrix 
+                      </label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="matrix-type" value="distance">
+                      <label class="form-check-label" for="gridRadios2" title="The column names of the similarity matrix are matched with a folder in file names.">
+                        Distance matrix
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </fieldset>
             
             <fieldset class="form-group">
                 <div class="row">

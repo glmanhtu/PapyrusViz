@@ -31,6 +31,7 @@ class ProjectController {
             const img = project.images[imageId];
             const result = {'queryImg': imageId, 'matches': []};
             const readStream = fs.createReadStream(project.matching.matchingFile)
+            const isSimilarity = project.matching.matrixType === 'similarity';
             readStream 
                 .on('end', function() {
                     event.reply('main:matching:results', result);
@@ -53,7 +54,13 @@ class ProjectController {
                                     }
                                 }
                             }
-                            result['matches'] = matches.sort((a, b) => a['distance'] - b['distance']);
+
+                            result['matches'] = matches.sort((a, b) => {
+                                if (isSimilarity) {
+                                    return b['distance'] - a['distance'];
+                                }
+                                return a['distance'] - b['distance'];
+                            });
                             readStream.destroy();
                         }
                     }
@@ -65,10 +72,12 @@ class ProjectController {
             const matchingName = args['matchingName'];
             const matchingFile = args['matchingFile'];
             const matchingMethod = args['matchingMethod'];
+            const matrixType = args['matrixType'];
             const project = await this.getProject(event, args);
             project.matching = {
                 'matchingName': matchingName,
                 'matchingFile': matchingFile,
+                'matrixType': matrixType,
                 'matchingMethod': matchingMethod
             }
             await this.saveProject(event, {'projPath': projPath, 'project': project});
