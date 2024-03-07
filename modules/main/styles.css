@@ -19,19 +19,15 @@ body {
 
 #board {
     width: 100%;
-    /* overflow: scroll; */
+    overflow: scroll;
     position: relative;
 }
 
 
 #board img {
     position: absolute;
-    /* top: 10px; */
-    /* left: 10px; */
-}
-
-#thumbnail-container {
-    overflow-y: scroll; /* Enable vertical scrolling if needed */
+    top: 10px;
+    left: 10px;
 }
 
 #thumbnail-container img {
@@ -44,6 +40,10 @@ body {
 
 .card-body {
     overflow: auto;
+}
+
+#thumbnail-container {
+    padding: 1.25rem .5rem !important;
 }
 
 .nav-link {
@@ -103,4 +103,9 @@ figcaption {
 
 #matching-query {
     border: 1px solid green;
+}
+
+.fixed-height {
+    height: 710px;
+    overflow-y: scroll;
 }

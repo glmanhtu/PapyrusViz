@@ -14,7 +14,9 @@ require('jquery-lazy');
 require('bootstrap');
 let project = null;
 let projectPath = null;
-let imagePaths = {};
+let imageDict = {};
+let imagePathList = [];
+const nItemsPerPage = 10;
 
 const board = document.getElementById('board');
 board.addEventListener('click', () => {
@@ -123,6 +125,46 @@ function createAssembling() {
     alertUnsaved();
 }
 
+function loadPartThumbnails(container, imgList, fromIdx, toIdx) {
+    for (let i = fromIdx; i < Math.min(toIdx, imagePathList.length); i++) {
+        const imgPath = imgList[i];
+        const imgId = imageDict[imgPath];
+        const imgInfo = project.images[imgId];
+        
+        const thumbnail = $('#thumbnail-template').clone()
+        .css('display', 'block')
+        .removeAttr('id')
+        .attr('data-img-id', imgId);
+
+        thumbnail.children('img')
+            .addClass('thumbnails-block' + toIdx)
+                .attr('src', 'file://' + imgInfo.thumbnails);
+        thumbnail.children('figcaption')
+                .html(imgInfo.name);
+        thumbnail.appendTo(container);
+    }
+    if (toIdx < imgList.length) {
+        $('<div>', {id: 'thumbnails-lazy', 'data-loader': "nextThumbnails"}).appendTo(container);
+        $('.thumbnails-block' + toIdx).on('load', function() {
+            $('#thumbnails-lazy').Lazy({
+                scrollDirection: 'vertical',
+                chainable: false,
+                effect: "fadeIn",
+                effectTime: 200,
+                threshold: 200,
+                appendScroll: $('#thumbnails'),
+                nextThumbnails: function(element) {
+                    if ($('#thumbnails').hasClass('active')) {
+                        $('#thumbnails-lazy').remove();
+                        loadPartThumbnails(container, imgList, toIdx, toIdx + nItemsPerPage);
+                    }
+                }
+            });
+        });
+    }
+
+}
+
 function loadThumbnails() {
     const thumbnailContainer = $('#thumbnail-images');
     thumbnailContainer.html('');
@@ -132,33 +174,16 @@ function loadThumbnails() {
         project.rootDirs.selected = selectedDir; 
     }
 
-    imagePaths = {};
+    imageDict = {};
+    imagePathList = [];
     for (const [key, imgInfo] of Object.entries(project.images)) {
-        imagePaths[imgInfo.path] = parseInt(key);
+        imageDict[imgInfo.path] = parseInt(key);
         if (!imgInfo.path.includes(selectedDir)) {
             continue;
         }
-        const thumbnail = $('#thumbnail-template').clone()
-            .css('display', 'block')
-            .removeAttr('id')
-            .attr('data-img-id', key);
-
-        thumbnail.children('img')
-                .attr('data-src', 'file://' + imgInfo.thumbnails)
-                .addClass('lazy');
-        thumbnail.children('figcaption')
-                .html(imgInfo.name);
-        thumbnail.appendTo(thumbnailContainer);
-
+        imagePathList.push(imgInfo.path);
     };
-    $("img.lazy").Lazy({
-        scrollDirection: 'vertical',
-        chainable: false,
-        effect: "fadeIn",
-        effectTime: 200,
-        threshold: 500,
-        appendScroll: $('#thumbnail-container')
-    });
+    loadPartThumbnails(thumbnailContainer, imagePathList, 0, nItemsPerPage);
 }
 
 ipcRenderer.on('project-loaded', async (event, projPath) => {
@@ -209,7 +234,7 @@ window.addEventListener('contextmenu', (e) => {
     project.rootDirs.available.forEach(root => {
         if (imgRoot !== root.path) {
             const subDirImgPath = root.path + subImgPath;
-            const imgId = imagePaths[subDirImgPath];
+            const imgId = imageDict[subDirImgPath];
             if (imgId) {
                 switchVersions.push({'name': root.name, 'imgId': imgId})
             }
@@ -291,19 +316,10 @@ ipcRenderer.on('main:menu:img-find-similarity', async (event, args) => {
     const matchedImgs = ipcRenderer.send('proj:find-matching', {'projPath': projectPath, 'imageId': imageId});
 });
 
-ipcRenderer.on('main:matching:results', async (event, args) => {
-    $('.thumbnail-tabs a[href="#similarity"]').tab('show');
-    const queryImg = project.images[args['queryImg']];
-    const matches = args['matches'];
-    const queryDom = $('#matching-query').css('display', 'block');
-    queryDom.children('img').attr('src', queryImg.path);
-    queryDom.children('figcaption').html(queryImg.name);
 
-    const matchesContainer = $('#matched-results');
-    matchesContainer.html('');
-    let rank = 0;
-    let prevDistance = 0;
-    matches.forEach(matchedImgResult => {
+function loadPartSimilarityResults(container, matches, fromIdx, toIdx, rank, prevDistance) {
+    for (let i = fromIdx; i < Math.min(toIdx, matches.length); i++) {
+        const matchedImgResult = matches[i];
         const matchedImgId = parseInt(matchedImgResult['imgId']);
         const matchedImgDistance = matchedImgResult['distance'];
         if (matchedImgDistance > prevDistance) {
@@ -316,20 +332,48 @@ ipcRenderer.on('main:matching:results', async (event, args) => {
             .css('display', 'block')
             .attr('data-img-id', matchedImgId);
         matchedItem.children('img')
-            .addClass('lazy')
-            .attr('data-src', matchedImg.path);
+            .addClass('match-block' + toIdx)
+            .attr('src', 'file://' + matchedImg.thumbnails);
         matchedItem.children('figcaption').html('#' + rank + ' ' + matchedImg.name);
-        matchedItem.appendTo(matchesContainer);
-    }); 
+        matchedItem.appendTo(container);
+        lastIdx = i;
+    }
+    if (toIdx < matches.length) {
+        $('<div>', {id: 'match-lazy', 'data-loader': "nextMatches"}).appendTo(container);
+        $('.match-block' + toIdx).on('load', function() {
+            $('#match-lazy').Lazy({
+                scrollDirection: 'vertical',
+                chainable: false,
+                effect: "fadeIn",
+                effectTime: 200,
+                threshold: 200,
+                appendScroll: $('#similarity'),
+                nextMatches: function(element) {
+                    if ($('#similarity').hasClass('active')) {
+                        $('#match-lazy').remove();
+                        loadPartSimilarityResults(container, matches, toIdx, toIdx + nItemsPerPage, rank, prevDistance);
+                    }
+                }
+            });
+        });
+    }
 
-    $("img.lazy").Lazy({
-        scrollDirection: 'vertical',
-        chainable: false,
-        effect: "fadeIn",
-        effectTime: 200,
-        threshold: 500,
-        appendScroll: $('#thumbnail-container')
-    });
+}
+
+ipcRenderer.on('main:matching:results', async (event, args) => {
+    $('.thumbnail-tabs a[href="#similarity"]').tab('show');
+    const queryImg = project.images[args['queryImg']];
+    const matches = args['matches'];
+    const queryDom = $('#matching-query').css('display', 'block');
+    queryDom.children('img').attr('src', queryImg.path);
+    queryDom.children('figcaption').html(queryImg.name);
+
+    const matchesContainer = $('#matched-results');
+    matchesContainer.html('');
+    let rank = 0;
+    let prevDistance = 0;
+
+    loadPartSimilarityResults(matchesContainer, matches, 0, nItemsPerPage, rank, prevDistance);
 });
 
 repeatActionOnHold('i', () => zoomIn(0.01));
@@ -342,9 +386,7 @@ ipcRenderer.on('resized', (event, size) => {
     const boardRect = document.querySelector('#board').getBoundingClientRect();
     const navRect = document.querySelector('#proj-nav').getBoundingClientRect();
     const drawingAreaHeight = height - parseInt(boardRect.y + 0.6 * navRect.height);
-
-    document.getElementById('thumbnail-container').style.height = `${drawingAreaHeight}px`;
-    document.getElementById('board').style.height = `${drawingAreaHeight}px`;
+    $('.fixed-height').css('height', `${drawingAreaHeight}px`)
 });
 
 function save() {

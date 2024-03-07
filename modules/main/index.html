@@ -50,9 +50,9 @@
                     </li>
                   </ul>
                 </div>
-                <div class="card-body" id="thumbnail-container" style="height: 710px;">
+                <div class="card-body" id="thumbnail-container">
                   <div class="tab-content">
-                    <div class="tab-pane active" id="thumbnails" role="tabpanel">
+                    <div class="tab-pane active fixed-height" id="thumbnails" role="tabpanel" >
                       <form>
                         <div class="mb-3">
                           <div class="form-group">
@@ -62,13 +62,13 @@
                         </div>
                       </form>
 
-                      <div id="thumbnail-images">
+                      <div id="thumbnail-images" class="container">
 
                       </div>
                     </div>
 
 
-                    <div class="tab-pane" id="similarity" role="tabpanel">
+                    <div class="tab-pane fixed-height" id="similarity" role="tabpanel">
                     <form>
                       <div class="form-group"  id="no-similarity">
                         <label>No similarity matrix found!</label>
@@ -81,11 +81,13 @@
                           </div>
                           <input type="text" class="form-control form-control-sm" id="matching-name" readonly>
                         </div>
-                        <figure class="figure row" id="matching-query" style="display: none;">
-                          <img src="..." class="figure-img img-fluid img-thumbnail">
-                          <figcaption class="figure-caption">A caption for the above image.</figcaption>
-                        </figure>
-                        <div id="matched-results">
+                        <div class="container">
+                          <figure class="figure row" id="matching-query" style="display: none;">
+                            <img src="..." class="figure-img img-fluid img-thumbnail">
+                            <figcaption class="figure-caption">A caption for the above image.</figcaption>
+                          </figure>
+                        </div>
+                        <div id="matched-results" class="container">
 
                         </div>
 
@@ -118,7 +120,7 @@
                     </li>
                   </ul>
                 </div>
-                  <div class="card-body" id="board" style="height: 710px;">
+                  <div class="card-body fixed-height" id="board">
                 </div>
             </div>
         </div>
