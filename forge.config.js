@@ -1,6 +1,8 @@
 module.exports = {
   packagerConfig: {
-    asar: true,
+    asar: {
+      unpack: "**/node_modules/sharp/**/*"
+    }
   },
   rebuildConfig: {},
   makers: [

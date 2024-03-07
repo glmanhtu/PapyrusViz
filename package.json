@@ -27,6 +27,8 @@
     "electron-squirrel-startup": "^1.0.0",
     "jquery": "^3.7.1",
     "jquery-lazy": "^1.7.11",
-    "sharp": "^0.31.3"
+    "popper.js": "^1.16.1",
+    "sharp": "^0.31.3",
+    "yarn": "^1.22.21"
   }
 }
