@@ -287,6 +287,10 @@ ipcRenderer.on('main:menu:img-to-front', (event, args) => {
     }
 });
 
+ipcRenderer.on('main:menu:save', (event, args) => {
+    save();
+});
+
 ipcRenderer.on('main:menu:img-to-back', (event, args) => {
     const image = getActiveImage()
     if (image) {
@@ -311,8 +315,11 @@ ipcRenderer.on('main:menu:img-to-back', (event, args) => {
 
 
 ipcRenderer.on('main:menu:img-find-similarity', async (event, args) => {
-    const imageId = args['imageId'];
-    const matchedImgs = ipcRenderer.send('proj:find-matching', {'projPath': projectPath, 'imageId': imageId});
+    const image = getActiveImage()
+    if (image) {
+        const imageId = parseInt(image.dataset.imgId);
+        ipcRenderer.send('proj:find-matching', {'projPath': projectPath, 'imageId': imageId});
+    }
 });
 
 
