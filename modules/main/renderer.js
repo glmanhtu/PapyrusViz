@@ -15,7 +15,6 @@ require('bootstrap');
 let project = null;
 let projectPath = null;
 let imageDict = {};
-let imagePathList = [];
 const nItemsPerPage = 10;
 
 const board = document.getElementById('board');
@@ -126,7 +125,7 @@ function createAssembling() {
 }
 
 function loadPartThumbnails(container, imgList, fromIdx, toIdx) {
-    for (let i = fromIdx; i < Math.min(toIdx, imagePathList.length); i++) {
+    for (let i = fromIdx; i < Math.min(toIdx, imgList.length); i++) {
         const imgPath = imgList[i];
         const imgId = imageDict[imgPath];
         const imgInfo = project.images[imgId];
@@ -144,9 +143,10 @@ function loadPartThumbnails(container, imgList, fromIdx, toIdx) {
         thumbnail.appendTo(container);
     }
     if (toIdx < imgList.length) {
-        $('<div>', {id: 'thumbnails-lazy', 'data-loader': "nextThumbnails"}).appendTo(container);
+        const lazyThumb = $('<div>', {id: 'thumbnails-lazy' + toIdx, 'data-loader': "nextThumbnails"});
         $('.thumbnails-block' + toIdx).on('load', function() {
-            $('#thumbnails-lazy').Lazy({
+            lazyThumb.appendTo(container);
+            lazyThumb.Lazy({
                 scrollDirection: 'vertical',
                 chainable: false,
                 effect: "fadeIn",
@@ -154,10 +154,9 @@ function loadPartThumbnails(container, imgList, fromIdx, toIdx) {
                 threshold: 200,
                 appendScroll: $('#thumbnails'),
                 nextThumbnails: function(element) {
-                    if ($('#thumbnails').hasClass('active')) {
-                        $('#thumbnails-lazy').remove();
-                        loadPartThumbnails(container, imgList, toIdx, toIdx + nItemsPerPage);
-                    }
+                    lazyThumb.data("plugin_lazy").destroy();
+                    lazyThumb.remove();
+                    loadPartThumbnails(container, imgList, toIdx, toIdx + nItemsPerPage);
                 }
             });
         });
@@ -175,7 +174,7 @@ function loadThumbnails() {
     }
 
     imageDict = {};
-    imagePathList = [];
+    const imagePathList = [];
     for (const [key, imgInfo] of Object.entries(project.images)) {
         imageDict[imgInfo.path] = parseInt(key);
         if (!imgInfo.path.includes(selectedDir)) {
@@ -336,12 +335,12 @@ function loadPartSimilarityResults(container, matches, fromIdx, toIdx, rank, pre
             .attr('src', 'file://' + matchedImg.thumbnails);
         matchedItem.children('figcaption').html('#' + rank + ' ' + matchedImg.name);
         matchedItem.appendTo(container);
-        lastIdx = i;
     }
     if (toIdx < matches.length) {
-        $('<div>', {id: 'match-lazy', 'data-loader': "nextMatches"}).appendTo(container);
+        const matchObj = $('<div>', {id: 'match-lazy' + toIdx, 'data-loader': "nextMatches"});
         $('.match-block' + toIdx).on('load', function() {
-            $('#match-lazy').Lazy({
+            matchObj.appendTo(container);
+            matchObj.Lazy({
                 scrollDirection: 'vertical',
                 chainable: false,
                 effect: "fadeIn",
@@ -349,10 +348,9 @@ function loadPartSimilarityResults(container, matches, fromIdx, toIdx, rank, pre
                 threshold: 200,
                 appendScroll: $('#similarity'),
                 nextMatches: function(element) {
-                    if ($('#similarity').hasClass('active')) {
-                        $('#match-lazy').remove();
-                        loadPartSimilarityResults(container, matches, toIdx, toIdx + nItemsPerPage, rank, prevDistance);
-                    }
+                    matchObj.data("plugin_lazy").destroy();
+                    matchObj.remove();
+                    loadPartSimilarityResults(container, matches, toIdx, toIdx + nItemsPerPage, rank, prevDistance);
                 }
             });
         });
