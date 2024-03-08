@@ -528,8 +528,7 @@ function zoomOut(step=0.1) {
 }
 
 function exportImg() {
-    const rect = document.querySelector('#board').getBoundingClientRect();
-    ipcRenderer.send('main:export-img', {x: parseInt(rect.left), y: parseInt(rect.top), width: parseInt(rect.width), height: parseInt(rect.height)});
+    ipcRenderer.send('main:export-img', {project: project, activeAssemblingId: getActiveAssemblingId()});
 }
 
 function dragElement(elmnt) {

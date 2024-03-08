@@ -1,6 +1,5 @@
 const fs = require('fs');
 const pathUtils = require('./path.utils')
-const path = require('node:path');
 
 
 module.exports.readAppData = function() {
@@ -16,4 +15,13 @@ module.exports.readAppData = function() {
 module.exports.writeAppData = function(appData) {
     const dataFile = pathUtils.fromAppData('data.json');
     fs.writeFileSync(dataFile, JSON.stringify(appData));
+}
+
+
+module.exports.getItemList = function(data, callback) {
+    const result = [];
+    data.forEach(element => {
+        result.push(callback(element))
+    });
+    return result;
 }

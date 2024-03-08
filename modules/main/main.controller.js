@@ -1,9 +1,10 @@
 const path = require('node:path');
 const fs = require('fs');
-const { Menu } = require('electron')
+const sharp = require('sharp');
+const { Menu, dialog } = require('electron')
 const dialogUtils = require('../utils/dialog.utils');
 const pathUtils = require('../utils/path.utils');
-const { event } = require('jquery');
+const dataUtils = require('../utils/data.utils');
 
 const isMac = process.platform === 'darwin'
 
@@ -21,14 +22,81 @@ class MainController {
 
 
         ipcMain.on('main:export-img', async (event, args) => {
-            mainWin.webContents.capturePage(args).then(data => {
-                fs.writeFile('./print.png', data.toPNG(), (error) => {
-                  if (error) throw error
-                  console.log('Write PNG successfully.')
+          const project = args['project'];
+          const activeAssemblingId = parseInt(args['activeAssemblingId']);
+          const activeAssembling = project.assembled[activeAssemblingId];
+          
+          const { filePath, canceled } = await dialog.showSaveDialog({
+            defaultPath: "image.png"
+          });
+        
+          if (!filePath || canceled) {
+            return;
+          }
+
+          const images = [];
+          for (const [imgId, imageTransforms] of Object.entries(activeAssembling.images)) {
+            const image = project.images[parseInt(imgId)];
+            const zIndex = imageTransforms['zIndex'];
+            const rotation = imageTransforms['rotation'] || 0;
+            const scale = imageTransforms['scale'] || 1;
+            const width = Math.round(scale * image.width);
+            const height = Math.round(scale * image.height);
+            const top = imageTransforms['top'];
+            const left = imageTransforms['left'];
+            let processedImage = await sharp(image.path, {
+                  raw: {
+                    width: image.width,
+                    height: image.height,
+                    channels: 4
+                  },
                 })
-              }).catch(error => {
-                console.log(error)
-              });
+                .resize({ width: width, height: height })
+                .toBuffer();
+              
+            const metaData1 = await sharp(processedImage).metadata();
+            const width1 = metaData1.width;
+            
+            processedImage = await sharp(processedImage)
+            .rotate(rotation, {background: { r: 0, g: 0, b: 0, alpha: 0 }})
+            .toBuffer();
+
+            const metaData = await sharp(processedImage).metadata();
+
+            const wChange = (metaData.width - width1) / 2;
+            
+            images.push({img: processedImage, zIndex: zIndex, top: top, left: parseInt(left - wChange), width: metaData.width, height: metaData.height});
+            mainWin.setProgressBar(images.length / activeAssembling.images.length)
+          }
+
+          const minX = Math.min(...dataUtils.getItemList(images, (x) => x.left));
+          const maxX = Math.max(...dataUtils.getItemList(images, (x) => x.left + x.width - minX));
+          
+          const minY = Math.min(...dataUtils.getItemList(images, (x) => x.top));
+          const maxY = Math.max(...dataUtils.getItemList(images, (x) => x.top + x.height - minY));
+          
+          const fragments = images.sort((a, b) => a.zIndex - b.zIndex);
+          const composites = [];
+          fragments.forEach(element => {
+            composites.push({
+              input: element.img,
+              top: element.top - minY,
+              left: element.left - minX
+            });
+          });
+
+
+          await sharp({
+            create: {
+              width: maxX,
+              height: maxY,
+              channels: 4,
+              background: { r: 255, g: 255, b: 255, alpha: 1 }
+            }})
+            .composite(composites)
+            .toFile(filePath);
+
+          mainWin.setProgressBar(-1)
         });
 
         ipcMain.on('main:img-context-menu', (event, args) => {
