@@ -12,9 +12,9 @@
     <link href="../../node_modules/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
 </head>
 
-<body class="d-flex flex-column">
+<body class="vh-100 d-flex flex-column overflow-hidden">
     <!-- Toolbar -->
-    <nav class="navbar navbar-dark bg-dark" id="proj-nav">
+    <nav class="navbar navbar-dark bg-dark flex-shrink-1 p-1" id="proj-nav">
         <div class="container-fluid">
             <span class="navbar-brand mb-0 h1" id="proj-name">Papyrus Visualization</span>
             <div class="d-flex">
@@ -36,12 +36,10 @@
     </nav>
 
     <!-- Main Content -->
-    <div class="container-fluid mt-1 flex-grow-1">
-      <div class="row h-100">
-
+    <div class="flex-fill d-flex flex-row overflow-auto">
         <!-- Thumbnails Column -->
-        <div id="thumbnail-column" class="col-md-2 full-height main-component" >
-            <div class="card text-center">
+        <aside id="thumbnail-column" class="sidebar d-flex p-1 flex-column" >
+            <div class="card text-center sidebar-content h-100" id="thumbnail-container" >
                 <div class="card-header">
                   <ul class="nav nav-tabs card-header-tabs thumbnail-tabs">
                     <li class="nav-item">
@@ -52,9 +50,9 @@
                     </li>
                   </ul>
                 </div>
-                <div class="card-body" id="thumbnail-container">
-                  <div class="tab-content">
-                    <div class="tab-pane active fixed-height" id="thumbnails" role="tabpanel" >
+                <div class="card-body h-100" style="padding: 1.25rem .5rem 0 .5rem;">
+                  <div class="tab-content h-100">
+                    <div class="tab-pane active h-100 overflow-auto" id="thumbnails" role="tabpanel" >
                       <form>
                         <div class="mb-3">
                           <div class="form-group">
@@ -70,7 +68,7 @@
                     </div>
 
 
-                    <div class="tab-pane fixed-height" id="similarity" role="tabpanel">
+                    <div class="tab-pane h-100 overflow-auto" id="similarity" role="tabpanel">
                     <form>
                       <div class="form-group"  id="no-similarity">
                         <label>No similarity matrix found!</label>
@@ -107,11 +105,11 @@
                   </div>
                 </div>
               </div>
-        </div>
+        </aside>
         <!-- Board Column -->
-        <div id="board-column" class="col-md-10 full-height main-component">
+        <main id="board-column" class="main flex-fill p-1 ">
             <!-- <h5>Board</h5> -->
-            <div class="card text-center">
+            <div class="card text-center h-100">
                 <div class="card-header">
                   <ul class="nav nav-tabs card-header-tabs" id="assembling-tabs">
                     <li class="nav-item" id="assembling-tab-template", style="display: none;">
@@ -122,13 +120,15 @@
                     </li>
                   </ul>
                 </div>
-                  <div class="card-body fixed-height" id="board">
+                  <div class="card-body h-100 overflow-auto" id="board">
                 </div>
             </div>
-        </div>
-      </div>
+          </main>
     </div>
 
+    <!-- <div class="flex-shrink-1 bg-primary text-white p-1">
+      <span>Bottom Bar</span>
+    </div> -->
     <!-- You can also require other files to run in this process -->
     <script src="./renderer.js"></script>
 </body>
