@@ -8,7 +8,6 @@
 
 const { ipcRenderer } = require('electron');
 const fs = require('fs');
-const { event } = require('jquery');
 let $ = jQuery = require('jquery');
 require('jquery-lazy');
 require('bootstrap');
@@ -26,6 +25,27 @@ $('#thumbnail-column .thumbnail-tabs a').on('click', function (e) {
     e.preventDefault()
     $(this).tab('show')
 });
+
+$.fn.waitForImages = function (callback) {
+    var $img = $(this),
+        totalImg = $img.length;
+
+    var waitImgLoad = function () {
+        totalImg--;
+        if (!totalImg) {
+            callback();
+        }
+    };
+
+    $img.each(function () {
+        if (this.complete) { 
+            waitImgLoad();
+        }
+    })
+
+    $img.on('load', waitImgLoad)
+        .on('error', waitImgLoad);
+};
 
 $('#thumbnail-column').on('dblclick', 'figure', function() {
     const board = $('#board');
@@ -137,14 +157,14 @@ function loadPartThumbnails(container, imgList, fromIdx, toIdx) {
 
         thumbnail.children('img')
             .addClass('thumbnails-block' + toIdx)
-                .attr('src', 'file://' + imgInfo.thumbnails);
+            .attr('src', 'file://' + imgInfo.thumbnails);
         thumbnail.children('figcaption')
                 .html(imgInfo.name);
         thumbnail.appendTo(container);
     }
     if (toIdx < imgList.length) {
         const lazyThumb = $('<div>', {id: 'thumbnails-lazy' + toIdx, 'data-loader': "nextThumbnails"});
-        $('.thumbnails-block' + toIdx).on('load', function() {
+        $('.thumbnails-block' + toIdx).waitForImages(function() {
             lazyThumb.appendTo(container);
             lazyThumb.Lazy({
                 scrollDirection: 'vertical',
@@ -154,7 +174,10 @@ function loadPartThumbnails(container, imgList, fromIdx, toIdx) {
                 threshold: 200,
                 appendScroll: $('#thumbnails'),
                 nextThumbnails: function(element) {
-                    lazyThumb.data("plugin_lazy").destroy();
+                    const lazyObj = lazyThumb.data("plugin_lazy");
+                    if (lazyObj) {
+                        lazyObj.destroy();
+                    }
                     lazyThumb.remove();
                     loadPartThumbnails(container, imgList, toIdx, toIdx + nItemsPerPage);
                 }
@@ -345,7 +368,7 @@ function loadPartSimilarityResults(container, matches, fromIdx, toIdx, rank, pre
     }
     if (toIdx < matches.length) {
         const matchObj = $('<div>', {id: 'match-lazy' + toIdx, 'data-loader': "nextMatches"});
-        $('.match-block' + toIdx).on('load', function() {
+        $('.match-block' + toIdx).waitForImages(function() {
             matchObj.appendTo(container);
             matchObj.Lazy({
                 scrollDirection: 'vertical',
@@ -355,7 +378,10 @@ function loadPartSimilarityResults(container, matches, fromIdx, toIdx, rank, pre
                 threshold: 200,
                 appendScroll: $('#similarity'),
                 nextMatches: function(element) {
-                    matchObj.data("plugin_lazy").destroy();
+                    const lazyObj = matchObj.data("plugin_lazy");
+                    if (lazyObj) {
+                        lazyObj.destroy();
+                    }
                     matchObj.remove();
                     loadPartSimilarityResults(container, matches, toIdx, toIdx + nItemsPerPage, rank, prevDistance);
                 }
