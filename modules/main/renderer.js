@@ -163,7 +163,7 @@ function loadPartThumbnails(container, imgList, fromIdx, toIdx) {
         thumbnail.appendTo(container);
     }
     if (toIdx < imgList.length) {
-        const lazyThumb = $('<div>', {id: 'thumbnails-lazy' + toIdx, 'data-loader': "nextThumbnails"});
+        const lazyThumb = $('<div>', {id: 'thumbnails-lazy', 'data-loader': "nextThumbnails"});
         $('.thumbnails-block' + toIdx).waitForImages(function() {
             lazyThumb.appendTo(container);
             lazyThumb.Lazy({
@@ -188,6 +188,11 @@ function loadPartThumbnails(container, imgList, fromIdx, toIdx) {
 }
 
 function loadThumbnails() {
+    const prevLazy = $('#thumbnails-lazy').data("plugin_lazy");
+    if (prevLazy) {
+        prevLazy.destroy();
+    }
+
     const thumbnailContainer = $('#thumbnail-images');
     thumbnailContainer.html('');
 
