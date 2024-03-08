@@ -77,6 +77,11 @@ class MainController {
         ipcMain.on('main:open-create-similarity', async (event, projPath) => {
           const dlg = dialogUtils.openDialog(pathUtils.fromRoot('modules', 'main', 'dialogs', 'similarity', 'index.html'), this.mainWin, 800, 600, projPath);
         });
+
+        ipcMain.on('main:quit', async (event, args) => {
+          dialogUtils.closeCurrentDialog();
+          mainWin.close();
+        });
     }
 
 }

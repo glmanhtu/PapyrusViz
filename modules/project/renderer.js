@@ -32,3 +32,7 @@ let $ = jQuery = require('jquery');
 function createProject() {
     ipcRenderer.send('proj:open-create-project');
 }
+
+function quit() {
+    ipcRenderer.send('main:quit');
+}
