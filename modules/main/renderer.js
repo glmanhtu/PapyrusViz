@@ -274,8 +274,14 @@ window.addEventListener('contextmenu', (e) => {
 ipcRenderer.on('main:menu:switch-image', (event, args) => {
     const imgId = args['imageId'];
     const toImageId = args['toImage'];
+    const img = project.images[imgId];
+    const targetImg = project.images[toImageId];
     const activeAssembling = project.assembled[getActiveAssemblingId()];
+
+    const scaledImgWidth = img.width * activeAssembling.images[imgId].scale;
+    const targetScaled = scaledImgWidth / targetImg.width;
     activeAssembling.images[toImageId] = activeAssembling.images[imgId];
+    activeAssembling.images[toImageId].scale = targetScaled;
     delete activeAssembling.images[imgId];
     drawAssembledImage(activeAssembling.images);
     setActiveImage($(`.board-img[data-img-id="${toImageId}"]`).get()[0]);
