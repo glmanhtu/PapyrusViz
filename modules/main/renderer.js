@@ -98,7 +98,18 @@ $('#thumbnail-column').on('dblclick', 'figure', function() {
     } else {
         setActiveImage(fullImage.get()[0]);
     }
-})
+});
+
+function removeMatching() {
+    if (project.matching) {
+        project.matching = null;
+        $('#no-similarity').css('display', 'block');
+        $('#has-similarity').css('display', 'none');
+        $('#matched-results').html('');
+        $('#matching-query').css('display', 'none');
+        save();
+    }
+}
 
 function drawAssembledImage(images) {
     const board = document.getElementById('board');

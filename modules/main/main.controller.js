@@ -142,7 +142,7 @@ class MainController {
             { 
               label: 'Find similarities', 
               accelerator: 'CmdOrCtrl+F',
-              enabled: matching !== undefined,
+              enabled: (matching !== undefined) && (matching !== null),
               click: () => {event.reply('main:menu:img-find-similarity', args)}
             },
             {
