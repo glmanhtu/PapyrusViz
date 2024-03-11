@@ -32,7 +32,7 @@ body {
 }
 
 .nav-link {
-    padding: .3rem 1rem .3rem 1rem !important;
+    padding: .3rem 1rem .5rem 1rem !important;
     color: #495057;
     position: relative;
 }
@@ -83,7 +83,7 @@ figcaption {
 }
 
 .assembling-tab {
-    padding: 0.3rem 1.3rem 0.3rem 1rem !important;
+    padding: 0.3rem 1.3rem 0.5rem 1rem !important;
 }
 
 #matching-query {
@@ -98,7 +98,7 @@ figcaption {
     max-width: 100%;
     display: block !important;
     white-space: nowrap;
-    /* overflow-y: hidden; */
+    overflow-y: hidden;
     overflow-x: scroll;
     text-align: left;
     flex-wrap: nowrap;
@@ -106,4 +106,8 @@ figcaption {
 
 #assembling-tabs .nav-item {
     display: inline-block;
+}
+
+#board-column .card-header-tabs {
+    margin-bottom: -.8rem !important;
 }
