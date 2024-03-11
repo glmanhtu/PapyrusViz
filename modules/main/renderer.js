@@ -27,6 +27,13 @@ $('#thumbnail-column .thumbnail-tabs a').on('click', function (e) {
     $(this).tab('show')
 });
 
+$('#thumbnail-filter').on('keyup', function(e) {
+    const val = $(this).val();
+    if (val.length === 0 || val.length > 1) {
+        loadThumbnails();
+    }
+});
+
 $('#assembling-tabs').on('click', '.assembling-tab', function() {
     const prevActiv = getActiveAssembling();
     const prevActivId = prevActiv.attr('data-assembledId');
@@ -206,9 +213,14 @@ function loadThumbnails() {
 
     imageDict = {};
     const imagePathList = [];
+    const filterVal = $('#thumbnail-filter').val();
     for (const [key, imgInfo] of Object.entries(project.images)) {
         imageDict[imgInfo.path] = parseInt(key);
         if (!imgInfo.path.includes(selectedDir)) {
+            continue;
+        }
+        
+        if (!imgInfo.path.includes(filterVal)) {
             continue;
         }
         imagePathList.push(imgInfo.path);
