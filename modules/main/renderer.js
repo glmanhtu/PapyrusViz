@@ -8,6 +8,7 @@
 
 const { ipcRenderer } = require('electron');
 const fs = require('fs');
+const { event } = require('jquery');
 let $ = jQuery = require('jquery');
 require('jquery-lazy');
 require('bootstrap');
@@ -24,6 +25,21 @@ board.addEventListener('click', () => {
 $('#thumbnail-column .thumbnail-tabs a').on('click', function (e) {
     e.preventDefault()
     $(this).tab('show')
+});
+
+$('#assembling-tabs').on('click', '.assembling-tab', function() {
+    const prevActiv = getActiveAssembling();
+    const prevActivId = prevActiv.attr('data-assembledId');
+    const activId = $(this).attr('data-assembledId')
+    if (activId !== prevActivId) {
+        prevActiv.removeClass('active');
+        prevActiv.removeAttr('id');
+        $(this).attr('id', 'current-assembling');
+        $(this).addClass('active');
+        project.assembled[prevActivId].activated = false;
+        project.assembled[activId].activated = true;
+        drawAssembledImage(project.assembled[parseInt(activId)].images);
+    }
 });
 
 $.fn.waitForImages = function (callback) {
@@ -109,7 +125,7 @@ function addAssemblingToTabs(key) {
         .removeAttr('style')
         .addClass('assembling-tab-head');
     const tabA = tab.children('a');
-    tabA.html(assembledInfo.name + '<span>●</span>');
+    tabA.html(`${assembledInfo.name}` + '<span>●</span>');
     tabA.addClass('assembling-tab');
     if (assembledInfo.activated) {
         tabA.addClass('active');
@@ -117,20 +133,6 @@ function addAssemblingToTabs(key) {
         drawAssembledImage(assembledInfo.images);
     }
     tabA.attr(`data-assembledId`, key);
-    tabA.on('click', function() {
-        const prevActiv = getActiveAssembling();
-        const prevActivId = prevActiv.attr('data-assembledId');
-        const activId = $(this).attr('data-assembledId')
-        if (activId !== prevActivId) {
-            prevActiv.removeClass('active');
-            prevActiv.removeAttr('id');
-            $(this).attr('id', 'current-assembling');
-            $(this).addClass('active');
-            project.assembled[prevActivId].activated = false;
-            project.assembled[activId].activated = true;
-            drawAssembledImage(project.assembled[key].images);
-        }
-    });
     tab.appendTo('#assembling-tabs');
     return tab;
 }
@@ -246,7 +248,11 @@ ipcRenderer.on('project-loaded', async (event, projPath) => {
 
 window.addEventListener('contextmenu', (e) => {
   e.preventDefault();
-  if (e.target.className == 'board-img') {
+  if (e.target.className.includes('assembling-tab')) {
+    const tabId = parseInt(e.target.dataset.assembledid);
+    ipcRenderer.send('main:tab-context-menu', {assembleId: tabId});
+  }
+  else if (e.target.className == 'board-img') {
     setActiveImage(e.target);
     const imageId = parseInt(e.target.dataset.imgId);
     const matching = project.matching;
@@ -270,6 +276,25 @@ window.addEventListener('contextmenu', (e) => {
     });
     ipcRenderer.send('main:img-context-menu', {imageId: imageId, matching: matching, switchVersions: switchVersions});
   }
+});
+
+ipcRenderer.on('main:menu:tab-rename', (event, args) => {
+
+    const currentAssemblingTab = $(`.assembling-tab[data-assembledid="${args.assembleId}"]`);
+    const renameInput = $('<input>', {id: 'renameAssembling', class: 'form-control form-control-sm', "data-assembling-id": args.assembleId});
+    currentAssemblingTab.replaceWith(renameInput);
+    renameInput.val(project.assembled[args.assembleId].name);
+    renameInput.trigger('focus');
+    renameInput.on('keyup', function(e) {
+        if (e.key === 'Escape') {
+            renameInput.replaceWith(currentAssemblingTab);
+        } else if (e.key === 'Enter') {
+            project.assembled[args.assembleId].name = renameInput.val();
+            currentAssemblingTab.html(`${renameInput.val()}` + '<span>●</span>');
+            currentAssemblingTab.children('span').addClass('unsaved');
+            renameInput.replaceWith(currentAssemblingTab);
+        }
+    });
 });
 
 ipcRenderer.on('main:menu:switch-image', (event, args) => {

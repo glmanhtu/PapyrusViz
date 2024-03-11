@@ -99,6 +99,19 @@ class MainController {
           mainWin.setProgressBar(-1)
         });
 
+        ipcMain.on('main:tab-context-menu', (event, args) => {
+          const template = [
+            {
+              label: 'Rename',
+              click: () => { 
+                event.reply('main:menu:tab-rename', args) 
+              }
+            }
+          ]
+          const menu = Menu.buildFromTemplate(template)
+          menu.popup({ window: mainWin })
+        });
+
         ipcMain.on('main:img-context-menu', (event, args) => {
           const imageId = args['imageId'];
           const matching = args['matching'];

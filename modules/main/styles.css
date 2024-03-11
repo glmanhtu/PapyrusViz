@@ -98,7 +98,7 @@ figcaption {
     max-width: 100%;
     display: block !important;
     white-space: nowrap;
-    overflow-y: hidden;
+    /* overflow-y: hidden; */
     overflow-x: scroll;
     text-align: left;
     flex-wrap: nowrap;
