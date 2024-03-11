@@ -43,7 +43,9 @@ $('#assembling-tabs').on('click', '.assembling-tab', function() {
         prevActiv.removeAttr('id');
         $(this).attr('id', 'current-assembling');
         $(this).addClass('active');
-        project.assembled[prevActivId].activated = false;
+        if (project.assembled[prevActivId]) {
+            project.assembled[prevActivId].activated = false;
+        }
         project.assembled[activId].activated = true;
         drawAssembledImage(project.assembled[parseInt(activId)].images);
     }
@@ -169,6 +171,17 @@ function addAssemblingToTabs(key) {
     return tab;
 }
 
+function drawAssemblings() {
+    $('.assembling-tab').each(function(i, e) {
+        e.remove();
+    });
+
+
+    for (const [key, assembledInfo] of Object.entries(project.assembled)) {
+        addAssemblingToTabs(key);
+    }
+}
+
 function createAssembling() {
     const assembleId = project.assembledCount;
     const assemblingInfo = {
@@ -263,9 +276,6 @@ function loadThumbnails() {
 ipcRenderer.on('project-loaded', async (event, projPath) => {
     project = await ipcRenderer.invoke('proj:get-project', {'projPath': projPath});
     projectPath = projPath;
-    $('.assembling-tab').each(function(i, e) {
-        e.remove();
-    });
 
     project.rootDirs.available.forEach(root => {
         let isSelected = false;
@@ -275,15 +285,13 @@ ipcRenderer.on('project-loaded', async (event, projPath) => {
         $('#root-dirs').append(new Option(root.name, root.path, isSelected, isSelected));
     });
 
-    for (const [key, assembledInfo] of Object.entries(project.assembled)) {
-        addAssemblingToTabs(key);
-    }
-
     if (project.matching) {
         $('#no-similarity').css('display', 'none');
         $('#has-similarity').css('display', 'flex');
         $('#matching-name').val(project.matching.matchingName);
     }
+
+    drawAssemblings();
     
     $('#proj-name').html(`Project: ${project.projName}`);
 
@@ -320,6 +328,13 @@ window.addEventListener('contextmenu', (e) => {
     });
     ipcRenderer.send('main:img-context-menu', {imageId: imageId, matching: matching, switchVersions: switchVersions});
   }
+});
+
+ipcRenderer.on('main:menu:tab-delete', (event, args) => {
+    const currentAssemblingTab = $(`.assembling-tab[data-assembledid="${args.assembleId}"]`);
+    delete project.assembled[args.assembleId];
+    drawAssemblings();
+    save();
 });
 
 ipcRenderer.on('main:menu:tab-rename', (event, args) => {

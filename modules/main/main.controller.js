@@ -106,6 +106,12 @@ class MainController {
               click: () => { 
                 event.reply('main:menu:tab-rename', args) 
               }
+            },
+            {
+              label: 'Delete',
+              click: () => { 
+                event.reply('main:menu:tab-delete', args) 
+              }
             }
           ]
           const menu = Menu.buildFromTemplate(template)
