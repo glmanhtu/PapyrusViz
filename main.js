@@ -22,12 +22,6 @@ function createWindow() {
     }
   });
 
-  win.on('resize', function () {
-      var size   = win.getSize();
-      win.webContents.send('resized', size);
-  });
-
-
   const controllers = [
     new MainController(ipcMain, win),
     new DialogsController(ipcMain, win),

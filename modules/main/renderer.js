@@ -49,6 +49,20 @@ $('#assembling-tabs').on('click', '.assembling-tab', function() {
     }
 });
 
+
+// Event listener for keydown event
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'i') {
+        zoomIn(0.01);
+    } else if (event.key === 'o') {
+        zoomOut(0.01);
+    } else if (event.key === 'r') {
+        rotateRight(1);
+    } else if (event.key === 'l') {
+        rotateLeft(1);
+    }
+});
+
 $.fn.waitForImages = function (callback) {
     var $img = $(this),
         totalImg = $img.length;
@@ -456,18 +470,6 @@ ipcRenderer.on('main:matching:results', async (event, args) => {
     loadPartSimilarityResults(matchesContainer, matches, 0, nItemsPerPage, rank, prevDistance);
 });
 
-repeatActionOnHold('i', () => zoomIn(0.01));
-repeatActionOnHold('o', () => zoomOut(0.01));
-repeatActionOnHold('r', () => rotateRight(1));
-repeatActionOnHold('l', () => rotateLeft(1));
-
-ipcRenderer.on('resized', (event, size) => {
-    var height = size[1];
-    const boardRect = document.querySelector('#board').getBoundingClientRect();
-    const navRect = document.querySelector('#proj-nav').getBoundingClientRect();
-    const drawingAreaHeight = height - parseInt(boardRect.y + 0.6 * navRect.height);
-    $('.fixed-height').css('height', `${drawingAreaHeight}px`)
-});
 
 function save() {
     ipcRenderer.invoke('proj:save-project', {'projPath': projectPath, 'project': project}).then((result) => {
@@ -611,15 +613,4 @@ function dragElement(elmnt) {
         document.onmousemove = null;
         elmnt.style.cursor = "unset";
     }
-}
-
-
-function repeatActionOnHold(key, actionFunction) {
-    // Event listener for keydown event
-    document.addEventListener('keydown', (event) => {
-        if (event.key === key) {
-            actionFunction()
-        }
-    });
-
 }
