@@ -27,7 +27,7 @@ class MainController {
           const activeAssembling = project.assembled[activeAssemblingId];
           
           const { filePath, canceled } = await dialog.showSaveDialog({
-            defaultPath: "image.png"
+            defaultPath: activeAssembling.name + ".png"
           });
         
           if (!filePath || canceled) {
@@ -55,15 +55,15 @@ class MainController {
                 .toBuffer();
               
             const metaData1 = await sharp(processedImage).metadata();
-            const width1 = metaData1.width;
+            const widthBeforeRotate = metaData1.width;
             
             processedImage = await sharp(processedImage)
-            .rotate(rotation, {background: { r: 0, g: 0, b: 0, alpha: 0 }})
-            .toBuffer();
+              .rotate(rotation, {background: { r: 0, g: 0, b: 0, alpha: 0 }})
+              .toBuffer();
 
             const metaData = await sharp(processedImage).metadata();
 
-            const wChange = (metaData.width - width1) / 2;
+            const wChange = (metaData.width - widthBeforeRotate) / 2;
             
             images.push({img: processedImage, zIndex: zIndex, top: top, left: parseInt(left - wChange), width: metaData.width, height: metaData.height});
             mainWin.setProgressBar(images.length / activeAssembling.images.length)
