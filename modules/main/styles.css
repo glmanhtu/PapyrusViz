@@ -93,3 +93,17 @@ figcaption {
 .sidebar {
     flex: 0 0 20%;
 }
+
+#assembling-tabs {
+    max-width: 100%;
+    display: block !important;
+    white-space: nowrap;
+    overflow-y: hidden;
+    overflow-x: scroll;
+    text-align: left;
+    flex-wrap: nowrap;
+}
+
+#assembling-tabs .nav-item {
+    display: inline-block;
+}

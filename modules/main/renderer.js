@@ -106,7 +106,8 @@ function addAssemblingToTabs(key) {
     const assembledInfo = project.assembled[key];
     const tab = $('#assembling-tab-template').clone()
         .removeAttr('id')
-        .css('display', 'list-item');
+        .removeAttr('style')
+        .addClass('assembling-tab-head');
     const tabA = tab.children('a');
     tabA.html(assembledInfo.name + '<span>●</span>');
     tabA.addClass('assembling-tab');
