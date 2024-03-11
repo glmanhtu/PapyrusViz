@@ -163,7 +163,14 @@ class ProjectController {
         projectData.images = {}
         projectData.createdAt = Date.now();
         projectData.assembled = { 
-            0: {'name': 'Assembling #1', 'activated': true, 'images': {}, 'imagesCount': 0, 'createdAt': Date.now()},
+            0: {
+                'name': 'Assembling #1', 
+                'parent': 'default', 
+                'activated': true, 
+                'images': {}, 
+                'imagesCount': 0, 
+                'createdAt': Date.now()
+            },
         };
         projectData.assembledCount = 1;
 

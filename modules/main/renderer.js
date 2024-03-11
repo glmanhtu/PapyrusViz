@@ -171,7 +171,14 @@ function addAssemblingToTabs(key) {
 
 function createAssembling() {
     const assembleId = project.assembledCount;
-    const assemblingInfo = {'name': `Assembling #${assembleId + 1}`, 'activated': true, 'images': {}, 'imagesCount': 0, 'createdAt': Date.now()};
+    const assemblingInfo = {
+        'name': `Assembling #${assembleId + 1}`, 
+        'parent': 'default', 
+        'activated': true, 
+        'images': {}, 
+        'imagesCount': 0, 
+        'createdAt': Date.now()
+    };
     project.assembled[assembleId] = assemblingInfo;
     project.assembledCount += 1;
     const tab = addAssemblingToTabs(assembleId);
