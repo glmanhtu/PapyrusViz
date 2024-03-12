@@ -19,7 +19,7 @@ body {
 }
 
 #thumbnail-container figcaption {
-    max-width: 250px;
+    max-width: 100%;
 }
 
 #thumbnail-container img {
@@ -114,4 +114,23 @@ figcaption {
 
 #board-column .card-header-tabs {
     margin-bottom: -.8rem !important;
+}
+
+/* width */
+::-webkit-scrollbar {
+    width: 5px;
+ }
+/* Track */
+ ::-webkit-scrollbar-track {
+   background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+   background: #bec4c4;
+}
+
+/* Handle on hover */
+ ::-webkit-scrollbar-thumb:hover {
+    background: #555;
 }
