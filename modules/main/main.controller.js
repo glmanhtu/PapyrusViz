@@ -1,7 +1,7 @@
 const path = require('node:path');
 const fs = require('fs');
 const sharp = require('sharp');
-const { Menu, dialog } = require('electron')
+const { Menu, dialog, nativeImage } = require('electron')
 const dialogUtils = require('../utils/dialog.utils');
 const pathUtils = require('../utils/path.utils');
 const dataUtils = require('../utils/data.utils');
@@ -15,7 +15,7 @@ class MainController {
         this.mainWin = mainWin
 
         mainWin.loadFile(pathUtils.fromRoot('modules', 'main', 'index.html'));
-        mainWin.setIcon(pathUtils.fromRoot('icon.ico'))
+        mainWin.setIcon(nativeImage.createFromPath(pathUtils.fromRoot('icon.png')))
 
         ipcMain.on('main:reload', (projPath) => {
             mainWin.webContents.postMessage('project-loaded', projPath);
