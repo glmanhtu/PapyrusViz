@@ -99,9 +99,13 @@ figcaption {
     display: block !important;
     white-space: nowrap;
     overflow-y: hidden;
-    overflow-x: auto;
+    overflow-x: scroll;
     text-align: left;
     flex-wrap: nowrap;
+}
+
+#assembling-tabs::-webkit-scrollbar {
+    display: none;
 }
 
 #assembling-tabs .nav-item {
