@@ -2,13 +2,17 @@ module.exports = {
   packagerConfig: {
     asar: {
       unpack: "**/node_modules/sharp/**/*"
-    }
+    },
+    icon: 'icon.ico',
   },
   rebuildConfig: {},
   makers: [
     {
       name: '@electron-forge/maker-squirrel',
-      config: {},
+      config: {
+        icon: 'icon.ico',
+        setupIcon: 'icon.ico'
+      },
     },
     {
       name: '@electron-forge/maker-zip',
