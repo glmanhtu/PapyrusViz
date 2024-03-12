@@ -99,7 +99,7 @@ figcaption {
     display: block !important;
     white-space: nowrap;
     overflow-y: hidden;
-    overflow-x: scroll;
+    overflow-x: auto;
     text-align: left;
     flex-wrap: nowrap;
 }
