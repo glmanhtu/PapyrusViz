@@ -330,11 +330,14 @@ window.addEventListener('contextmenu', (e) => {
   }
 });
 
-ipcRenderer.on('main:menu:tab-delete', (event, args) => {
-    const currentAssemblingTab = $(`.assembling-tab[data-assembledid="${args.assembleId}"]`);
-    delete project.assembled[args.assembleId];
-    drawAssemblings();
-    save();
+ipcRenderer.on('main:menu:tab-delete', async (event, args) => {
+    const confirm = await ipcRenderer.invoke('dialogs:confirm', {title: 'Delete assembled image', content: 'Are you sure? This can not be undone !'});
+    if (confirm) {
+        const currentAssemblingTab = $(`.assembling-tab[data-assembledid="${args.assembleId}"]`);
+        delete project.assembled[args.assembleId];
+        drawAssemblings();
+        save();
+    }
 });
 
 ipcRenderer.on('main:menu:tab-rename', (event, args) => {

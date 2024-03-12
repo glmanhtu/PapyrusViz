@@ -7,6 +7,13 @@ class DialogsController {
     constructor(ipcMain, mainWin) {
         this.ipcMain = ipcMain
         this.mainWin = mainWin
+
+        ipcMain.handle('dialogs:confirm', async (event, args) => {
+          const title = args.title;
+          const content = args.content;
+          const currDialog = dialogUtils.getCurrentDialog() || this.mainWin;
+          return dialogUtils.confirmDialog(currDialog, title, content);
+        });
         
         ipcMain.on('dialogs:open-images-dialog', async (event) => {
           const currDialog = dialogUtils.getCurrentDialog() || this.mainWin;
