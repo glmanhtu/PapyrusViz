@@ -19,7 +19,7 @@ body {
 }
 
 #thumbnail-container figcaption {
-    max-width: 320px;
+    max-width: 300px;
 }
 
 #thumbnail-container img {
@@ -92,7 +92,7 @@ figcaption {
 
 .sidebar {
     flex: 0 0 20%;
-    max-width: 320px;
+    max-width: 300px;
 }
 
 #assembling-tabs {
