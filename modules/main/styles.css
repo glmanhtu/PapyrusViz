@@ -19,7 +19,7 @@ body {
 }
 
 #thumbnail-container figcaption {
-    max-width: 100%;
+    max-width: 250px;
 }
 
 #thumbnail-container img {
