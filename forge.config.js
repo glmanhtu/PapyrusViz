@@ -3,24 +3,29 @@ module.exports = {
     asar: {
       unpack: "**/node_modules/sharp/**/*"
     },
-    icon: 'icon.ico',
+    icon: 'icons/icon',
   },
   rebuildConfig: {},
   makers: [
     {
       name: '@electron-forge/maker-squirrel',
       config: {
-        icon: 'icon.ico',
-        setupIcon: 'icon.ico'
-      },
+        setupIcon: 'icons/icon.ico'
+      }
     },
     {
-      name: '@electron-forge/maker-zip',
-      platforms: ['darwin'],
+      name: '@electron-forge/maker-dmg',
+      config: {
+        icon: 'icons/icon.icns'
+      }
     },
     {
       name: '@electron-forge/maker-deb',
-      config: {},
+      config: {
+        options: {
+          icon: 'icons/icon.png'
+        }
+      },
     },
     {
       name: '@electron-forge/maker-rpm',

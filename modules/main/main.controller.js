@@ -15,7 +15,7 @@ class MainController {
         this.mainWin = mainWin
 
         mainWin.loadFile(pathUtils.fromRoot('modules', 'main', 'index.html'));
-        mainWin.setIcon(nativeImage.createFromPath(pathUtils.fromRoot('icon.png')))
+        mainWin.setIcon(pathUtils.fromRoot('icons', 'icon.png'))
 
         ipcMain.on('main:reload', (projPath) => {
             mainWin.webContents.postMessage('project-loaded', projPath);
