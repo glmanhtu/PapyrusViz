@@ -15,6 +15,8 @@ require('bootstrap');
 let project = null;
 let projectPath = null;
 let imageDict = {};
+let searchResults = [];
+let queryImgId = null;
 const nItemsPerPage = 10;
 
 const board = document.getElementById('board');
@@ -289,14 +291,16 @@ function loadThumbnails() {
 ipcRenderer.on('project-loaded', async (event, projPath) => {
     project = await ipcRenderer.invoke('proj:get-project', {'projPath': projPath});
     projectPath = projPath;
-
+    
     $('#root-dirs').empty();
+    $('#sim-root-dirs').empty();
     project.rootDirs.available.forEach(root => {
         let isSelected = false;
         if (project.rootDirs.selected === root.path) {
             isSelected = true;
         }
         $('#root-dirs').append(new Option(root.name, root.path, isSelected, isSelected));
+        $('#sim-root-dirs').append(new Option(root.name, root.path, isSelected, isSelected));
     });
 
     if (project.matching) {
@@ -509,7 +513,7 @@ function loadPartSimilarityResults(container, matches, fromIdx, toIdx, rank, pre
 
 }
 
-ipcRenderer.on('main:matching:results', async (event, args) => {
+function loadSearchResults() {
     $('.thumbnail-tabs a[href="#similarity"]').tab('show');
 
     const prevLazy = $('#match-lazy').data("plugin_lazy");
@@ -517,8 +521,18 @@ ipcRenderer.on('main:matching:results', async (event, args) => {
         prevLazy.destroy();
     }
 
-    const queryImg = project.images[args['queryImg']];
-    const matches = args['matches'];
+    const queryImg = project.images[queryImgId];
+    const matches = [];
+
+    const selectedDir = document.getElementById("sim-root-dirs").value;
+    searchResults.forEach(element => {
+        const matchedImgId = parseInt(element['imgId']);
+        const matchedImg = project.images[matchedImgId];
+        if (matchedImg.path.includes(selectedDir)) {
+            matches.push(element);
+        }
+    });
+
     const queryDom = $('#matching-query').css('display', 'block');
     queryDom.children('img').attr('src', queryImg.path);
     queryDom.children('figcaption').html(queryImg.name);
@@ -528,7 +542,13 @@ ipcRenderer.on('main:matching:results', async (event, args) => {
     let rank = 0;
     let prevDistance = 0;
 
-    loadPartSimilarityResults(matchesContainer, matches, 0, nItemsPerPage, rank, prevDistance);
+    loadPartSimilarityResults(matchesContainer, matches, 0, nItemsPerPage, rank, prevDistance); 
+}
+
+ipcRenderer.on('main:matching:results', async (event, args) => {
+    searchResults = args['matches'];
+    queryImgId = args['queryImg'];
+    loadSearchResults();
 });
 
 

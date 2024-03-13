@@ -74,7 +74,11 @@
                         
                         <button type="button" class="btn btn-success btn-sm me-2" onclick="selectSimilarityMatrix()">Select a file</button>
                       </div>
-                      <div class="input-group input-group-sm mb-3" id="has-similarity" title="Matching name">
+                      <div id="has-similarity" style="flex-direction: column;">
+
+                        <select class="form-control form-control-sm mb-1" id="sim-root-dirs" onchange="loadSearchResults()">
+                        </select>
+                      <div class="input-group input-group-sm mb-3" title="Matching name">
                           <div class="input-group-prepend">
                             <div class="input-group-text"><i class="fa-solid fa-arrow-down-wide-short"></i></div>
                           </div>
@@ -83,6 +87,9 @@
                             <div class="input-group-text" role='button' onclick="removeMatching()"><i class="fa-solid fa-close text-danger"></i></div>
                           </div>
                         </div>
+
+                      </div>
+
                         <div class="container">
                           <figure class="figure row" id="matching-query" style="display: none;">
                             <img src="..." class="figure-img img-fluid img-thumbnail">
