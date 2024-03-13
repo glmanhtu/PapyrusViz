@@ -160,6 +160,10 @@ function createWindow() {
   Menu.setApplicationMenu(menu);
   if (require('electron-squirrel-startup')) app.quit();
 
+  win.on('resize', function () {
+    var size   = win.getSize();
+    win.webContents.send('resized', size);
+  });
   ipcMain.emit('proj:open-welcome-dialog');
 }
 

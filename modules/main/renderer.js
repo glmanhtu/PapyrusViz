@@ -86,6 +86,19 @@ $.fn.waitForImages = function (callback) {
         .on('error', waitImgLoad);
 };
 
+ipcRenderer.on('resized', (event, size) => {
+    let prevLazy = $('#thumbnails-lazy').data("plugin_lazy");
+    if (prevLazy) {
+        // Temporary fix the problem when lazy object doesn't load after user resize the window
+        prevLazy.loadAll();
+    }
+    prevLazy = $('#match-lazy').data("plugin_lazy");
+    if (prevLazy) {
+        // Temporary fix the problem when lazy object doesn't load after user resize the window
+        prevLazy.loadAll();
+    }
+});
+
 $('#thumbnail-column').on('dblclick', 'figure', function() {
     const board = $('#board');
     const key = $(this).attr('data-img-id');
@@ -226,7 +239,7 @@ function loadPartThumbnails(container, imgList, fromIdx, toIdx) {
                 chainable: false,
                 effect: "fadeIn",
                 effectTime: 200,
-                threshold: 200,
+                threshold: 0,
                 appendScroll: $('#thumbnails'),
                 nextThumbnails: function(element) {
                     const lazyObj = lazyThumb.data("plugin_lazy");
@@ -277,6 +290,7 @@ ipcRenderer.on('project-loaded', async (event, projPath) => {
     project = await ipcRenderer.invoke('proj:get-project', {'projPath': projPath});
     projectPath = projPath;
 
+    $('#root-dirs').empty();
     project.rootDirs.available.forEach(root => {
         let isSelected = false;
         if (project.rootDirs.selected === root.path) {
@@ -289,6 +303,11 @@ ipcRenderer.on('project-loaded', async (event, projPath) => {
         $('#no-similarity').css('display', 'none');
         $('#has-similarity').css('display', 'flex');
         $('#matching-name').val(project.matching.matchingName);
+    } else {
+        $('#no-similarity').css('display', 'block');
+        $('#has-similarity').css('display', 'none');
+        $('#matched-results').html('');
+        $('#matching-query').css('display', 'none');
     }
 
     drawAssemblings();
@@ -466,7 +485,7 @@ function loadPartSimilarityResults(container, matches, fromIdx, toIdx, rank, pre
         matchedItem.appendTo(container);
     }
     if (toIdx < matches.length) {
-        const matchObj = $('<div>', {id: 'match-lazy' + toIdx, 'data-loader': "nextMatches"});
+        const matchObj = $('<div>', {id: 'match-lazy', 'data-loader': "nextMatches"});
         $('.match-block' + toIdx).waitForImages(function() {
             matchObj.appendTo(container);
             matchObj.Lazy({
@@ -474,7 +493,7 @@ function loadPartSimilarityResults(container, matches, fromIdx, toIdx, rank, pre
                 chainable: false,
                 effect: "fadeIn",
                 effectTime: 200,
-                threshold: 200,
+                threshold: 0,
                 appendScroll: $('#similarity'),
                 nextMatches: function(element) {
                     const lazyObj = matchObj.data("plugin_lazy");
@@ -492,6 +511,12 @@ function loadPartSimilarityResults(container, matches, fromIdx, toIdx, rank, pre
 
 ipcRenderer.on('main:matching:results', async (event, args) => {
     $('.thumbnail-tabs a[href="#similarity"]').tab('show');
+
+    const prevLazy = $('#match-lazy').data("plugin_lazy");
+    if (prevLazy) {
+        prevLazy.destroy();
+    }
+
     const queryImg = project.images[args['queryImg']];
     const matches = args['matches'];
     const queryDom = $('#matching-query').css('display', 'block');
