@@ -1,6 +1,6 @@
 {
   "name": "papyviz",
-  "version": "1.0.0",
+  "version": "2.1.0",
   "description": "Visualize papyrus fragments and allow user to reassemble them",
   "main": "main.js",
   "scripts": {
