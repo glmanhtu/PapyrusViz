@@ -29,14 +29,14 @@ $('#thumbnail-column .thumbnail-tabs a').on('click', function (e) {
     $(this).tab('show')
 });
 
-$('#thumbnail-filter').on('keyup', function(e) {
+$('#thumbnail-filter').on('keyup', function (e) {
     const val = $(this).val();
     if (val.length === 0 || val.length > 1) {
         loadThumbnails();
     }
 });
 
-$('#assembling-tabs').on('click', '.assembling-tab', function() {
+$('#assembling-tabs').on('click', '.assembling-tab', function () {
     const prevActiv = getActiveAssembling();
     const prevActivId = prevActiv.attr('data-assembledId');
     const activId = $(this).attr('data-assembledId')
@@ -79,7 +79,7 @@ $.fn.waitForImages = function (callback) {
     };
 
     $img.each(function () {
-        if (this.complete) { 
+        if (this.complete) {
             waitImgLoad();
         }
     })
@@ -101,7 +101,7 @@ ipcRenderer.on('resized', (event, size) => {
     }
 });
 
-$('#thumbnail-column').on('dblclick', 'figure', function() {
+$('#thumbnail-column').on('dblclick', 'figure', function () {
     const board = $('#board');
     const key = $(this).attr('data-img-id');
     let fullImage = board.children(`*[data-img-id=${key}]`);
@@ -109,7 +109,7 @@ $('#thumbnail-column').on('dblclick', 'figure', function() {
         fullImage = addImageToBoard(key);
         const activeAssembling = project.assembled[getActiveAssemblingId()];
         activeAssembling.imagesCount += 1;
-        activeAssembling.images[key] = {'zIndex': activeAssembling.imagesCount};
+        activeAssembling.images[key] = { 'zIndex': activeAssembling.imagesCount };
         fullImage.style.zIndex = activeAssembling.imagesCount;
         alertUnsaved();
     } else {
@@ -142,7 +142,7 @@ function drawAssembledImage(images) {
         fullImage.height = Math.round(scale * image.height);
         fullImage.style.top = imageTransforms['top'] + 'px' || '10px';
         fullImage.style.left = imageTransforms['left'] + 'px' || '10px';
-    } 
+    }
 }
 
 
@@ -187,7 +187,7 @@ function addAssemblingToTabs(key) {
 }
 
 function drawAssemblings() {
-    $('.assembling-tab').each(function(i, e) {
+    $('.assembling-tab').each(function (i, e) {
         e.remove();
     });
 
@@ -200,11 +200,11 @@ function drawAssemblings() {
 function createAssembling() {
     const assembleId = project.assembledCount;
     const assemblingInfo = {
-        'name': `Assembling #${assembleId + 1}`, 
-        'parent': 'default', 
-        'activated': true, 
-        'images': {}, 
-        'imagesCount': 0, 
+        'name': `Assembling #${assembleId + 1}`,
+        'parent': 'default',
+        'activated': true,
+        'images': {},
+        'imagesCount': 0,
         'createdAt': Date.now()
     };
     project.assembled[assembleId] = assemblingInfo;
@@ -219,22 +219,22 @@ function loadPartThumbnails(container, imgList, fromIdx, toIdx) {
         const imgPath = imgList[i];
         const imgId = imageDict[imgPath];
         const imgInfo = project.images[imgId];
-        
+
         const thumbnail = $('#thumbnail-template').clone()
-        .css('display', 'block')
-        .removeAttr('id')
-        .attr('data-img-id', imgId);
+            .css('display', 'block')
+            .removeAttr('id')
+            .attr('data-img-id', imgId);
 
         thumbnail.children('img')
             .addClass('thumbnails-block' + toIdx)
             .attr('src', 'file://' + imgInfo.thumbnails);
         thumbnail.children('figcaption')
-                .html(imgInfo.name);
+            .html(imgInfo.name);
         thumbnail.appendTo(container);
     }
     if (toIdx < imgList.length) {
-        const lazyThumb = $('<div>', {id: 'thumbnails-lazy', 'data-loader': "nextThumbnails"});
-        $('.thumbnails-block' + toIdx).waitForImages(function() {
+        const lazyThumb = $('<div>', { id: 'thumbnails-lazy', 'data-loader': "nextThumbnails" });
+        $('.thumbnails-block' + toIdx).waitForImages(function () {
             lazyThumb.appendTo(container);
             lazyThumb.Lazy({
                 scrollDirection: 'vertical',
@@ -243,7 +243,7 @@ function loadPartThumbnails(container, imgList, fromIdx, toIdx) {
                 effectTime: 200,
                 threshold: 0,
                 appendScroll: $('#thumbnails'),
-                nextThumbnails: function(element) {
+                nextThumbnails: function (element) {
                     const lazyObj = lazyThumb.data("plugin_lazy");
                     if (lazyObj) {
                         lazyObj.destroy();
@@ -268,7 +268,7 @@ function loadThumbnails() {
 
     const selectedDir = document.getElementById("root-dirs").value;
     if (selectedDir !== project.rootDirs.selected) {
-        project.rootDirs.selected = selectedDir; 
+        project.rootDirs.selected = selectedDir;
     }
 
     imageDict = {};
@@ -279,7 +279,7 @@ function loadThumbnails() {
         if (!imgInfo.path.includes(selectedDir)) {
             continue;
         }
-        
+
         if (!imgInfo.path.includes(filterVal)) {
             continue;
         }
@@ -289,9 +289,9 @@ function loadThumbnails() {
 }
 
 ipcRenderer.on('project-loaded', async (event, projPath) => {
-    project = await ipcRenderer.invoke('proj:get-project', {'projPath': projPath});
+    project = await ipcRenderer.invoke('proj:get-project', { 'projPath': projPath });
     projectPath = projPath;
-    
+
     $('#root-dirs').empty();
     $('#sim-root-dirs').empty();
     project.rootDirs.available.forEach(root => {
@@ -315,46 +315,46 @@ ipcRenderer.on('project-loaded', async (event, projPath) => {
     }
 
     drawAssemblings();
-    
+
     $('#proj-name').html(`Project: ${project.projName}`);
 
     loadThumbnails();
 });
 
 window.addEventListener('contextmenu', (e) => {
-  e.preventDefault();
-  if (e.target.className.includes('assembling-tab')) {
-    const tabId = parseInt(e.target.dataset.assembledid);
-    ipcRenderer.send('main:tab-context-menu', {assembleId: tabId});
-  }
-  else if (e.target.className == 'board-img') {
-    setActiveImage(e.target);
-    const imageId = parseInt(e.target.dataset.imgId);
-    const matching = project.matching;
-    const imgPath = e.target.src;
-    const switchVersions = [];
-    let imgRoot = "";
-    project.rootDirs.available.forEach(root => {
-        if (imgPath.includes(root.path) && root.path !== "") {
-            imgRoot = root.path;
-        }
-    });
-    const subImgPath = imgPath.split(imgRoot)[1];
-    project.rootDirs.available.forEach(root => {
-        if (imgRoot !== root.path) {
-            const subDirImgPath = root.path + subImgPath;
-            const imgId = imageDict[subDirImgPath];
-            if (imgId) {
-                switchVersions.push({'name': root.name, 'imgId': imgId})
+    e.preventDefault();
+    if (e.target.className.includes('assembling-tab')) {
+        const tabId = parseInt(e.target.dataset.assembledid);
+        ipcRenderer.send('main:tab-context-menu', { assembleId: tabId });
+    }
+    else if (e.target.className == 'board-img') {
+        setActiveImage(e.target);
+        const imageId = parseInt(e.target.dataset.imgId);
+        const matching = project.matching;
+        const imgPath = e.target.src;
+        const switchVersions = [];
+        let imgRoot = "";
+        project.rootDirs.available.forEach(root => {
+            if (imgPath.includes(root.path) && root.path !== "") {
+                imgRoot = root.path;
             }
-        }
-    });
-    ipcRenderer.send('main:img-context-menu', {imageId: imageId, matching: matching, switchVersions: switchVersions});
-  }
+        });
+        const subImgPath = imgPath.split(imgRoot)[1];
+        project.rootDirs.available.forEach(root => {
+            if (imgRoot !== root.path) {
+                const subDirImgPath = root.path + subImgPath;
+                const imgId = imageDict[subDirImgPath];
+                if (imgId) {
+                    switchVersions.push({ 'name': root.name, 'imgId': imgId })
+                }
+            }
+        });
+        ipcRenderer.send('main:img-context-menu', { imageId: imageId, matching: matching, switchVersions: switchVersions });
+    }
 });
 
 ipcRenderer.on('main:menu:tab-delete', async (event, args) => {
-    const confirm = await ipcRenderer.invoke('dialogs:confirm', {title: 'Delete assembled image', content: 'Are you sure? This can not be undone !'});
+    const confirm = await ipcRenderer.invoke('dialogs:confirm', { title: 'Delete assembled image', content: 'Are you sure? This can not be undone !' });
     if (confirm) {
         const currentAssemblingTab = $(`.assembling-tab[data-assembledid="${args.assembleId}"]`);
         delete project.assembled[args.assembleId];
@@ -366,11 +366,11 @@ ipcRenderer.on('main:menu:tab-delete', async (event, args) => {
 ipcRenderer.on('main:menu:tab-rename', (event, args) => {
 
     const currentAssemblingTab = $(`.assembling-tab[data-assembledid="${args.assembleId}"]`);
-    const renameInput = $('<input>', {id: 'renameAssembling', class: 'form-control form-control-sm', "data-assembling-id": args.assembleId});
+    const renameInput = $('<input>', { id: 'renameAssembling', class: 'form-control form-control-sm', "data-assembling-id": args.assembleId });
     currentAssemblingTab.replaceWith(renameInput);
     renameInput.val(project.assembled[args.assembleId].name);
     renameInput.trigger('focus');
-    renameInput.on('keyup', function(e) {
+    renameInput.on('keyup', function (e) {
         if (e.key === 'Escape') {
             renameInput.replaceWith(currentAssemblingTab);
         } else if (e.key === 'Enter') {
@@ -416,13 +416,13 @@ ipcRenderer.on('main:menu:img-to-front', (event, args) => {
         const imageId = parseInt(image.dataset.imgId);
         const imgZIndex = parseInt(image.style.zIndex);
         let zIndexes = [];
-        $('.board-img').each(function(i, element) {
+        $('.board-img').each(function (i, element) {
             const elementZIndex = parseInt(element.style.zIndex);
             if (elementZIndex > imgZIndex) {
                 zIndexes.push(elementZIndex);
                 const domElementImgId = parseInt(element.dataset.imgId);
                 setActiveAssemblingChanges(domElementImgId, 'zIndex', elementZIndex - 1);
-                element.style.zIndex = elementZIndex - 1; 
+                element.style.zIndex = elementZIndex - 1;
             }
         });
         const maxZIndex = Math.max(...zIndexes);
@@ -442,13 +442,13 @@ ipcRenderer.on('main:menu:img-to-back', (event, args) => {
         const imageId = parseInt(image.dataset.imgId);
         const imgZIndex = parseInt(image.style.zIndex);
         let zIndexes = [];
-        $('.board-img').each(function(i, element) {
+        $('.board-img').each(function (i, element) {
             const elementZIndex = parseInt(element.style.zIndex);
             if (elementZIndex < imgZIndex) {
                 zIndexes.push(elementZIndex);
                 const domElementImgId = parseInt(element.dataset.imgId);
                 setActiveAssemblingChanges(domElementImgId, 'zIndex', elementZIndex + 1);
-                element.style.zIndex = elementZIndex + 1; 
+                element.style.zIndex = elementZIndex + 1;
             }
         });
         const minZIndex = Math.min(...zIndexes);
@@ -463,7 +463,7 @@ ipcRenderer.on('main:menu:img-find-similarity', async (event, args) => {
     const image = getActiveImage()
     if (image) {
         const imageId = parseInt(image.dataset.imgId);
-        ipcRenderer.send('proj:find-matching', {'projPath': projectPath, 'imageId': imageId});
+        ipcRenderer.send('proj:find-matching', { 'projPath': projectPath, 'imageId': imageId });
     }
 });
 
@@ -489,8 +489,8 @@ function loadPartSimilarityResults(container, matches, fromIdx, toIdx, rank, pre
         matchedItem.appendTo(container);
     }
     if (toIdx < matches.length) {
-        const matchObj = $('<div>', {id: 'match-lazy', 'data-loader': "nextMatches"});
-        $('.match-block' + toIdx).waitForImages(function() {
+        const matchObj = $('<div>', { id: 'match-lazy', 'data-loader': "nextMatches" });
+        $('.match-block' + toIdx).waitForImages(function () {
             matchObj.appendTo(container);
             matchObj.Lazy({
                 scrollDirection: 'vertical',
@@ -499,7 +499,7 @@ function loadPartSimilarityResults(container, matches, fromIdx, toIdx, rank, pre
                 effectTime: 200,
                 threshold: 0,
                 appendScroll: $('#similarity'),
-                nextMatches: function(element) {
+                nextMatches: function (element) {
                     const lazyObj = matchObj.data("plugin_lazy");
                     if (lazyObj) {
                         lazyObj.destroy();
@@ -542,7 +542,7 @@ function loadSearchResults() {
     let rank = 0;
     let prevDistance = 0;
 
-    loadPartSimilarityResults(matchesContainer, matches, 0, nItemsPerPage, rank, prevDistance); 
+    loadPartSimilarityResults(matchesContainer, matches, 0, nItemsPerPage, rank, prevDistance);
 }
 
 ipcRenderer.on('main:matching:results', async (event, args) => {
@@ -553,9 +553,9 @@ ipcRenderer.on('main:matching:results', async (event, args) => {
 
 
 function save() {
-    ipcRenderer.invoke('proj:save-project', {'projPath': projectPath, 'project': project}).then((result) => {
+    ipcRenderer.invoke('proj:save-project', { 'projPath': projectPath, 'project': project }).then((result) => {
         if (result) {
-            $('.assembling-tab').each(function(i, element) {
+            $('.assembling-tab').each(function (i, element) {
                 const assembledStatus = $(this).children('span');
                 if (assembledStatus.hasClass('unsaved')) {
                     assembledStatus.removeClass('unsaved');
@@ -609,14 +609,14 @@ function getActiveImage() {
 
 function selectSimilarityMatrix() {
     save();
-    ipcRenderer.send('main:open-create-similarity', {projectPath});
+    ipcRenderer.send('main:open-create-similarity', { projectPath });
 }
 
 function openDialog() {
     ipcRenderer.send('dialogs:open-images-dialog');
 }
 
-function rotateLeft(step=5) {
+function rotateLeft(step = 5) {
     const image = getActiveImage()
     if (image) {
         const imageId = parseInt(image.dataset.imgId);
@@ -626,11 +626,11 @@ function rotateLeft(step=5) {
     }
 }
 
-function rotateRight(step=5) {
+function rotateRight(step = 5) {
     return rotateLeft(-step);
 }
 
-function zoomIn(step=0.1) {
+function zoomIn(step = 0.1) {
     const image = getActiveImage();
     if (image) {
         const imageId = parseInt(image.dataset.imgId);
@@ -644,12 +644,12 @@ function zoomIn(step=0.1) {
     }
 }
 
-function zoomOut(step=0.1) {
+function zoomOut(step = 0.1) {
     return zoomIn(-step);
 }
 
 function exportImg() {
-    ipcRenderer.send('main:export-img', {project: project, activeAssemblingId: getActiveAssemblingId()});
+    ipcRenderer.send('main:export-img', { project: project, activeAssemblingId: getActiveAssemblingId() });
 }
 
 function dragElement(elmnt) {

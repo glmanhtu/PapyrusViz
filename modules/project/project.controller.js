@@ -12,7 +12,7 @@ class ProjectController {
     constructor(ipcMain, mainWin) {
         this.ipcMain = ipcMain;
         this.mainWin = mainWin;
-        
+
         ipcMain.on('proj:create-project', this.createProject.bind(this));
 
         ipcMain.on('proj:open-project', this.openProject.bind(this));
@@ -29,14 +29,14 @@ class ProjectController {
             const imageId = args['imageId'];
             const project = await this.getProject(event, args);
             const img = project.images[imageId];
-            const result = {'queryImg': imageId, 'matches': []};
+            const result = { 'queryImg': imageId, 'matches': [] };
             const readStream = fs.createReadStream(project.matching.matchingFile)
             const isSimilarity = project.matching.matrixType === 'similarity';
-            readStream 
-                .on('end', function() {
+            readStream
+                .on('end', function () {
                     event.reply('main:matching:results', result);
                 })
-                .on('close', function(err) {
+                .on('close', function (err) {
                     event.reply('main:matching:results', result);
                 })
                 .pipe(csv.parse({ headers: true }))
@@ -50,7 +50,7 @@ class ProjectController {
                                 }
                                 for (const [targetImgId, targetImg] of Object.entries(project.images)) {
                                     if (targetImg.name.includes(fragId) && parseInt(targetImgId) !== imageId) {
-                                        matches.push({'imgId': targetImgId, 'distance': parseFloat(distance)});
+                                        matches.push({ 'imgId': targetImgId, 'distance': parseFloat(distance) });
                                     }
                                 }
                             }
@@ -80,7 +80,7 @@ class ProjectController {
                 'matrixType': matrixType,
                 'matchingMethod': matchingMethod
             }
-            await this.saveProject(event, {'projPath': projPath, 'project': project});
+            await this.saveProject(event, { 'projPath': projPath, 'project': project });
             dialogUtils.closeCurrentDialog();
             this.ipcMain.emit('main:reload', projPath);
         });
@@ -90,7 +90,7 @@ class ProjectController {
         ipcMain.handle('proj:save-project', this.saveProject.bind(this));
         ipcMain.handle('proj:del-project', this.delProject.bind(this));
     }
-    
+
     async saveProject(event, args) {
         const projLocation = args['projPath'];
         if (!this.projectExists(projLocation)) {
@@ -98,7 +98,7 @@ class ProjectController {
             return false;
         }
         const project = args['project'];
-        fs.writeFileSync(path.join(projLocation, 'project.json'), JSON.stringify(project)); 
+        fs.writeFileSync(path.join(projLocation, 'project.json'), JSON.stringify(project));
         return true;
     }
 
@@ -114,7 +114,7 @@ class ProjectController {
         const appData = dataUtils.readAppData();
         return appData.projects;
     }
-    
+
     async openProject(event, args) {
         const projLocation = args['projPath'];
         if (!this.projectExists(projLocation)) {
@@ -159,16 +159,16 @@ class ProjectController {
     async createProject(event, args) {
         const projLocation = args['projPath'];
         const datasetLocation = args['datasetPath'];
-        const projectData = {...args};
+        const projectData = { ...args };
         projectData.images = {}
         projectData.createdAt = Date.now();
-        projectData.assembled = { 
+        projectData.assembled = {
             0: {
-                'name': 'Assembling #1', 
-                'parent': 'default', 
-                'activated': true, 
-                'images': {}, 
-                'imagesCount': 0, 
+                'name': 'Assembling #1',
+                'parent': 'default',
+                'activated': true,
+                'images': {},
+                'imagesCount': 0,
                 'createdAt': Date.now()
             },
         };
@@ -187,23 +187,23 @@ class ProjectController {
 
         // Step 1: Create project files
         event.reply('proj:starting');
-        event.reply('proj:progress', {'name': "Step 1/3 - Creating project...", 'desc': "Writing project files...", 'current': 0});
+        event.reply('proj:progress', { 'name': "Step 1/3 - Creating project...", 'desc': "Writing project files...", 'current': 0 });
         if (!isProjPathExists) {
             fs.mkdirSync(projLocation);
         }
         fs.writeFileSync(path.join(projLocation, 'project.json'), JSON.stringify(projectData));
-        event.reply('proj:progress', {'name': "Step 1/3 - Creating project...", 'desc': "Writing project files...", 'current': 5});
+        event.reply('proj:progress', { 'name': "Step 1/3 - Creating project...", 'desc': "Writing project files...", 'current': 5 });
 
         // Step 2: Get image files
         const images = [];
         const topLvSubdir = [];
-        const getFilesRecursively = (directory, level=0) => {
+        const getFilesRecursively = (directory, level = 0) => {
             const filesInDirectory = fs.readdirSync(directory);
             for (let i = 0; i < filesInDirectory.length; i++) {
                 const absolute = path.join(directory, filesInDirectory[i]);
                 if (fs.statSync(absolute).isDirectory()) {
                     if (level === 0) {
-                        topLvSubdir.push({'name': filesInDirectory[i], 'path': absolute});
+                        topLvSubdir.push({ 'name': filesInDirectory[i], 'path': absolute });
                     }
                     getFilesRecursively(absolute, level + 1);
                 } else {
@@ -212,28 +212,28 @@ class ProjectController {
                         images.push(absolute);
                     }
                 }
-                event.reply('proj:progress', {'name': "Step 2/3 - Collecting images...", 'desc': `Collected ${images.length} images...`, 'current': 10});
+                event.reply('proj:progress', { 'name': "Step 2/3 - Collecting images...", 'desc': `Collected ${images.length} images...`, 'current': 10 });
             }
         };
 
         getFilesRecursively(datasetLocation);
-        topLvSubdir.push({'name': 'All Images', 'path': ''});
-        projectData.rootDirs = {'available': topLvSubdir, 'selected': null};
+        topLvSubdir.push({ 'name': 'All Images', 'path': '' });
+        projectData.rootDirs = { 'available': topLvSubdir, 'selected': null };
 
         // Step 3: Generate image thumbnails
-        fs.mkdirSync(path.join(projLocation, 'thumbnails')); 
+        fs.mkdirSync(path.join(projLocation, 'thumbnails'));
         for (let i = 0; i < images.length; i++) {
             const thumbnailPath = path.join(projLocation, 'thumbnails', `${i}.jpg`)
             const image = sharp(images[i]);
             try {
                 await image
-                .resize({height: 200})
-                .flatten({ background: { r: 255, g: 255, b: 255 } })
-                .toFile(thumbnailPath);
+                    .resize({ height: 200 })
+                    .flatten({ background: { r: 255, g: 255, b: 255 } })
+                    .toFile(thumbnailPath);
                 const metadata = await image.metadata();
 
                 const per = (i + 1) * 90 / images.length;
-                event.reply('proj:progress', {'name': "Step 3/3 - Generating thumbnails...", 'desc': `Generated ${i + 1}/${images.length} thumbnails images...`, 'current': 15 + per});
+                event.reply('proj:progress', { 'name': "Step 3/3 - Generating thumbnails...", 'desc': `Generated ${i + 1}/${images.length} thumbnails images...`, 'current': 15 + per });
                 projectData.images[i] = {
                     'path': images[i],
                     'name': path.basename(images[i]),
@@ -244,7 +244,7 @@ class ProjectController {
                     'size': metadata.size,
                 };
             } catch (e) {
-                event.reply('proj:error', {'name': "Unnable to read " + images[i] + ', Ignoring...' });
+                event.reply('proj:error', { 'name': "Unnable to read " + images[i] + ', Ignoring...' });
             }
         }
         projectData.imagesCount = images.length;

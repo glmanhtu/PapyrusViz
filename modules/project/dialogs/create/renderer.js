@@ -7,7 +7,7 @@ function cancel() {
 }
 
 function selectFolder(targetId) {
-    ipcRenderer.send('dialogs:open-dir-dialog', {'target': targetId});
+    ipcRenderer.send('dialogs:open-dir-dialog', { 'target': targetId });
 }
 
 ipcRenderer.on('selected-dir', (event, args) => {
@@ -21,7 +21,7 @@ $('#projectCreation').on('submit', (e) => {
     const projectName = $('#projName').val();
     const projectPath = $('#inputLocation').val();
     const datasetPath = $('#inputDataset').val();
-    
+
     ipcRenderer.send('proj:create-project', {
         'projName': projectName,
         'projPath': projectPath,
@@ -42,19 +42,19 @@ ipcRenderer.on('proj:progress', (event, args) => {
 
     $('#progressTitle').html(name);
     $('#progressDesc').html(desc);
-    $('#progressBar').css('width', currentVal+'%').attr('aria-valuenow', currentVal); 
+    $('#progressBar').css('width', currentVal + '%').attr('aria-valuenow', currentVal);
 });
 
 ipcRenderer.on('proj:error', (event, args) => {
     const name = args['name'];
 
     $('#project-error').css('display', 'block').html($('#project-error').html() + '\n' + name);
-    
+
 });
 
 ipcRenderer.on('proj:finished', (event, args) => {
     const projectPath = $('#inputLocation').val();
-    $('#openProject').css('display', 'block').on('click', function() {
-        ipcRenderer.send('proj:open-project', {'projPath': projectPath});
+    $('#openProject').css('display', 'block').on('click', function () {
+        ipcRenderer.send('proj:open-project', { 'projPath': projectPath });
     });
 });

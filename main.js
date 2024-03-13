@@ -20,17 +20,17 @@ function handleSquirrelEvent() {
   const updateDotExe = path.resolve(path.join(rootAtomFolder, 'Update.exe'));
   const exeName = path.basename(process.execPath);
 
-  const spawn = function(command, args) {
+  const spawn = function (command, args) {
     let spawnedProcess, error;
 
     try {
-      spawnedProcess = ChildProcess.spawn(command, args, {detached: true});
-    } catch (error) {}
+      spawnedProcess = ChildProcess.spawn(command, args, { detached: true });
+    } catch (error) { }
 
     return spawnedProcess;
   };
 
-  const spawnUpdate = function(args) {
+  const spawnUpdate = function (args) {
     return spawn(updateDotExe, args);
   };
 
@@ -69,9 +69,9 @@ function handleSquirrelEvent() {
   }
 };
 
-const {ProjectController} = require('./modules/project/project.controller');
-const {DialogsController} = require('./modules/dialogs/dialogs.controller');
-const {MainController} = require('./modules/main/main.controller');
+const { ProjectController } = require('./modules/project/project.controller');
+const { DialogsController } = require('./modules/dialogs/dialogs.controller');
+const { MainController } = require('./modules/main/main.controller');
 
 const isMac = process.platform === 'darwin'
 
@@ -100,19 +100,19 @@ function createWindow() {
   const menu = Menu.buildFromTemplate([
     ...(isMac
       ? [{
-          label: app.name,
-          submenu: [
-            { role: 'about' },
-            { type: 'separator' },
-            { role: 'services' },
-            { type: 'separator' },
-            { role: 'hide' },
-            { role: 'hideOthers' },
-            { role: 'unhide' },
-            { type: 'separator' },
-            { role: 'quit' }
-          ]
-        }]
+        label: app.name,
+        submenu: [
+          { role: 'about' },
+          { type: 'separator' },
+          { role: 'services' },
+          { type: 'separator' },
+          { role: 'hide' },
+          { role: 'hideOthers' },
+          { role: 'unhide' },
+          { type: 'separator' },
+          { role: 'quit' }
+        ]
+      }]
       : []),
     {
       label: 'File',
@@ -126,10 +126,10 @@ function createWindow() {
         { role: 'cut' },
         { role: 'copy' },
         { type: 'separator' },
-        { 
-          label: 'Save', 
+        {
+          label: 'Save',
           accelerator: 'CmdOrCtrl+S',
-          click: () => {win.webContents.send('main:menu:save')}
+          click: () => { win.webContents.send('main:menu:save') }
         },
         {
           label: 'Delete',
@@ -137,10 +137,10 @@ function createWindow() {
           click: () => { win.webContents.send('main:menu:img-delete') }
         },
         { type: 'separator' },
-        { 
-          label: 'Find similarities', 
+        {
+          label: 'Find similarities',
           accelerator: 'CmdOrCtrl+F',
-          click: () => {win.webContents.send('main:menu:img-find-similarity')}
+          click: () => { win.webContents.send('main:menu:img-find-similarity') }
         },
       ]
     },
@@ -161,7 +161,7 @@ function createWindow() {
   if (require('electron-squirrel-startup')) app.quit();
 
   win.on('resize', function () {
-    var size   = win.getSize();
+    var size = win.getSize();
     win.webContents.send('resized', size);
   });
   ipcMain.emit('proj:open-welcome-dialog');

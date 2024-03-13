@@ -14,11 +14,11 @@ let $ = jQuery = require('jquery');
             let projTemplate = $('#proj-template').clone().css('display', 'table-row').attr('id', projId);
             projTemplate.children('.proj-name').html(project['projName']);
             projTemplate.children('.proj-path').html(project['projPath']);
-            projTemplate.find('.proj-open').on('click', function() {
-                ipcRenderer.send('proj:open-project', {'projPath': project['projPath']});
+            projTemplate.find('.proj-open').on('click', function () {
+                ipcRenderer.send('proj:open-project', { 'projPath': project['projPath'] });
             });
-            projTemplate.find('.proj-del').on('click', function() {
-                ipcRenderer.invoke('proj:del-project', {'projPath': project['projPath']}).then((result) => {
+            projTemplate.find('.proj-del').on('click', function () {
+                ipcRenderer.invoke('proj:del-project', { 'projPath': project['projPath'] }).then((result) => {
                     if (result) {
                         $(`#${projId}`).fadeOut();
                     }

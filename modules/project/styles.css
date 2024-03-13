@@ -1,6 +1,8 @@
 body {
-    background-color: #343a40; /* Dark background color */
-    color: #fff; /* Light text color */
+    background-color: #343a40;
+    /* Dark background color */
+    color: #fff;
+    /* Light text color */
     font-family: Arial, sans-serif;
 }
 
@@ -26,7 +28,9 @@ h1 {
 }
 
 
-.table-dark td, .table-dark th, .table-dark thead th {
+.table-dark td,
+.table-dark th,
+.table-dark thead th {
     border-top: none;
     border-bottom: 1px solid;
     border-color: #454d55;

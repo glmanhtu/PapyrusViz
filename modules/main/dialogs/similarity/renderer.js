@@ -3,7 +3,7 @@ const { ipcRenderer } = require('electron');
 let projPath = null;
 
 function selectFile(targetId) {
-    ipcRenderer.send('dialogs:open-file-dialog', {'target': targetId, 'filters': ['csv']});
+    ipcRenderer.send('dialogs:open-file-dialog', { 'target': targetId, 'filters': ['csv'] });
 }
 
 function cancel() {
@@ -15,7 +15,7 @@ $('#similarityCreation').on('submit', (e) => {
     const matchingFile = $('#similarity-file').val();
     const matchingMethod = $('input[name=match-method]:checked', '#similarityCreation').val()
     const matrixType = $('input[name=matrix-type]:checked', '#similarityCreation').val()
-    
+
     ipcRenderer.send('proj:create-matching', {
         'projPath': projPath,
         'matchingName': matchingName,
