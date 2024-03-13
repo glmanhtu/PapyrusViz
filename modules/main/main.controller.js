@@ -7,6 +7,7 @@ const pathUtils = require('../utils/path.utils');
 const dataUtils = require('../utils/data.utils');
 
 const isMac = process.platform === 'darwin'
+const isWin = process.platform === 'win32'
 
 
 class MainController {
@@ -15,7 +16,9 @@ class MainController {
         this.mainWin = mainWin
 
         mainWin.loadFile(pathUtils.fromRoot('modules', 'main', 'index.html'));
-        mainWin.setIcon(pathUtils.fromRoot('icons', 'icon.png'))
+        if (!isMac && !isWin) {
+          mainWin.setIcon(pathUtils.fromRoot('icons', 'icon.png'))
+        }
 
         ipcMain.on('main:reload', (projPath) => {
             mainWin.webContents.postMessage('project-loaded', projPath);
