@@ -60,6 +60,7 @@ class MainController {
               
             const metaData1 = await sharp(processedImage).metadata();
             const widthBeforeRotate = metaData1.width;
+            const heightBeforeRotate = metaData1.height;
             
             processedImage = await sharp(processedImage)
               .rotate(rotation, {background: { r: 0, g: 0, b: 0, alpha: 0 }})
@@ -68,8 +69,9 @@ class MainController {
             const metaData = await sharp(processedImage).metadata();
 
             const wChange = (metaData.width - widthBeforeRotate) / 2;
+            const hChange = (metaData.height - heightBeforeRotate) / 2;
             
-            images.push({img: processedImage, zIndex: zIndex, top: top, left: parseInt(left - wChange), width: metaData.width, height: metaData.height});
+            images.push({img: processedImage, zIndex: zIndex, top: parseInt(top - hChange), left: parseInt(left - wChange), width: metaData.width, height: metaData.height});
             mainWin.setProgressBar(images.length / activeAssembling.images.length)
           }
 
