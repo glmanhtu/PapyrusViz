@@ -1,0 +1,40 @@
+.assembling-tab {
+    padding: 0.3rem 1.3rem 0.5rem 1rem !important;
+}
+
+#assembling-tabs {
+    max-width: 100%;
+    display: block !important;
+    white-space: nowrap;
+    overflow-y: hidden;
+    overflow-x: scroll;
+    text-align: left;
+    flex-wrap: nowrap;
+}
+
+#assembling-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+#assembling-tabs .nav-item {
+    display: inline-block;
+}
+
+#board-column .card-header-tabs {
+    margin-bottom: -.8rem !important;
+}
+
+#activated-image {
+    box-shadow: rgb(31, 193, 27) 0px 0px 0px 2px;
+}
+
+#board {
+    position: relative;
+}
+
+
+#board img {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+}

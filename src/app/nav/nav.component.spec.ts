@@ -1,20 +1,21 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
-import { HomeComponent } from './home.component';
+import { NavComponent } from './nav.component';
 import { TranslateModule } from '@ngx-translate/core';
+
 import { RouterTestingModule } from '@angular/router/testing';
 
-describe('HomeComponent', () => {
-  let component: HomeComponent;
-  let fixture: ComponentFixture<HomeComponent>;
+describe('DetailComponent', () => {
+  let component: NavComponent;
+  let fixture: ComponentFixture<NavComponent>;
 
   beforeEach(waitForAsync(() => {
     void TestBed.configureTestingModule({
-      declarations: [HomeComponent],
+      declarations: [NavComponent],
       imports: [TranslateModule.forRoot(), RouterTestingModule]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(HomeComponent);
+    fixture = TestBed.createComponent(NavComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   }));
@@ -26,7 +27,7 @@ describe('HomeComponent', () => {
   it('should render title in a h1 tag', waitForAsync(() => {
     const compiled = fixture.debugElement.nativeElement;
     expect(compiled.querySelector('h1').textContent).toContain(
-      'PAGES.HOME.TITLE'
+      'PAGES.DETAIL.TITLE'
     );
   }));
 });

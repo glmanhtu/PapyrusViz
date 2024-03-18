@@ -1,0 +1,79 @@
+  <div class="card text-center sidebar-content h-100" id="thumbnail-container">
+    <div class="card-header">
+      <ul class="nav nav-tabs card-header-tabs thumbnail-tabs">
+        <li class="nav-item">
+          <a class="nav-link active" href="#thumbnails" role="tab" aria-controls="thumbnails"
+            aria-selected="true">Images</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#similarity" role="tab" aria-controls="similarity"
+            aria-selected="false">Similarity</a>
+        </li>
+      </ul>
+    </div>
+    <div class="card-body h-100" style="padding: 1.25rem .5rem 0 .5rem;">
+      <div class="tab-content h-100">
+        <div class="tab-pane active h-100 overflow-auto" id="thumbnails" role="tabpanel">
+          <form>
+            <div class="mb-3">
+              <select class="form-control form-control-sm mb-1" id="root-dirs" onchange="loadThumbnails()">
+              </select>
+              <input class="form-control form-control-sm" id="thumbnail-filter" placeholder="Filter images">
+            </div>
+          </form>
+
+          <div id="thumbnail-images" class="container">
+
+          </div>
+        </div>
+
+
+        <div class="tab-pane h-100 overflow-auto" id="similarity" role="tabpanel">
+          <form>
+            <div class="form-group" id="no-similarity">
+              <label>No similarity matrix found!</label>
+
+              <button type="button" class="btn btn-success btn-sm me-2" onclick="selectSimilarityMatrix()">Select a
+                file</button>
+            </div>
+            <div id="has-similarity" style="flex-direction: column;">
+
+              <select class="form-control form-control-sm mb-1" id="sim-root-dirs" onchange="loadSearchResults()">
+              </select>
+              <div class="input-group input-group-sm mb-3" title="Matching name">
+                <div class="input-group-prepend">
+                  <div class="input-group-text"><i class="fa-solid fa-arrow-down-wide-short"></i></div>
+                </div>
+                <input type="text" class="form-control form-control-sm" id="matching-name" readonly>
+                <div class="input-group-append">
+                  <div class="input-group-text" role='button' onclick="removeMatching()"><i
+                      class="fa-solid fa-close text-danger"></i></div>
+                </div>
+              </div>
+
+            </div>
+
+            <div class="container">
+              <figure class="figure row" id="matching-query" style="display: none;">
+                <img src="..." class="figure-img img-fluid img-thumbnail">
+                <figcaption class="figure-caption">A caption for the above image.</figcaption>
+              </figure>
+            </div>
+            <div id="matched-results" class="container">
+
+            </div>
+
+            <figure class="figure row" id="matching-result-template" style="display: none;">
+              <img src="..." class="figure-img img-fluid img-thumbnail">
+              <figcaption class="figure-caption">A caption for the above image.</figcaption>
+            </figure>
+          </form>
+
+          <figure class="figure row" id="thumbnail-template" style="display: none;">
+            <img src="..." class="figure-img img-fluid img-thumbnail">
+            <figcaption class="figure-caption">A caption for the above image.</figcaption>
+          </figure>
+        </div>
+      </div>
+    </div>
+  </div>
