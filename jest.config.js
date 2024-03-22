@@ -1,7 +1,7 @@
 const esModules = [].join('|');
 
 module.exports = {
-  rootDir : './src',
+  rootDir : './src/renderer',
   transformIgnorePatterns: [`<rootDir>/node_modules/(?!${esModules})`],
   transform: {
     '^.+\\.tsx?$': [

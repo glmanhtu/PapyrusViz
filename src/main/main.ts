@@ -1,6 +1,8 @@
 import {app, BrowserWindow} from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
+import * as pathUtils from './utils/path.utils';
+import * as dbUtils from './utils/db.utils';
 
 let win: BrowserWindow | null = null;
 const args = process.argv.slice(1),
@@ -14,6 +16,7 @@ function createWindow(): BrowserWindow {
     height: 850,
     minWidth: 1350,
     minHeight: 850,
+    show: false,
     webPreferences: {
       nodeIntegration: true,
       allowRunningInsecureContent: (serve),
@@ -41,6 +44,16 @@ function createWindow(): BrowserWindow {
     win.loadURL(url.href);
   }
 
+
+  const dbFile = pathUtils.fromAppData('data.db');
+  const db = dbUtils.createConnection(dbFile);
+  
+  dbUtils.migrateDb(db, pathUtils.fromRoot('schema')).then(() => {
+    win!.once('ready-to-show', () => {
+      win!.show()
+    })
+  })
+
   // Emitted when the window is closed.
   win.on('closed', () => {
     // Dereference the window object, usually you would store window
@@ -48,6 +61,7 @@ function createWindow(): BrowserWindow {
     // when you should delete the corresponding element.
     win = null;
   });
+
 
   return win;
 }

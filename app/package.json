@@ -9,6 +9,9 @@
   "main": "main.js",
   "private": true,
   "dependencies": {
+    "@types/better-sqlite3": "^7.6.9",
+    "better-sqlite3": "^9.4.3",
+    "drizzle-orm": "^0.30.4",
     "sharp": "^0.31.3"
   }
 }

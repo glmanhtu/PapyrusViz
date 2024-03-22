@@ -1,7 +1,7 @@
 {
-  "extends": "../tsconfig.json",
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "outDir": "../out-tsc/app",
+    "outDir": "./out-tsc/app",
     "baseUrl": "",
     "types": [
       "node"
@@ -15,6 +15,6 @@
     "**/*.d.ts"
   ],
   "exclude": [
-    "**/*.spec.ts"
+    "**/*.spec.ts",
   ]
 }
