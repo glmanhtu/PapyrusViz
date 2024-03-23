@@ -31,10 +31,10 @@ CREATE TABLE `img` (
 );
 --> statement-breakpoint
 CREATE TABLE `img_assembling` (
-	`id` integer PRIMARY KEY NOT NULL,
-	`transforms` text,
 	`img_id` integer,
 	`assembling_id` integer,
+	`transforms` text,
+	PRIMARY KEY(`assembling_id`, `img_id`),
 	FOREIGN KEY (`img_id`) REFERENCES `img`(`id`) ON UPDATE no action ON DELETE no action,
 	FOREIGN KEY (`assembling_id`) REFERENCES `assembling`(`id`) ON UPDATE no action ON DELETE no action
 );
@@ -49,4 +49,5 @@ CREATE TABLE `project` (
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `dirPathIndex` ON `dir` (`path`);--> statement-breakpoint
+CREATE INDEX `imgPathIdx` ON `img` (`path`);--> statement-breakpoint
 CREATE UNIQUE INDEX `projPathIndex` ON `project` (`path`);

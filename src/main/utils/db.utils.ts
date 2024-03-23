@@ -10,6 +10,6 @@ export function createConnection(dbPath: string) : BetterSQLite3Database {
     return db;
 }
 
-export async function migrateDb(db: BetterSQLite3Database, schemaPath: string) {
-    return migrate(db, { migrationsFolder: schemaPath });
+export function migrateDb(db: BetterSQLite3Database, schemaPath: string) {
+    migrate(db, { migrationsFolder: schemaPath });
 }

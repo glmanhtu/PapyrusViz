@@ -48,10 +48,10 @@ function createWindow(): BrowserWindow {
   const dbFile = pathUtils.fromAppData('data.db');
   const db = dbUtils.createConnection(dbFile);
   
-  dbUtils.migrateDb(db, pathUtils.fromRoot('schema')).then(() => {
-    win!.once('ready-to-show', () => {
-      win!.show()
-    })
+  dbUtils.migrateDb(db, pathUtils.fromRoot('schema'));
+
+  win!.once('ready-to-show', () => {
+    win!.show()
   })
 
   // Emitted when the window is closed.

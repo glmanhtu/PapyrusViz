@@ -22,6 +22,9 @@
   "files": [
     "src/main/main.ts",
   ],
+  "include": [
+    "src/shared/**/*.ts"
+  ],
   "exclude": [
     "node_modules",
     "**/*.spec.ts"

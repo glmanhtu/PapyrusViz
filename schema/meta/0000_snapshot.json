@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "sqlite",
-  "id": "78f3c3fd-425c-4b01-bdb5-8199997c2357",
+  "id": "0dea83a2-2567-434a-bc2c-d913dc38808d",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "assembling": {
@@ -203,7 +203,15 @@
           "autoincrement": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "imgPathIdx": {
+          "name": "imgPathIdx",
+          "columns": [
+            "path"
+          ],
+          "isUnique": false
+        }
+      },
       "foreignKeys": {
         "img_dir_id_dir_id_fk": {
           "name": "img_dir_id_dir_id_fk",
@@ -225,20 +233,6 @@
     "img_assembling": {
       "name": "img_assembling",
       "columns": {
-        "id": {
-          "name": "id",
-          "type": "integer",
-          "primaryKey": true,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "transforms": {
-          "name": "transforms",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
         "img_id": {
           "name": "img_id",
           "type": "integer",
@@ -249,6 +243,13 @@
         "assembling_id": {
           "name": "assembling_id",
           "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "transforms": {
+          "name": "transforms",
+          "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
@@ -283,7 +284,15 @@
           "onUpdate": "no action"
         }
       },
-      "compositePrimaryKeys": {},
+      "compositePrimaryKeys": {
+        "img_assembling_img_id_assembling_id_pk": {
+          "columns": [
+            "assembling_id",
+            "img_id"
+          ],
+          "name": "img_assembling_img_id_assembling_id_pk"
+        }
+      },
       "uniqueConstraints": {}
     },
     "project": {

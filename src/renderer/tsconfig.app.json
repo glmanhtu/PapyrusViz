@@ -1,5 +1,5 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../../tsconfig.renderer.json",
   "compilerOptions": {
     "outDir": "./out-tsc/app",
     "baseUrl": "",
@@ -9,10 +9,11 @@
   },
   "files": [
     "main.ts",
-    "polyfills.ts"
+    "polyfills.ts",
   ],
   "include": [
-    "**/*.d.ts"
+    "**/*.d.ts",
+    "../shared/**/*.ts"
   ],
   "exclude": [
     "**/*.spec.ts",
