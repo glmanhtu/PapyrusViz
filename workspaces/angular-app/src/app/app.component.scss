@@ -1,0 +1,34 @@
+:host {
+  
+}
+
+.sidebar {
+    flex: 0 0 20%;
+    max-width: 300px;
+}
+
+.card-header {
+    padding: 0.5rem 1.25rem 0.75rem 1.25rem !important;
+}
+
+.nav-link {
+    padding: .3rem 1rem .5rem 1rem !important;
+    color: #495057;
+    position: relative;
+}
+
+.nav-link span {
+    font-size: x-small;
+    position: absolute;
+    top: 25%;
+    right: 9px;
+}
+
+.nav-link .saved {
+    color: forestgreen;
+}
+
+.nav-link .unsaved {
+    color: red;
+}
+

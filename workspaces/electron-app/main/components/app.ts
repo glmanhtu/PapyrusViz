@@ -1,8 +1,6 @@
 import { app, BrowserWindow, shell } from 'electron';
 import { Window } from './window';
 
-declare const global: Global;
-
 export class App {
 	private static _wrapper: Window;
 

@@ -1,3 +1,7 @@
+export interface GlobalConfig {
+	appConfig: AppConfig;
+}
+
 export interface AppConfig {
 	/** The configuration identifier */
 	configId: string;
@@ -26,3 +30,5 @@ export interface AppConfig {
 	/** Tells if we should open dev tools */
 	isOpenDevTools: boolean;
 }
+
+

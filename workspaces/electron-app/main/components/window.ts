@@ -4,8 +4,9 @@ import * as path from 'node:path';
 import { AbstractService } from '../services/abstract-service';
 import { MultiplesService } from '../services/multiples-service';
 import { Logger } from '../utils/logger';
+import { GlobalConfig } from 'shared-lib';
 
-declare const global: Global;
+declare const global: GlobalConfig;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
 export class Window {

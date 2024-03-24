@@ -2,8 +2,9 @@ import { app } from 'electron';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import * as winston from 'winston';
+import { GlobalConfig } from 'shared-lib';
 
-declare const global: Global;
+declare const global: GlobalConfig;
 
 export class Logger {
 	private static singleton: Logger;

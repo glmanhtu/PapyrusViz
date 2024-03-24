@@ -1,19 +1,12 @@
 import * as fs from 'fs-extra';
 import _ from 'lodash';
 import * as path from 'node:path';
-import { AppConfig } from 'shared-lib';
+import { GlobalConfig } from 'shared-lib';
 import { App } from './components/app';
 import * as pathUtils from './utils/path.utils';
 import * as databaseUtils from './utils/database.utils';
 
-declare const global: Global;
-
-declare global {
-	// Global augmentation of the `Global` interface
-	interface Global {
-		appConfig: AppConfig;
-	}
-}
+declare const global: GlobalConfig;
 
 // Load config
 const currentEnvironment = process.env.X_NODE_ENV || process.env.NODE_ENV;
