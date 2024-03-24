@@ -13,7 +13,7 @@
   ],
   "include": [
     "**/*.d.ts",
-    "../shared/**/*.ts"
+    "../main/ipc-models/**/*.ts"
   ],
   "exclude": [
     "**/*.spec.ts",

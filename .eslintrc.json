@@ -12,10 +12,10 @@
       ],
       "parserOptions": {
         "project": [
-          "./tsconfig.serve.json",
-          "./src/tsconfig.app.json",
-          "./src/tsconfig.spec.json",
-          "./e2e/tsconfig.e2e.json"
+          "./tsconfig.main.json",
+          "./src/renderer/tsconfig.app.json",
+          "./src/renderer/tsconfig.spec.json",
+          "./e2e/renderer/tsconfig.e2e.json"
         ],
         "createDefaultProgram": true
       },

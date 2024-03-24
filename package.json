@@ -24,7 +24,6 @@
   "main": "app/main.js",
   "private": true,
   "scripts": {
-    "copy-schema": "copyfiles schema/* app/",
     "db:generate": "drizzle-kit generate:sqlite",
     "postinstall": "electron-builder install-app-deps",
     "ng": "ng",
@@ -35,7 +34,7 @@
     "build:prod": "npm run build -- -c production",
     "web:build": "npm run build -- -c web-production",
     "electron": "electron",
-    "electron:serve-tsc": "tsc -p tsconfig.main.json && npm run copy-schema",
+    "electron:serve-tsc": "tsc -b tsconfig.main.json",
     "electron:serve": "wait-on tcp:4200 && npm run electron:serve-tsc && electron . --serve",
     "electron:local": "npm run build:prod && electron .",
     "electron:build": "npm run build:prod && electron-builder build --publish=never",
@@ -107,7 +106,7 @@
     "webdriver-manager": "12.1.9"
   },
   "engines": {
-    "node": ">= 16.14.0 || >= 18.10.0"
+    "node": ">= 16.14.0 || >= 21.7.1"
   },
   "browserslist": [
     "chrome 114"

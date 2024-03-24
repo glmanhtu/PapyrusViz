@@ -23,6 +23,9 @@
     ],
     "useDefineForClassFields": false
   },
+  "references": [
+    { "path": "src/shared" }
+  ],
   "exclude": [
     "node_modules"
   ],

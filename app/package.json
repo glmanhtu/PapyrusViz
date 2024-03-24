@@ -1,11 +1,11 @@
 {
-  "name": "angular-electron",
-  "description": "Angular Electron sample",
+  "name": "papyviz",
+  "version": "3.0.0",
+  "description": "Visualize papyrus fragments and assemble them",
   "author": {
     "name": "Manh Tu VU",
     "email": "glmanhtu@gmail.com"
   },
-  "version": "14.0.0",
   "main": "main.js",
   "private": true,
   "dependencies": {

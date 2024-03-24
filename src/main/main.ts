@@ -3,10 +3,12 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as pathUtils from './utils/path.utils';
 import * as dbUtils from './utils/db.utils';
+import {ProjectDTO} from "../shared/project.dto";
 
 let win: BrowserWindow | null = null;
 const args = process.argv.slice(1),
   serve = args.some(val => val === '--serve');
+const db = new ProjectDTO();
 
 function createWindow(): BrowserWindow {
 
@@ -47,8 +49,8 @@ function createWindow(): BrowserWindow {
 
   const dbFile = pathUtils.fromAppData('data.db');
   const db = dbUtils.createConnection(dbFile);
-  
-  dbUtils.migrateDb(db, pathUtils.fromRoot('schema'));
+
+  dbUtils.migrateDb(db, './schema');
 
   win!.once('ready-to-show', () => {
     win!.show()

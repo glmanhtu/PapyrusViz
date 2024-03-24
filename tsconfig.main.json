@@ -1,7 +1,9 @@
 {
   "compilerOptions": {
     "sourceMap": true,
+    "rootDir": "src/main",
     "outDir": "./app",
+    "baseUrl": "./",
     "declaration": false,
     "skipLibCheck": true,
     "moduleResolution": "node",
@@ -22,8 +24,8 @@
   "files": [
     "src/main/main.ts",
   ],
-  "include": [
-    "src/shared/**/*.ts"
+  "references": [
+    { "path": "src/shared", "prepend": true }
   ],
   "exclude": [
     "node_modules",
