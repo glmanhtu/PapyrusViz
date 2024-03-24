@@ -96,3 +96,4 @@ allure-results
 Thumbs.db
 setenv.cmd
 wdio-chromedriver.log
+.idea
