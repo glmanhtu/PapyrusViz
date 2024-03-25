@@ -25,10 +25,6 @@ module.exports = {
 			patterns: [
 				{ from: 'workspaces/electron-app/main/assets' },
 				{
-					from: 'workspaces/electron-app/schema',
-					to: 'schema'
-				},
-				{
 					from: 'workspaces/angular-app/.dist/angular-app',
 					to: '../renderer/angular_window',
 					noErrorOnMissing: true,
