@@ -1,0 +1,46 @@
+<ng-template #content let-modal>
+	<div>
+		<div class="modal-header text-center">
+			<h4 class="modal-title w-100">Papyrus Projects</h4>
+		</div>
+		<div class="modal-body">
+			<div class="container mt-4">
+				<div class="d-flex justify-content-center">
+					<button type="button" class="btn btn-success btn-sm btn-create me-2" (click)="createProject()"><i
+						class="fas fa-plus-circle mr-2"></i> Create a New
+						Project</button>
+					<button type="button" class="btn btn-primary btn-sm btn-open me-2"><i class="fas fa-folder-open mr-2"></i>
+						Open an Existing
+						Project</button>
+					<button type="button" class="btn btn-danger btn-sm btn-open me-2" onclick="quit()"><i
+						class="fas fa-close mr-2"></i> Quit</button>
+				</div>
+
+				<div class="recent-projects mt-5 overflow-auto" style="height: 300px">
+					<h5>Recent Projects</h5>
+					<table class="table mt-3 table-sm overflow-auto">
+						<tbody id="proj-list">
+						<tr id="proj-template" >
+							<th scope="row" class="proj-name">Test 1</th>
+							<td colspan="2" class="proj-path">/Users/mvu/Downloads/demo_images</td>
+							<td>
+								<div class="text-right d-flex justify-content-end">
+									<button type="button"
+													class="btn btn-outline-success btn-sm me-1 proj-open">Open</button>
+									<button type="button" class="btn btn-outline-danger btn-sm proj-del">X</button>
+								</div>
+							</td>
+						</tr>
+
+						<tr id="no-proj" style="display: none;">
+							<td colspan="4">No project was found!</td>
+						</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		<div class="modal-footer border-0">
+		</div>
+	</div>
+</ng-template>

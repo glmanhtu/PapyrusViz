@@ -1,10 +1,10 @@
 import * as remoteMain from '@electron/remote/main';
 import { app, BrowserWindow, ipcMain, nativeImage } from 'electron';
 import * as path from 'node:path';
-import { AbstractService } from '../services/abstract-service';
-import { MultiplesService } from '../services/multiples-service';
 import { Logger } from '../utils/logger';
 import { GlobalConfig } from 'shared-lib';
+import { DialogHandler } from '../handlers/dialog.handler';
+import { BaseHandler } from '../handlers/base.handler';
 
 declare const global: GlobalConfig;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -15,7 +15,21 @@ export class Window {
 	constructor() {
 		this.createWindow();
 		this.loadRenderer();
-		this.registerService<number, number[]>(new MultiplesService());
+		const combinedRouteMap = this.combineRoutes(new DialogHandler(this._electronWindow));
+		ipcMain.on('ipc-request', async (event, message: { type: string; payload: unknown; requestId: string }) => {
+			const { type, payload, requestId } = message;
+			const handlerFunction = combinedRouteMap.get(type);
+			if (handlerFunction) {
+				try {
+					const response = await handlerFunction(payload);
+					event.reply(`ipc-response:${requestId}`, { type, status: 'success', payload: response });
+				} catch (error) {
+					event.reply(`ipc-response:${requestId}`, { type, status: 'error', payload: error.message });
+				}
+			} else {
+				event.reply(`ipc-response:${requestId}`, { type, status: 'error', payload: 'Handler not found' });
+			}
+		});
 	}
 
 	private createWindow(): void {
@@ -96,25 +110,14 @@ export class Window {
 		});
 	}
 
-	private registerService<In, Out>(service: AbstractService<In, Out>) {
-		ipcMain.on(
-			service.receptionChannel(),
-			async (event: Electron.IpcMainEvent, ...parameters: any[]) => {
-				// Handling input
-				const input = parameters[0];
-				Logger.debug(`[${service.receptionChannel()}]  =====> `, input);
-				const output: Out = service.process(input);
-
-				// Handling output
-				if (service.sendingChannel()) {
-					Logger.debug(`[${service.sendingChannel()}] =====> `, output);
-					this._electronWindow.webContents.send(
-						service.sendingChannel(),
-						output
-					);
-				}
-			}
-		);
+	private combineRoutes(...handlers: BaseHandler[]): Map<string, (payload: unknown) => Promise<unknown>> {
+		const combined = new Map<string, (payload: unknown) => Promise<unknown>>();
+		handlers.forEach(handler => {
+			handler.getRoutes().forEach((value, key) => {
+				combined.set(key, value);
+			});
+		});
+		return combined;
 	}
 
 	public get electronWindow(): BrowserWindow | undefined {

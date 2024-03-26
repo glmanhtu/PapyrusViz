@@ -19,7 +19,7 @@ describe('AppComponent', () => {
 	it(`should have as title 'electron-angular-quick-start'`, () => {
 		const fixture = TestBed.createComponent(AppComponent);
 		const app = fixture.componentInstance;
-		expect(app.title).toEqual('electron-angular-quick-start');
+		expect(app.title).toEqual('Papyrus Visualization');
 	});
 
 	it('should render title', () => {

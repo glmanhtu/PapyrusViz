@@ -1,6 +1,5 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
-import { MultiplesComponent } from './multiples.component';
 import { ElectronIpcService } from 'src/app/services/electron-ipc.service';
 import {
 	TranslateFakeLoader,
@@ -9,15 +8,16 @@ import {
 	TranslateService,
 } from '@ngx-translate/core';
 import { ReactiveFormsModule } from '@angular/forms';
+import { ProjectManagementComponent } from './project.management.component';
 
 describe('MultiplesComponent', () => {
 	const mockElectronIpcService = jasmine.createSpyObj(['receive', 'send']);
-	let fixture: ComponentFixture<MultiplesComponent>;
-	let component: MultiplesComponent;
+	let fixture: ComponentFixture<ProjectManagementComponent>;
+	let component: ProjectManagementComponent;
 
 	beforeEach(waitForAsync(() => {
 		TestBed.configureTestingModule({
-			declarations: [MultiplesComponent],
+			declarations: [ProjectManagementComponent],
 			imports: [
 				ReactiveFormsModule,
 				TranslateModule,
@@ -39,7 +39,7 @@ describe('MultiplesComponent', () => {
 	}));
 
 	beforeEach(() => {
-		fixture = TestBed.createComponent(MultiplesComponent);
+		fixture = TestBed.createComponent(ProjectManagementComponent);
 		component = fixture.componentInstance;
 		fixture.detectChanges();
 	});

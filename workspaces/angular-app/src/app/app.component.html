@@ -1,3 +1,5 @@
+<app-project-management #projectManagement [projectCreation]="projectCreation"></app-project-management>
+<app-project-creation #projectCreation [projectManagement]="projectManagement"></app-project-creation>
 <app-nav></app-nav>
 <div class="flex-fill d-flex flex-row overflow-auto">
     <app-panel id="thumbnail-column" class="sidebar d-flex p-1 flex-column"></app-panel>

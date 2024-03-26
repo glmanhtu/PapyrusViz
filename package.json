@@ -103,6 +103,8 @@
 		}
 	},
 	"devDependencies": {
+		"@angular-eslint/schematics": "^17.3.0",
+		"@angular-eslint/template-parser": "^17.3.0",
 		"@commitlint/cli": "^18.4.2",
 		"@commitlint/config-conventional": "^18.4.2",
 		"@electron-forge/cli": "^7.1.0",
@@ -115,6 +117,7 @@
 		"@types/jasmine": "^5.1.2",
 		"@types/lodash": "^4.14.201",
 		"@types/node": "^20.9.2",
+		"@types/uuid": "^9.0.8",
 		"@typescript-eslint/eslint-plugin": "^6.11.0",
 		"@typescript-eslint/parser": "^6.11.0",
 		"@vercel/webpack-asset-relocator-loader": "^1.7.3",
@@ -164,6 +167,7 @@
 		"electron-squirrel-startup": "^1.0.0",
 		"fs-extra": "^11.1.1",
 		"pretty-quick": "^2.0.2",
+		"uuid": "^9.0.1",
 		"winston": "^3.11.0"
 	},
 	"lint-staged": {

@@ -5,15 +5,10 @@
 		"node": true
 	},
 	"plugins": ["@typescript-eslint", "import", "unicorn", "sonarjs"],
-	"extends": [
-		"plugin:unicorn/recommended",
-		"plugin:sonarjs/recommended",
-		"plugin:@typescript-eslint/eslint-recommended",
-		"plugin:@typescript-eslint/recommended",
-		"plugin:import/errors",
-		"plugin:import/warnings",
-		"plugin:import/typescript"
-	],
+//	"extends": [
+//		"plugin:unicorn/recommended",
+//		"plugin:sonarjs/recommended"
+//	],
 	"parser": "@typescript-eslint/parser",
 	"settings": {
 		"import/resolver": {
@@ -37,5 +32,27 @@
 			}
 		],
 		"unicorn/prefer-module": "off"
-	}
+	},
+	"overrides": [
+		{
+			"files": [
+				"*.ts"
+			],
+			"extends": [
+				"plugin:@typescript-eslint/eslint-recommended",
+				"plugin:@typescript-eslint/recommended",
+				"plugin:import/errors",
+				"plugin:import/warnings",
+				"plugin:import/typescript"
+			]
+		},
+		{
+			"files": [
+				"*.html"
+			],
+			"extends": [
+				"plugin:@angular-eslint/template/recommended"
+			]
+		}
+	]
 }

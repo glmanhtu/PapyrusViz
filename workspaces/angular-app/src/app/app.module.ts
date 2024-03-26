@@ -9,6 +9,8 @@ import { NavComponent } from './components/nav/nav.component';
 import { PanelComponent } from './components/panel/panel.component';
 import { MainComponent } from './components/main/main.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { ProjectManagementComponent } from './components/project/management/project.management.component';
+import { ProjectCreationComponent } from './components/project/creation/project.creation.component';
 
 
 // AoT requires an exported function for factories
@@ -21,7 +23,9 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     AppComponent, 
     NavComponent,
     PanelComponent,
-    MainComponent
+    MainComponent,
+		ProjectManagementComponent,
+		ProjectCreationComponent
   ],
 	imports: [
 		BrowserModule,
