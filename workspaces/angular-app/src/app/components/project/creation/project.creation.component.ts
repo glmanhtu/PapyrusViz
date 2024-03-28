@@ -4,7 +4,7 @@ import { ProjectManagementComponent } from '../management/project.management.com
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap/modal/modal-ref';
 import { ElectronIpcService } from '../../../services/electron-ipc.service';
 import { FormControl, FormGroup } from '@angular/forms';
-import { FileDialogRequest, FileDialogResponse } from 'shared-lib';
+import { FileDialogRequest, FileDialogResponse, Progress, ProjectDTO } from 'shared-lib';
 
 @Component({
   selector: 'app-project-creation',
@@ -23,6 +23,9 @@ export class ProjectCreationComponent implements OnInit {
     projectPath: new FormControl(''),
   });
 
+  progress: Progress | null = null;
+  showProgress = false;
+
   constructor(
     config: NgbModalConfig,
     private modalService: NgbModal,
@@ -40,7 +43,19 @@ export class ProjectCreationComponent implements OnInit {
     this.modelRef = this.modalService.open(this.content, { size: 'lg', centered: true });
   }
 
-  createProject(): void {
+  onSubmit() {
+    const formValue = this.projectForm.value;
+    const projectRequest: ProjectDTO = {
+      name: formValue.projectName!,
+      path: formValue.projectPath!,
+      dataPath: formValue.datasetPath!
+    }
+    this.showProgress = true;
+    this.electronIpc.sendAndListen<ProjectDTO, Progress>('project::create-project', projectRequest, (message) => {
+      if (message.status === 'success') {
+       this.progress = message.payload as Progress;
+      }
+    });
   }
 
   cancel() {

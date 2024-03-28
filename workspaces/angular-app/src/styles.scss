@@ -40,3 +40,11 @@ html, body {
   background-color: #dde0e3;
   cursor: pointer;
 }
+
+// CSS. Prevents clicking on the input and applies same style that Bootstrap
+// applies to disabled / readonly inputs.
+input.disabled-input {
+  pointer-events: none;
+  background-color: var(--bs-tertiary-bg);
+  opacity: 1;
+}

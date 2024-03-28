@@ -1,3 +1,5 @@
+import { IMessage } from '../models/common';
+
 export interface WindowApi {
 
 	/**
@@ -6,4 +8,6 @@ export interface WindowApi {
 	 * @param payload the data sent by the renderer process to the main process
 	 */
 	send<P, R>(type: string, payload: P): Promise<R>;
+
+	sendAndListen<P, R>(type: string, payload: P,  listener: (message: IMessage<R>) => void): void;
 }

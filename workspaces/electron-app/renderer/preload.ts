@@ -3,6 +3,7 @@
 
 import { contextBridge, ipcRenderer } from 'electron';
 import { v4 as uuidv4 } from 'uuid';
+import { Message } from 'shared-lib';
 
 
 // So we expose protected methods that allow the renderer process
@@ -15,8 +16,8 @@ contextBridge.exposeInMainWorld('api', {
 	send: <P, R>(type: string, payload: P): Promise<R> => {
 		const requestId = uuidv4();
 		return new Promise<R>((resolve, reject) => {
-			ipcRenderer.once(`ipc-response:${requestId}`, (_, response: { type: string; status: string;  payload: R | string }) => {
-				if (response.type === type && response.status === 'success') {
+			ipcRenderer.once(`ipc-response:${requestId}`, (_, response: Message<R>) => {
+				if (response.status === 'success') {
 					resolve(response.payload as R);
 				} else {
 					reject(new Error(response.payload as string));
@@ -25,6 +26,19 @@ contextBridge.exposeInMainWorld('api', {
 
 			ipcRenderer.send('ipc-request', { type, payload, requestId });
 		});
+	},
+	sendAndListen: <P, R>(type: string, payload: P,  listener: (message: Message<R>) => void) => {
+		const requestId = uuidv4();
+			ipcRenderer.on(`ipc-continuous-response:${requestId}`, (_, response: Message<R>) => {
+				if (response.status === 'success') {
+					listener(response)
+				} else {
+					listener(response)
+					ipcRenderer.removeAllListeners(`ipc-continuous-response:${requestId}`);
+				}
+			});
+
+			ipcRenderer.send('ipc-continuous-request', { type, payload, requestId });
 	}
 });
 

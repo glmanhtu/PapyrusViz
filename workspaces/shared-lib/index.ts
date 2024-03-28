@@ -1,8 +1,9 @@
 import { WindowApi } from './apis/window-api';
 export * from './apis/window-api';
-export * from './apis/window-api-consts';
 export * from './models/config/app-config';
 export * from './models/dialog/file-dialog';
+export * from './models/common';
+export * from './models/project';
 
 declare global {
 	// Global augmentation of the `Window` interface

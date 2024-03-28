@@ -2,9 +2,10 @@ import * as remoteMain from '@electron/remote/main';
 import { app, BrowserWindow, ipcMain, nativeImage } from 'electron';
 import * as path from 'node:path';
 import { Logger } from '../utils/logger';
-import { GlobalConfig } from 'shared-lib';
+import { GlobalConfig, IMessage } from 'shared-lib';
 import { DialogHandler } from '../handlers/dialog.handler';
 import { BaseHandler } from '../handlers/base.handler';
+import { ProjectHandler } from '../handlers/project.handler';
 
 declare const global: GlobalConfig;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -15,21 +16,39 @@ export class Window {
 	constructor() {
 		this.createWindow();
 		this.loadRenderer();
-		const combinedRouteMap = this.combineRoutes(new DialogHandler(this._electronWindow));
+		const handlers = [
+			new DialogHandler(this._electronWindow),
+			new ProjectHandler()
+		]
+		const combinedRouteMap = this.combineRoutes(...handlers);
 		ipcMain.on('ipc-request', async (event, message: { type: string; payload: unknown; requestId: string }) => {
 			const { type, payload, requestId } = message;
 			const handlerFunction = combinedRouteMap.get(type);
 			if (handlerFunction) {
 				try {
 					const response = await handlerFunction(payload);
-					event.reply(`ipc-response:${requestId}`, { type, status: 'success', payload: response });
+					event.reply(`ipc-response:${requestId}`, { status: 'success', payload: response });
 				} catch (error) {
-					event.reply(`ipc-response:${requestId}`, { type, status: 'error', payload: error.message });
+					event.reply(`ipc-response:${requestId}`, { status: 'error', payload: error.message });
 				}
 			} else {
-				event.reply(`ipc-response:${requestId}`, { type, status: 'error', payload: 'Handler not found' });
+				event.reply(`ipc-response:${requestId}`, { status: 'error', payload: 'Handler not found' });
 			}
 		});
+
+
+		const combinedContinuousMap = this.combineContinuousRoutes(...handlers);
+		ipcMain.on('ipc-continuous-request', (event,  message: { type: string; payload: unknown; requestId: string }) => {
+			const { type, payload, requestId } = message;
+			const handlerFunction = combinedContinuousMap.get(type);
+			if (handlerFunction) {
+				handlerFunction(payload, (message) => {
+					event.reply(`ipc-continuous-response:${requestId}`, message)
+				});
+			} else {
+				event.reply(`ipc-continuous-response:${requestId}`, { status: 'error', payload: 'Handler not found' });
+			}
+		})
 	}
 
 	private createWindow(): void {
@@ -119,6 +138,17 @@ export class Window {
 		});
 		return combined;
 	}
+
+	private combineContinuousRoutes(...handlers: BaseHandler[]): Map<string, (payload: unknown, listener: (message: IMessage<unknown>) => void) => void> {
+		const combined = new Map<string, (payload: unknown, listener: (message: IMessage<unknown>) => void) => void>();
+		handlers.forEach(handler => {
+			handler.getContinuousHandlers().forEach((value, key) => {
+				combined.set(key, value);
+			});
+		});
+		return combined;
+	}
+
 
 	public get electronWindow(): BrowserWindow | undefined {
 		return this._electronWindow;

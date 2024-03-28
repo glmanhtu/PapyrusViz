@@ -1,11 +1,10 @@
 <ng-template #content let-modal>
-	<div>
+	<form class="was-validated" [formGroup]="projectForm" (ngSubmit)="onSubmit()" *ngIf="!showProgress">
 		<div class="modal-header text-center">
 			<h4 class="modal-title w-100">Create Project</h4>
 		</div>
 		<div class="modal-body">
-			<form class="was-validated mt-3" [formGroup]="projectForm">
-				<div class="form-group row">
+				<div class="form-group row mt-3">
 					<label for="projName" class="col-sm-3 col-form-label">Name</label>
 					<div class="col-sm-9">
 						<input type="text" class="form-control form-control-sm" id="projName" placeholder="Project name"
@@ -17,8 +16,8 @@
 					<div class="col-sm-9">
 						<div class="input-group input-group-sm custom-file-button">
 							<label class="input-group-text" for="imageDataset">Choose folder</label>
-							<input type="text" class="form-control form-control-sm" id="imageDataset" (click)="folderSelection($event)"
-										 formControlName="datasetPath" required readonly>
+							<input type="text" class="form-control form-control-sm disabled-input" id="imageDataset" (click)="folderSelection($event)"
+										 formControlName="datasetPath" required>
 						</div>
 					</div>
 				</div>
@@ -28,16 +27,39 @@
 					<div class="col-sm-9">
 							<div class="input-group input-group-sm custom-file-button">
 								<label class="input-group-text" for="projectPath">Choose folder</label>
-								<input type="text" class="form-control form-control-sm" id="projectPath" (click)="folderSelection($event, true)"
-											 formControlName="projectPath" required readonly>
+								<input type="text" class="form-control form-control-sm disabled-input" id="projectPath" (click)="folderSelection($event, true)"
+											 formControlName="projectPath" required>
 							</div>
 					</div>
 				</div>
-			</form>
 		</div>
 		<div class="modal-footer">
-			<button type="submit" class="btn btn-success btn-sm">Create</button>
+			<button type="submit" class="btn btn-success btn-sm" [disabled]="!projectForm.valid">Create</button>
 			<button type="button" class="btn btn-secondary btn-sm" (click)="cancel()">Cancel</button>
+		</div>
+	</form>
+
+	<div class="col-sm-12" *ngIf="showProgress">
+		<div class="row mb-3">
+			<h5 id="progressTitle">Creating project...</h5>
+		</div>
+		<div class="row mb-3">
+			<p id="progressDesc">Writing project files...</p>
+		</div>
+		<div class="progress row mb-5" style="height: 20px;">
+			<div class="progress-bar" id="progressBar" role="progressbar" [ngStyle]="{'width.%': progress?.percentage}"
+					 aria-valuemin="0" aria-valuemax="100"></div>
+		</div>
+		<div class="row">
+				<pre>
+					<code id="project-error" style="display: none; color: white;">
+					</code>
+				</pre>
+		</div>
+
+		<div class="row text-right mt-5 d-flex justify-content-end">
+			<button type="submit" class="btn btn-success btn-sm" id="openProject" style="display: none;">Open
+				project</button>
 		</div>
 	</div>
 </ng-template>
