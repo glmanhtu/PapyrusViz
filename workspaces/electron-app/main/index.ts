@@ -5,6 +5,8 @@ import { GlobalConfig } from 'shared-lib';
 import { App } from './components/app';
 import * as pathUtils from './utils/path.utils';
 import * as databaseUtils from './utils/database.utils';
+import { DialogHandler } from './handlers/dialog.handler';
+import { ProjectHandler } from './handlers/project.handler';
 
 declare const global: GlobalConfig;
 
@@ -24,4 +26,12 @@ const database = databaseUtils.createConnection(databaseFile);
 
 databaseUtils.migrateDatabase(database, path.join(__dirname, 'schema'));
 // Launch app
-App.launch();
+App.launch((mainWin) => {
+
+	const handlers = [
+		new DialogHandler(mainWin),
+		new ProjectHandler(database)
+	]
+	App.registerHandlers(handlers);
+});
+

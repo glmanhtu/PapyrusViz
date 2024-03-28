@@ -3,7 +3,7 @@ import { projects } from './project';
 
 
 export const categories = sqliteTable('category', {
-    id: integer('id').primaryKey(),
+    id: integer('id').primaryKey({autoIncrement: true}),
     name: text('name'),
     path: text('path'),
     projectId: integer('project_id').references(() => projects.id),

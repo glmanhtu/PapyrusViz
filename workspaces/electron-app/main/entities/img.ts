@@ -3,7 +3,7 @@ import { categories } from './category';
 
 
 export const imgs = sqliteTable('img', {
-    id: integer('id').primaryKey(),
+    id: integer('id').primaryKey({autoIncrement: true}),
     name: text('name'),
     path: text('path'),     // relative path with respect to dirId
     thumbnail: text('thumbnail'),

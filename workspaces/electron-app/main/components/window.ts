@@ -2,10 +2,7 @@ import * as remoteMain from '@electron/remote/main';
 import { app, BrowserWindow, ipcMain, nativeImage } from 'electron';
 import * as path from 'node:path';
 import { Logger } from '../utils/logger';
-import { GlobalConfig, IMessage } from 'shared-lib';
-import { DialogHandler } from '../handlers/dialog.handler';
-import { BaseHandler } from '../handlers/base.handler';
-import { ProjectHandler } from '../handlers/project.handler';
+import { GlobalConfig } from 'shared-lib';
 
 declare const global: GlobalConfig;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -16,39 +13,6 @@ export class Window {
 	constructor() {
 		this.createWindow();
 		this.loadRenderer();
-		const handlers = [
-			new DialogHandler(this._electronWindow),
-			new ProjectHandler()
-		]
-		const combinedRouteMap = this.combineRoutes(...handlers);
-		ipcMain.on('ipc-request', async (event, message: { type: string; payload: unknown; requestId: string }) => {
-			const { type, payload, requestId } = message;
-			const handlerFunction = combinedRouteMap.get(type);
-			if (handlerFunction) {
-				try {
-					const response = await handlerFunction(payload);
-					event.reply(`ipc-response:${requestId}`, { status: 'success', payload: response });
-				} catch (error) {
-					event.reply(`ipc-response:${requestId}`, { status: 'error', payload: error.message });
-				}
-			} else {
-				event.reply(`ipc-response:${requestId}`, { status: 'error', payload: 'Handler not found' });
-			}
-		});
-
-
-		const combinedContinuousMap = this.combineContinuousRoutes(...handlers);
-		ipcMain.on('ipc-continuous-request', async (event,  message: { type: string; payload: unknown; requestId: string }) => {
-			const { type, payload, requestId } = message;
-			const handlerFunction = combinedContinuousMap.get(type);
-			if (handlerFunction) {
-				await handlerFunction(payload, (message) => {
-					event.reply(`ipc-continuous-response:${requestId}`, message)
-				});
-			} else {
-				event.reply(`ipc-continuous-response:${requestId}`, { status: 'error', payload: 'Handler not found' });
-			}
-		})
 	}
 
 	private createWindow(): void {
@@ -129,25 +93,6 @@ export class Window {
 		});
 	}
 
-	private combineRoutes(...handlers: BaseHandler[]): Map<string, (payload: unknown) => Promise<unknown>> {
-		const combined = new Map<string, (payload: unknown) => Promise<unknown>>();
-		handlers.forEach(handler => {
-			handler.getRoutes().forEach((value, key) => {
-				combined.set(key, value);
-			});
-		});
-		return combined;
-	}
-
-	private combineContinuousRoutes(...handlers: BaseHandler[]): Map<string, (payload: unknown, listener: (message: IMessage<unknown>) => void) => Promise<void>> {
-		const combined = new Map<string, (payload: unknown, listener: (message: IMessage<unknown>) => void) => Promise<void>>();
-		handlers.forEach(handler => {
-			handler.getContinuousHandlers().forEach((value, key) => {
-				combined.set(key, value);
-			});
-		});
-		return combined;
-	}
 
 
 	public get electronWindow(): BrowserWindow | undefined {

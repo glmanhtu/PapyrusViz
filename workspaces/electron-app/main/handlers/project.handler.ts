@@ -1,9 +1,11 @@
 import { BaseHandler } from "./base.handler";
 import { IMessage, Message, Progress, ProjectDTO } from 'shared-lib';
 import * as fs from 'fs';
+import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
+import { projects } from '../entities/project';
 
 export class ProjectHandler extends BaseHandler {
-	constructor() {
+	constructor(private database: BetterSQLite3Database) {
 		super();
 		this.addContinuousHandler<ProjectDTO, Progress>('project::create-project', this.creteProject.bind(this));
 	}
@@ -23,5 +25,8 @@ export class ProjectHandler extends BaseHandler {
 		if (!isProjPathExists) {
 			fs.mkdirSync(payload.path);
 		}
+		this.database.insert(projects).values({
+
+		})
 	}
 }

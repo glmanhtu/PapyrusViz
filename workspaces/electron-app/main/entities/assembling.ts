@@ -4,7 +4,7 @@ import { sql } from "drizzle-orm";
 
 
 export const assemblings = sqliteTable('assembling', {
-    id: integer('id').primaryKey(),
+    id: integer('id').primaryKey({autoIncrement: true}),
     name: text('name'),
     group: text('group'),
     isActivated: integer('is_activated', { mode: 'boolean' }),
