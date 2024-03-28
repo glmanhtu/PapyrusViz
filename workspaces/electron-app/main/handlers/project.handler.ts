@@ -8,7 +8,7 @@ export class ProjectHandler extends BaseHandler {
 		this.addContinuousHandler<ProjectDTO, Progress>('project::create-project', this.creteProject.bind(this));
 	}
 
-	private creteProject(payload: ProjectDTO, reply: (message: IMessage<string | Progress>) => void ): void {
+	private async creteProject(payload: ProjectDTO, reply: (message: IMessage<string | Progress>) => void ): Promise<void> {
 		const isProjPathExists = fs.existsSync(payload.path) && fs.lstatSync(payload.path).isDirectory();
 		const isDSPathExists = fs.existsSync(payload.dataPath) && fs.lstatSync(payload.dataPath).isDirectory();
 		if (isProjPathExists &&  fs.readdirSync(payload.path).length !== 0) {

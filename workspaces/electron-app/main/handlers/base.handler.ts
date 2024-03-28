@@ -2,7 +2,7 @@ import { IMessage } from 'shared-lib';
 
 export abstract class BaseHandler {
 	private routes: Map<string, (payload: unknown) => Promise<unknown>>;
-	private continuousHandlers: Map<string, (payload: unknown, reply: (message: IMessage<unknown>) => void) => void>;
+	private continuousHandlers: Map<string, (payload: unknown, reply: (message: IMessage<unknown>) => void) => Promise<void>>;
 
 
 	constructor() {
@@ -14,7 +14,7 @@ export abstract class BaseHandler {
 		this.routes.set(action, method);
 	}
 
-	protected addContinuousHandler<T, R>(action: string, method: (payload: T, reply: (message: IMessage<R>) => void) => void): void {
+	protected addContinuousHandler<T, R>(action: string, method: (payload: T, reply: (message: IMessage<R>) => void) => Promise<void>): void {
 		this.continuousHandlers.set(action, method);
 	}
 
@@ -22,7 +22,7 @@ export abstract class BaseHandler {
 		return this.routes;
 	}
 
-	public getContinuousHandlers(): Map<string, (payload: unknown, reply: (message: IMessage<unknown>) => void) => void> {
+	public getContinuousHandlers(): Map<string, (payload: unknown, reply: (message: IMessage<unknown>) => void) => Promise<void>> {
 		return this.continuousHandlers;
 	}
 }

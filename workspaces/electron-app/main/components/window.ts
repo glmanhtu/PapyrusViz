@@ -38,11 +38,11 @@ export class Window {
 
 
 		const combinedContinuousMap = this.combineContinuousRoutes(...handlers);
-		ipcMain.on('ipc-continuous-request', (event,  message: { type: string; payload: unknown; requestId: string }) => {
+		ipcMain.on('ipc-continuous-request', async (event,  message: { type: string; payload: unknown; requestId: string }) => {
 			const { type, payload, requestId } = message;
 			const handlerFunction = combinedContinuousMap.get(type);
 			if (handlerFunction) {
-				handlerFunction(payload, (message) => {
+				await handlerFunction(payload, (message) => {
 					event.reply(`ipc-continuous-response:${requestId}`, message)
 				});
 			} else {
@@ -139,8 +139,8 @@ export class Window {
 		return combined;
 	}
 
-	private combineContinuousRoutes(...handlers: BaseHandler[]): Map<string, (payload: unknown, listener: (message: IMessage<unknown>) => void) => void> {
-		const combined = new Map<string, (payload: unknown, listener: (message: IMessage<unknown>) => void) => void>();
+	private combineContinuousRoutes(...handlers: BaseHandler[]): Map<string, (payload: unknown, listener: (message: IMessage<unknown>) => void) => Promise<void>> {
+		const combined = new Map<string, (payload: unknown, listener: (message: IMessage<unknown>) => void) => Promise<void>>();
 		handlers.forEach(handler => {
 			handler.getContinuousHandlers().forEach((value, key) => {
 				combined.set(key, value);
