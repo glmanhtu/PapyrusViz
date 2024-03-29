@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, Input, NgZone, OnInit, ViewChild } from '@angular/core';
 import { NgbModal, NgbModalConfig } from '@ng-bootstrap/ng-bootstrap';
 import { ProjectManagementComponent } from '../management/project.management.component';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap/modal/modal-ref';
@@ -23,12 +23,19 @@ export class ProjectCreationComponent implements OnInit {
     projectPath: new FormControl(''),
   });
 
-  progress: Progress | null = null;
+  progress: Progress = {
+    title: 'Creating Project',
+    description: '',
+    percentage: 0
+  }
   showProgress = false;
+  showComplete = false;
+  errorMessage = '';
 
   constructor(
     config: NgbModalConfig,
     private modalService: NgbModal,
+    private ngZone: NgZone,
     private electronIpc: ElectronIpcService,
   ) {
     // customize default values of modals used by this component tree
@@ -52,9 +59,16 @@ export class ProjectCreationComponent implements OnInit {
     }
     this.showProgress = true;
     this.electronIpc.sendAndListen<ProjectDTO, Progress>('project::create-project', projectRequest, (message) => {
-      if (message.status === 'success') {
-       this.progress = message.payload as Progress;
-      }
+      this.ngZone.run(() => {
+        if (message.status === 'success') {
+          this.progress = message.payload as Progress;
+          console.log(message)
+        } else if (message.status === 'complete') {
+          this.showComplete = true;
+        } else {
+          this.errorMessage += message.payload + '\n';
+        }
+      })
     });
   }
 

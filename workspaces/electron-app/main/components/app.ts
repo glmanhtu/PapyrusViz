@@ -2,6 +2,7 @@ import { app, BrowserWindow, ipcMain, shell } from 'electron';
 import { Window } from './window';
 import { BaseHandler } from '../handlers/base.handler';
 import { IMessage } from 'shared-lib';
+import { Message } from 'shared-lib/.dist/models/common';
 
 export class App {
 	private static _wrapper: Window;
@@ -27,14 +28,14 @@ export class App {
 			const { type, payload, requestId } = message;
 			const handlerFunction = combinedRouteMap.get(type);
 			if (handlerFunction) {
-				try {
-					const response = await handlerFunction(payload);
-					event.reply(`ipc-response:${requestId}`, { status: 'success', payload: response });
-				} catch (error) {
-					event.reply(`ipc-response:${requestId}`, { status: 'error', payload: error.message });
-				}
+				handlerFunction(payload)
+					.then((response) => {
+						event.reply(`ipc-response:${requestId}`, Message.success(response));
+					}).catch((err) => {
+						event.reply(`ipc-response:${requestId}`, Message.error(err.message));
+				});
 			} else {
-				event.reply(`ipc-response:${requestId}`, { status: 'error', payload: 'Handler not found' });
+				event.reply(`ipc-response:${requestId}`, Message.error('Handler not found'));
 			}
 		});
 
@@ -44,11 +45,13 @@ export class App {
 			const { type, payload, requestId } = message;
 			const handlerFunction = combinedContinuousMap.get(type);
 			if (handlerFunction) {
-				await handlerFunction(payload, (message) => {
-					event.reply(`ipc-continuous-response:${requestId}`, message)
+				handlerFunction(payload, (message) => {
+					event.reply(`ipc-continuous-response:${requestId}`, message);
+				}).then(() => {
+					event.reply(`ipc-continuous-response:${requestId}`, Message.complete(''));
 				});
 			} else {
-				event.reply(`ipc-continuous-response:${requestId}`, { status: 'error', payload: 'Handler not found' });
+				event.reply(`ipc-continuous-response:${requestId}`, Message.error('Handler not found'));
 			}
 		})
 	}

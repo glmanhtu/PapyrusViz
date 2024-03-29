@@ -11,7 +11,7 @@ export const imgs = sqliteTable('img', {
     height: integer('height'),
     format: text('format'),
     size: integer('size'),
-    dirId: integer('dir_id').references(() => categories.id),
+    categoryId: integer('dir_id').references(() => categories.id),
 }, (table) => {
   return {
     pathIdx: index("imgPathIdx").on(table.path),
