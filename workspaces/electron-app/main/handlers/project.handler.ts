@@ -1,5 +1,5 @@
 import { BaseHandler } from "./base.handler";
-import { IMessage, Message, Progress, ProjectDTO } from 'shared-lib';
+import { GlobalConfig, IMessage, Message, Progress, ProjectDTO } from 'shared-lib';
 import { promises as fs } from 'fs';
 
 import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
@@ -14,11 +14,14 @@ import sharp from 'sharp'
 import { ProjectInfo } from '../models/app-data';
 import * as databaseUtils from '../utils/database.utils';
 
+declare const global: GlobalConfig;
+
 export class ProjectHandler extends BaseHandler {
 	constructor(private databases: Map<string, BetterSQLite3Database>) {
 		super();
 		this.addContinuousHandler<ProjectDTO, Progress>('project::create-project', this.creteProject.bind(this));
-		this.addRoute<void, ProjectInfo[]>('project:get-projects', this.getProjects);
+		this.addRoute<void, ProjectInfo[]>('project:get-projects', this.getProjects.bind(this));
+		this.addRoute<string, ProjectDTO>('project:load-project', this.loadProject.bind(this))
 	}
 
 	private async getProjects(): Promise<ProjectInfo[]> {
@@ -27,27 +30,45 @@ export class ProjectHandler extends BaseHandler {
 	}
 
 	private async projectExists(projectPath: string): Promise<boolean> {
-		const projects = await this.getProjects();
-		return projects.some(project => project.projPath === projectPath);
+		const projectFile = pathUtils.projectFile(projectPath);
+		return await pathUtils.isFile(projectFile);
 	}
 
-	// private async loadProject(projectPath: string): Promise<ProjectDTO> {
-	// 	const isProjPathExists = await pathUtils.isDir(projectPath);
-	// 	if (!isProjPathExists) {
-	//
-	// 	}
-	// }
+	private async loadProject(projectPath: string): Promise<ProjectDTO> {
+		if (!await this.projectExists(projectPath)) {
+			throw new Error('Project does not exists!');
+		}
+		const projectFile = pathUtils.projectFile(projectPath);
+		const database = databaseUtils.createConnection(projectFile);
+		databaseUtils.migrateDatabase(database, path.join(__dirname, 'schema'));
+		this.databases.set(projectPath, database);
+
+		const projects = await database.select()
+			.from(projectTbl);
+
+		// We assume that there will be only one project in this table
+		const project = projects[0];
+		if (project.path !== projectPath) {
+			// This is likely the case when user import existing project
+			project.path = projectPath
+			await database
+				.update(projectTbl)
+				.set({
+					path: projectPath
+				})
+				.where(eq(projectTbl.id, project.id));
+		}
+		return project as ProjectDTO
+	}
 
 	private async creteProject(payload: ProjectDTO, reply: (message: IMessage<string | Progress>) => Promise<void> ): Promise<void> {
 		const isProjPathExists = await pathUtils.isDir(payload.path)
 		const isDSPathExists = await pathUtils.isDir(payload.dataPath);
 		if (isProjPathExists && (await fs.readdir(payload.path)).length !== 0) {
-			await reply(Message.error(`Project location: ${payload.path} is not empty!`));
-			return;
+			throw new Error(`Project location: ${payload.path} is not empty!`)
 		}
 		if (!isDSPathExists) {
-			await reply(Message.error(`Dataset location: ${payload.dataPath} doesn't exists!`));
-			return;
+			throw new Error(`Dataset location: ${payload.dataPath} doesn't exists!`)
 		}
 
 		await reply(Message.success({
@@ -58,7 +79,7 @@ export class ProjectHandler extends BaseHandler {
 			await fs.mkdir(payload.path);
 		}
 
-		const databaseFile = path.join(payload.path, 'project.db')
+		const databaseFile = pathUtils.projectFile(payload.path)
 		const database = databaseUtils.createConnection(databaseFile);
 		databaseUtils.migrateDatabase(database, path.join(__dirname, 'schema'));
 
@@ -128,7 +149,7 @@ export class ProjectHandler extends BaseHandler {
 				const image = sharp(images[i]);
 				try {
 					await image
-						.resize({ height: 200 })
+						.resize({ height: global.appConfig.thumbnailImgSize })
 						.flatten({ background: { r: 255, g: 255, b: 255 } })
 						.toFile(thumbnailPath);
 					const metadata = await image.metadata();

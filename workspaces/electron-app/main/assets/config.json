@@ -8,7 +8,8 @@
 		"isContextIsolation": true,
 		"isEnableRemoteModule": false,
 		"isSandbox": false,
-		"isOpenDevTools": true
+		"isOpenDevTools": true,
+		"thumbnailImgSize": 200
 	},
 	"e2e-test": {
 		"configId": "e2e-test",

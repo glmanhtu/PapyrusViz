@@ -1,7 +1,7 @@
 export type ProjectDTO = {
-	id?: string,
+	id?: number,
 	name: string,
 	path: string,
 	dataPath: string,
-	createdAt?: number
+	createdAt?: string
 }

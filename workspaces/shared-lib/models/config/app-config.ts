@@ -29,6 +29,8 @@ export interface AppConfig {
 
 	/** Tells if we should open dev tools */
 	isOpenDevTools: boolean;
+
+	thumbnailImgSize: number;
 }
 
 

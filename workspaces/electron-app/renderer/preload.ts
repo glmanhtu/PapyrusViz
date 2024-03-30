@@ -30,9 +30,7 @@ contextBridge.exposeInMainWorld('api', {
 	sendAndListen: <P, R>(type: string, payload: P,  listener: (message: Message<R>) => void) => {
 		const requestId = uuidv4();
 			ipcRenderer.on(`ipc-continuous-response:${requestId}`, (_, response: Message<R>) => {
-				if (response.status === 'success') {
-					listener(response)
-				}
+				listener(response)
 				if (response.status === 'error' || response.status === 'complete') {
 					ipcRenderer.removeAllListeners(`ipc-continuous-response:${requestId}`);
 				}

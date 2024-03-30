@@ -49,6 +49,8 @@ export class App {
 					event.reply(`ipc-continuous-response:${requestId}`, message);
 				}).then(() => {
 					event.reply(`ipc-continuous-response:${requestId}`, Message.complete(''));
+				}).catch((err) => {
+					event.reply(`ipc-continuous-response:${requestId}`, Message.error(err.message));
 				});
 			} else {
 				event.reply(`ipc-continuous-response:${requestId}`, Message.error('Handler not found'));
