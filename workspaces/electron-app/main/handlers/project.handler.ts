@@ -38,19 +38,19 @@ export class ProjectHandler extends BaseHandler {
 	// 	}
 	// }
 
-	private async creteProject(payload: ProjectDTO, reply: (message: IMessage<string | Progress>) => void ): Promise<void> {
+	private async creteProject(payload: ProjectDTO, reply: (message: IMessage<string | Progress>) => Promise<void> ): Promise<void> {
 		const isProjPathExists = await pathUtils.isDir(payload.path)
 		const isDSPathExists = await pathUtils.isDir(payload.dataPath);
 		if (isProjPathExists && (await fs.readdir(payload.path)).length !== 0) {
-			reply(Message.error(`Project location: ${payload.path} is not empty!`));
+			await reply(Message.error(`Project location: ${payload.path} is not empty!`));
 			return;
 		}
 		if (!isDSPathExists) {
-			reply(Message.error(`Dataset location: ${payload.dataPath} doesn't exists!`));
+			await reply(Message.error(`Dataset location: ${payload.dataPath} doesn't exists!`));
 			return;
 		}
 
-		reply(Message.success({
+		await reply(Message.success({
 			percentage: 0, title: 'Step 1/3 - Creating project', description: 'Writing project information...'
 		}));
 
@@ -70,7 +70,7 @@ export class ProjectHandler extends BaseHandler {
 		}).returning({insertedId: projectTbl.id});
 		const projectId = result[0].insertedId;
 
-		reply(Message.success({
+		await reply(Message.success({
 			percentage: 10, title: 'Step 1/3 - Creating project', description: 'Writing project information...'
 		}));
 
@@ -106,7 +106,7 @@ export class ProjectHandler extends BaseHandler {
 						imageMap.set(currentDirectoryId, images)
 
 						const nImages: number = [...imageMap.values()].reduce((acc, x) => acc + x.length, 0);
-						reply(Message.success({
+						await reply(Message.success({
 							percentage: 10, title: 'Step 2/3 - Collecting images', description: `Collected ${nImages} images...`
 						}));
 					}
@@ -134,7 +134,7 @@ export class ProjectHandler extends BaseHandler {
 					const metadata = await image.metadata();
 
 					const per = (count + 1) * 90 / nImages;
-					reply(Message.success({
+					await reply(Message.success({
 						percentage: 10 + per, title: 'Step 3/3 - Generating thumbnails...',
 						description: `Generated ${count + 1}/${nImages} thumbnails images...`
 					}));
@@ -149,7 +149,7 @@ export class ProjectHandler extends BaseHandler {
 						categoryId: category[0].id
 					});
 				} catch (e) {
-					reply(Message.warning("Unable to read " + images[i] + ', Ignoring...'));
+					await reply(Message.warning("Unable to read " + images[i] + ', Ignoring...'));
 				} finally {
 					count += 1;
 				}

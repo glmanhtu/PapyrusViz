@@ -32,8 +32,8 @@ contextBridge.exposeInMainWorld('api', {
 			ipcRenderer.on(`ipc-continuous-response:${requestId}`, (_, response: Message<R>) => {
 				if (response.status === 'success') {
 					listener(response)
-				} else {
-					listener(response)
+				}
+				if (response.status === 'error' || response.status === 'complete') {
 					ipcRenderer.removeAllListeners(`ipc-continuous-response:${requestId}`);
 				}
 			});

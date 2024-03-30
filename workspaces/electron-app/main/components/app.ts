@@ -45,7 +45,7 @@ export class App {
 			const { type, payload, requestId } = message;
 			const handlerFunction = combinedContinuousMap.get(type);
 			if (handlerFunction) {
-				handlerFunction(payload, (message) => {
+				handlerFunction(payload, async (message) => {
 					event.reply(`ipc-continuous-response:${requestId}`, message);
 				}).then(() => {
 					event.reply(`ipc-continuous-response:${requestId}`, Message.complete(''));
