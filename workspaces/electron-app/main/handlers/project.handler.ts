@@ -253,5 +253,9 @@ export class ProjectHandler extends BaseHandler {
 				}
 			}
 		}
+
+		const appData = await dataUtils.readAppData();
+		appData.projects.push({projName: payload.name, projPath: payload.path, datasetPath: payload.dataPath});
+		await dataUtils.writeAppData(appData);
 	}
 }
