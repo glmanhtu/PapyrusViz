@@ -20,19 +20,19 @@
 					<h5>Recent Projects</h5>
 					<table class="table mt-3 table-sm overflow-auto">
 						<tbody id="proj-list">
-						<tr id="proj-template" >
-							<th scope="row" class="proj-name">Test 1</th>
-							<td colspan="2" class="proj-path">/Users/mvu/Downloads/demo_images</td>
+						<tr *ngFor="let project of projects" >
+							<th scope="row" class="proj-name">{{project.projName}}</th>
+							<td colspan="2" class="proj-path">{{project.projPath}}</td>
 							<td>
 								<div class="text-right d-flex justify-content-end">
-									<button type="button"
-													class="btn btn-outline-success btn-sm me-1 proj-open">Open</button>
+									<button type="button" class="btn btn-outline-success btn-sm me-1 proj-open"
+													(click)="openProject(project.projPath)">Open</button>
 									<button type="button" class="btn btn-outline-danger btn-sm proj-del">X</button>
 								</div>
 							</td>
 						</tr>
 
-						<tr id="no-proj" style="display: none;">
+						<tr id="no-proj" *ngIf="projects.length === 0">
 							<td colspan="4">No project was found!</td>
 						</tr>
 						</tbody>

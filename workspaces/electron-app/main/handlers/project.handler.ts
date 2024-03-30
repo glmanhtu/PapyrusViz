@@ -6,13 +6,16 @@ import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { projectTbl } from '../entities/project';
 import path from 'node:path';
 import { categoryTbl } from '../entities/category';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { imgTbl } from '../entities/img';
 import * as dataUtils from '../utils/data.utils';
 import * as pathUtils from '../utils/path.utils';
 import sharp from 'sharp'
 import { ProjectInfo } from '../models/app-data';
 import * as databaseUtils from '../utils/database.utils';
+import { OldProjectModel } from '../models/project';
+import { assemblingTbl } from '../entities/assembling';
+import { imgAssemblingTbl } from '../entities/img-assembling';
 
 declare const global: GlobalConfig;
 
@@ -34,9 +37,84 @@ export class ProjectHandler extends BaseHandler {
 		return await pathUtils.isFile(projectFile);
 	}
 
+	private async migrateOldProject(projectPath: string): Promise<void> {
+		const projectFile = path.join(projectPath, 'project.json');
+		const data: OldProjectModel = JSON.parse(await fs.readFile(projectFile, 'utf-8'));
+
+		const databaseFile = pathUtils.projectFile(projectPath)
+		const database = databaseUtils.createConnection(databaseFile);
+		databaseUtils.migrateDatabase(database, path.join(__dirname, 'schema'));
+
+		const result = await database.insert(projectTbl).values({
+			name: data.projName,
+			path: data.projPath,
+			dataPath: data.datasetPath,
+			os: process.platform
+		}).returning({insertedId: projectTbl.id});
+		const projectId = result[0].insertedId;
+
+
+		const categoryMap = new Map<string, number>;
+		await Promise.all(data.rootDirs.available.map(async (rootDir) => {
+			const categories = await database.insert(categoryTbl).values({
+				name: rootDir.name,
+				path: rootDir.path,
+				projectId: projectId
+			}).returning({insertedId: categoryTbl.id});
+			categoryMap.set(rootDir.path, categories[0].insertedId);
+		}));
+
+		await Promise.all(Object.entries(data.images).map(async ([key, oldImg]) => {
+			await Promise.all(Object.entries(categoryMap).map(async ([rootDir, rootDirID]) => {
+				if (oldImg.path.includes(rootDir)) {
+					await database.insert(imgTbl).values({
+						id: parseInt(key),
+						path: path.relative(rootDir, oldImg.path),
+						name: oldImg.name,
+						thumbnail: path.relative(data.projPath, oldImg.thumbnails),
+						width: oldImg.width,
+						height: oldImg.height,
+						format: oldImg.format,
+						categoryId: rootDirID
+					});
+				}
+			}))
+		}));
+
+		await database.insert(categoryTbl).values({
+			name: 'All images',
+			path: '',
+			projectId: projectId
+		}).returning({insertedId: categoryTbl.id});
+
+		await Promise.all(Object.entries(data.assembled).map(async ([_, assembled]) => {
+			const assemblings = await database.insert(assemblingTbl).values({
+				name: assembled.name,
+				group: assembled.parent,
+				isActivated: assembled.activated,
+				imgCount: assembled.imagesCount,
+				projectId: projectId
+			}).returning({insertedId: assemblingTbl.id});
+			const assemblingId = assemblings[0].insertedId;
+
+			await Promise.all(Object.entries(assembled.images).map(async ([imgId, imgTransform]) => {
+				await database.insert(imgAssemblingTbl).values({
+					imgId: parseInt(imgId),
+					assemblingId: assemblingId,
+					transforms: sql`${imgTransform}::json`
+				})
+
+			}))
+		}));
+	}
+
 	private async loadProject(projectPath: string): Promise<ProjectDTO> {
 		if (!await this.projectExists(projectPath)) {
-			throw new Error('Project does not exists!');
+			if (await pathUtils.isFile(path.join(projectPath, 'project.json'))) {
+				await this.migrateOldProject(projectPath);
+			} else {
+				throw new Error('Project does not exists!');
+			}
 		}
 		const projectFile = pathUtils.projectFile(projectPath);
 		const database = databaseUtils.createConnection(projectFile);
@@ -166,7 +244,6 @@ export class ProjectHandler extends BaseHandler {
 						width: metadata.width,
 						height: metadata.height,
 						format: metadata.format,
-						size: metadata.size,
 						categoryId: category[0].id
 					});
 				} catch (e) {

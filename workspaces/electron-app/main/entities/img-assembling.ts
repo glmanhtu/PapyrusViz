@@ -3,7 +3,7 @@ import { assemblingTbl } from './assembling';
 import { imgTbl } from './img';
 
 
-export const imgAssemblings = sqliteTable('img_assembling', {
+export const imgAssemblingTbl = sqliteTable('img_assembling', {
     imgId: integer('img_id').references(() => imgTbl.id),
     assemblingId: integer('assembling_id').references(() => assemblingTbl.id),
     transforms: text('transforms', { mode: 'json' }),
@@ -13,4 +13,4 @@ export const imgAssemblings = sqliteTable('img_assembling', {
     }
 })
 
-export type ImgAssembling = typeof imgAssemblings.$inferSelect
+export type ImgAssembling = typeof imgAssemblingTbl.$inferSelect
