@@ -1,8 +1,8 @@
 import { sqliteTable, text, integer, index } from 'drizzle-orm/sqlite-core';
-import { categories } from './category';
+import { categoryTbl } from './category';
 
 
-export const imgs = sqliteTable('img', {
+export const imgTbl = sqliteTable('img', {
     id: integer('id').primaryKey({autoIncrement: true}),
     name: text('name'),
     path: text('path'),     // relative path with respect to dirId
@@ -11,7 +11,7 @@ export const imgs = sqliteTable('img', {
     height: integer('height'),
     format: text('format'),
     size: integer('size'),
-    categoryId: integer('dir_id').references(() => categories.id),
+    categoryId: integer('dir_id').references(() => categoryTbl.id),
 }, (table) => {
   return {
     pathIdx: index("imgPathIdx").on(table.path),
@@ -19,4 +19,4 @@ export const imgs = sqliteTable('img', {
 });
 
 
-export type Img = typeof imgs.$inferSelect
+export type Img = typeof imgTbl.$inferSelect

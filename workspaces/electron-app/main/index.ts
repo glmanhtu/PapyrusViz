@@ -3,10 +3,9 @@ import _ from 'lodash';
 import * as path from 'node:path';
 import { GlobalConfig } from 'shared-lib';
 import { App } from './components/app';
-import * as pathUtils from './utils/path.utils';
-import * as databaseUtils from './utils/database.utils';
 import { DialogHandler } from './handlers/dialog.handler';
 import { ProjectHandler } from './handlers/project.handler';
+import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 
 declare const global: GlobalConfig;
 
@@ -21,16 +20,13 @@ global.appConfig =
 		: _.merge(defaultConfig, currentConfig);
 
 
-const databaseFile = pathUtils.fromAppData('data.db');
-const database = databaseUtils.createConnection(databaseFile);
-
-databaseUtils.migrateDatabase(database, path.join(__dirname, 'schema'));
+const databases = new Map<string, BetterSQLite3Database>();
 // Launch app
 App.launch((mainWin) => {
 
 	const handlers = [
 		new DialogHandler(mainWin),
-		new ProjectHandler(database)
+		new ProjectHandler(databases)
 	]
 	App.registerHandlers(handlers);
 });

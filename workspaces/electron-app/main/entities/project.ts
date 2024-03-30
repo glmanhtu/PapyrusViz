@@ -2,7 +2,7 @@ import { sqliteTable, text, integer, uniqueIndex } from 'drizzle-orm/sqlite-core
 import { sql } from "drizzle-orm";
 
 
-export const projects = sqliteTable('project', {
+export const projectTbl = sqliteTable('project', {
     id: integer('id').primaryKey({autoIncrement: true}),
     name: text('name'),
     path: text('path'),
@@ -15,4 +15,4 @@ export const projects = sqliteTable('project', {
 );
 
 
-export type Project = typeof projects.$inferSelect
+export type Project = typeof projectTbl.$inferSelect

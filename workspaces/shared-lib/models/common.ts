@@ -25,6 +25,10 @@ export class Message<R> implements IMessage<R> {
 		return new Message<R>('success', payload);
 	}
 
+	public static warning<R>(payload: R) : IMessage<R> {
+		return new Message<R>('warning', payload);
+	}
+
 	public static complete(message: string) : IMessage<string> {
 		return new Message<string>('complete', message);
 	}

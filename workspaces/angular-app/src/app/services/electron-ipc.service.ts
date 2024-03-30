@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import { IMessage, WindowApi } from 'shared-lib';
 
 @Injectable({
@@ -7,7 +7,7 @@ import { IMessage, WindowApi } from 'shared-lib';
 export class ElectronIpcService {
 	private _api!: WindowApi;
 
-	constructor() {
+	constructor(private ngZone: NgZone) {
 		if (window && (window as Window).api) {
 			this._api = (window as Window).api;
 			console.log('Preloader API has been loaded successfully');
@@ -21,7 +21,11 @@ export class ElectronIpcService {
 	}
 
 	public sendAndListen<P, R>(type: string, payload: P, listener: (message: IMessage<R>) => void): void {
-		this._api.sendAndListen<P, R>(type, payload, listener);
+		this._api.sendAndListen<P, R>(type, payload, (message) => {
+			this.ngZone.run(() => {
+				listener(message);
+			});
+		});
 	};
 
 }

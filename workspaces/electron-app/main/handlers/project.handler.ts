@@ -1,25 +1,47 @@
 import { BaseHandler } from "./base.handler";
 import { IMessage, Message, Progress, ProjectDTO } from 'shared-lib';
-import * as fs from 'fs';
-import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
-import { projects } from '../entities/project';
-import path from 'node:path';
-import { categories } from '../entities/category';
-import { eq } from 'drizzle-orm';
-import { imgs } from '../entities/img';
+import { promises as fs } from 'fs';
 
+import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
+import { projectTbl } from '../entities/project';
+import path from 'node:path';
+import { categoryTbl } from '../entities/category';
+import { eq } from 'drizzle-orm';
+import { imgTbl } from '../entities/img';
+import * as dataUtils from '../utils/data.utils';
+import * as pathUtils from '../utils/path.utils';
 import sharp from 'sharp'
+import { ProjectInfo } from '../models/app-data';
+import * as databaseUtils from '../utils/database.utils';
 
 export class ProjectHandler extends BaseHandler {
-	constructor(private database: BetterSQLite3Database) {
+	constructor(private databases: Map<string, BetterSQLite3Database>) {
 		super();
 		this.addContinuousHandler<ProjectDTO, Progress>('project::create-project', this.creteProject.bind(this));
+		this.addRoute<void, ProjectInfo[]>('project:get-projects', this.getProjects);
 	}
 
+	private async getProjects(): Promise<ProjectInfo[]> {
+		const {projects} = await dataUtils.readAppData();
+		return projects;
+	}
+
+	private async projectExists(projectPath: string): Promise<boolean> {
+		const projects = await this.getProjects();
+		return projects.some(project => project.projPath === projectPath);
+	}
+
+	// private async loadProject(projectPath: string): Promise<ProjectDTO> {
+	// 	const isProjPathExists = await pathUtils.isDir(projectPath);
+	// 	if (!isProjPathExists) {
+	//
+	// 	}
+	// }
+
 	private async creteProject(payload: ProjectDTO, reply: (message: IMessage<string | Progress>) => void ): Promise<void> {
-		const isProjPathExists = fs.existsSync(payload.path) && fs.lstatSync(payload.path).isDirectory();
-		const isDSPathExists = fs.existsSync(payload.dataPath) && fs.lstatSync(payload.dataPath).isDirectory();
-		if (isProjPathExists && fs.readdirSync(payload.path).length !== 0) {
+		const isProjPathExists = await pathUtils.isDir(payload.path)
+		const isDSPathExists = await pathUtils.isDir(payload.dataPath);
+		if (isProjPathExists && (await fs.readdir(payload.path)).length !== 0) {
 			reply(Message.error(`Project location: ${payload.path} is not empty!`));
 			return;
 		}
@@ -27,18 +49,25 @@ export class ProjectHandler extends BaseHandler {
 			reply(Message.error(`Dataset location: ${payload.dataPath} doesn't exists!`));
 			return;
 		}
+
 		reply(Message.success({
 			percentage: 0, title: 'Step 1/3 - Creating project', description: 'Writing project information...'
 		}));
+
 		if (!isProjPathExists) {
-			fs.mkdirSync(payload.path);
+			await fs.mkdir(payload.path);
 		}
-		const result = await this.database.insert(projects).values({
+
+		const databaseFile = path.join(payload.path, 'project.db')
+		const database = databaseUtils.createConnection(databaseFile);
+		databaseUtils.migrateDatabase(database, path.join(__dirname, 'schema'));
+
+		const result = await database.insert(projectTbl).values({
 			name: payload.name,
 			path: payload.path,
 			dataPath: payload.dataPath,
 			os: process.platform
-		}).returning({insertedId: projects.id});
+		}).returning({insertedId: projectTbl.id});
 		const projectId = result[0].insertedId;
 
 		reply(Message.success({
@@ -46,26 +75,26 @@ export class ProjectHandler extends BaseHandler {
 		}));
 
 		// Step 2: Get image files
-		const category = await this.database.insert(categories).values({
+		const category = await database.insert(categoryTbl).values({
 			name: 'All images',
 			path: '',
 			projectId: projectId
-		}).returning({insertedId: categories.id});
+		}).returning({insertedId: categoryTbl.id});
 		const categoryId = category[0].insertedId;
 
 		const imageMap = new Map<number, string[]>();
 		const getFilesRecursively = async (directory: string, categoryId: number, level = 0): Promise<void> => {
-			const filesInDirectory = fs.readdirSync(directory);
+			const filesInDirectory = await fs.readdir(directory);
 			for (let i = 0; i < filesInDirectory.length; i++) {
 				const absolute = path.join(directory, filesInDirectory[i]);
 				let currentDirectoryId = categoryId;
-				if (fs.statSync(absolute).isDirectory()) {
+				if ((await fs.stat(absolute)).isDirectory()) {
 					if (level === 0) {
-						const category = await this.database.insert(categories).values({
+						const category = await database.insert(categoryTbl).values({
 							name: filesInDirectory[i],
 							path: absolute,
 							projectId: projectId
-						}).returning({insertedId: categories.id});
+						}).returning({insertedId: categoryTbl.id});
 						currentDirectoryId = category[0].insertedId;
 					}
 					await getFilesRecursively(absolute, currentDirectoryId, level + 1);
@@ -88,9 +117,11 @@ export class ProjectHandler extends BaseHandler {
 		await getFilesRecursively(payload.dataPath, categoryId);
 
 		// Step 3: Generate image thumbnails
-		fs.mkdirSync(path.join(payload.path, 'thumbnails'));
+		await fs.mkdir(path.join(payload.path, 'thumbnails'));
+		const nImages: number = [...imageMap.values()].reduce((acc, x) => acc + x.length, 0);
+		let count = 0;
 		for (const [categoryId, images] of imageMap) {
-			const category = await this.database.select().from(categories).where(eq(categories.id, categoryId));
+			const category = await database.select().from(categoryTbl).where(eq(categoryTbl.id, categoryId));
 
 			for (let i = 0; i < images.length; i++) {
 				const thumbnailPath = path.join(payload.path, 'thumbnails', `${i}.jpg`)
@@ -102,16 +133,15 @@ export class ProjectHandler extends BaseHandler {
 						.toFile(thumbnailPath);
 					const metadata = await image.metadata();
 
-					const per = (i + 1) * 90 / images.length;
+					const per = (count + 1) * 90 / nImages;
 					reply(Message.success({
 						percentage: 10 + per, title: 'Step 3/3 - Generating thumbnails...',
-						description: `Generated ${i + 1}/${images.length} thumbnails images...`
+						description: `Generated ${count + 1}/${nImages} thumbnails images...`
 					}));
-					const relPath = path.relative(category[0].path, images[i]);
-					await this.database.insert(imgs).values({
-						path: relPath,
+					await database.insert(imgTbl).values({
+						path: path.relative(category[0].path, images[i]),
 						name: path.basename(images[i]),
-						thumbnail: thumbnailPath,
+						thumbnail: path.relative(payload.path, thumbnailPath),
 						width: metadata.width,
 						height: metadata.height,
 						format: metadata.format,
@@ -119,7 +149,9 @@ export class ProjectHandler extends BaseHandler {
 						categoryId: category[0].id
 					});
 				} catch (e) {
-					reply(Message.error("Unnable to read " + images[i] + ', Ignoring...'));
+					reply(Message.warning("Unable to read " + images[i] + ', Ignoring...'));
+				} finally {
+					count += 1;
 				}
 			}
 		}
