@@ -9,7 +9,7 @@ export const categoryTbl = sqliteTable('category', {
     isActivated: integer('is_activated', { mode: 'boolean' }),
     projectId: integer('project_id').references(() => projectTbl.id),
 }, (categories) => ({
-    pathIdx: index('dirPathIndex').on(categories.path),
+    pathIdx: index('dir_path_index').on(categories.path),
   })
 );
 

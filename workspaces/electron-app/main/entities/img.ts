@@ -13,7 +13,7 @@ export const imgTbl = sqliteTable('img', {
     categoryId: integer('dir_id').references(() => categoryTbl.id),
 }, (table) => {
   return {
-    pathIdx: index("imgPathIdx").on(table.path),
+    pathIdx: index("img_path_idx").on(table.path),
   };  
 });
 

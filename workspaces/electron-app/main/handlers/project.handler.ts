@@ -6,7 +6,7 @@ import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { projectTbl } from '../entities/project';
 import path from 'node:path';
 import { categoryTbl } from '../entities/category';
-import { eq, sql } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { imgTbl } from '../entities/img';
 import * as dataUtils from '../utils/data.utils';
 import * as pathUtils from '../utils/path.utils';
@@ -96,7 +96,7 @@ export class ProjectHandler extends BaseHandler {
 				await database.insert(imgAssemblingTbl).values({
 					imgId: parseInt(imgId),
 					assemblingId: assemblingId,
-					transforms: sql`${imgTransform}::json`
+					transforms: imgTransform
 				})
 
 			}))

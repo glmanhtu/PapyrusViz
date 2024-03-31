@@ -8,9 +8,9 @@ export const projectTbl = sqliteTable('project', {
     path: text('path'),
     dataPath: text('data_path'),
     os: text('os'),
-    createdAt: text("createdAt").default(sql`CURRENT_TIMESTAMP`)
+    createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`)
 }, (projects) => ({
-    pathIdx: uniqueIndex('projPathIndex').on(projects.path),
+    pathIdx: uniqueIndex('proj_path_index').on(projects.path),
   })
 );
 
