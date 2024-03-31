@@ -10,7 +10,6 @@ export const imgTbl = sqliteTable('img', {
     width: integer('width'),
     height: integer('height'),
     format: text('format'),
-    size: integer('size'),
     categoryId: integer('dir_id').references(() => categoryTbl.id),
 }, (table) => {
   return {

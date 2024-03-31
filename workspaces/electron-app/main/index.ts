@@ -7,6 +7,7 @@ import { DialogHandler } from './handlers/dialog.handler';
 import { ProjectHandler } from './handlers/project.handler';
 import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { CategoryHandler } from './handlers/category.handler';
+import { ImageHandler } from './handlers/image.handler';
 
 declare const global: GlobalConfig;
 
@@ -28,7 +29,8 @@ App.launch((mainWin) => {
 	const handlers = [
 		new DialogHandler(mainWin),
 		new ProjectHandler(databases),
-		new CategoryHandler(databases)
+		new CategoryHandler(databases),
+		new ImageHandler(databases)
 	]
 	App.registerHandlers(handlers);
 });

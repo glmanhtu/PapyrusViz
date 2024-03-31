@@ -66,8 +66,8 @@ export class ProjectHandler extends BaseHandler {
 		}));
 
 		await Promise.all(Object.entries(data.images).map(async ([key, oldImg]) => {
-			await Promise.all(Object.entries(categoryMap).map(async ([rootDir, rootDirID]) => {
-				if (oldImg.path.includes(rootDir)) {
+			await Promise.all([...categoryMap].map(async ([rootDir, rootDirID]) => {
+				if (oldImg.path.includes(rootDir) && rootDir !== '') {
 					await database.insert(imgTbl).values({
 						id: parseInt(key),
 						path: path.relative(rootDir, oldImg.path),

@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, shell } from 'electron';
+import { app, BrowserWindow, ipcMain, shell, protocol, net } from 'electron';
 import { Window } from './window';
 import { BaseHandler } from '../handlers/base.handler';
 import { IMessage } from 'shared-lib';
@@ -10,6 +10,8 @@ export class App {
 	public static launch(callback: (mainWin: BrowserWindow) => void): void {
 		app.on('window-all-closed', App.quit);
 		app.whenReady().then(() => {
+			protocol.handle('atom', (request) =>
+				net.fetch('file://' + request.url.slice('atom://'.length)))
 			App.start();
 			callback(this.electronWindow);
 		});
