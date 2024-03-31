@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
 import { BroadcastService, PROJECT_BROADCAST_SERVICE_TOKEN } from '../../services/broadcast.service';
 import { CategoryDTO, ProjectDTO } from 'shared-lib';
 import { NgbNav } from '@ng-bootstrap/ng-bootstrap';
@@ -14,6 +14,9 @@ import { FormControl } from '@angular/forms';
 })
 export class PanelComponent implements OnInit {
 
+  @ViewChild('scrollContainer') scrollContainer!: ElementRef;
+  private scrollThreshold = 100; // Adjust this value as needed
+
   active = 1;
   projectDto: ProjectDTO | null = null;
   categories: CategoryDTO[] = [];
@@ -21,6 +24,8 @@ export class PanelComponent implements OnInit {
   filter = new FormControl('');
   currentPage = 0;
   thumbnails: Thumbnail[] = [];
+  isLoading: boolean = false; // is a boolean flag to track whether new items are being loaded.
+  isCompleted = false;  // a boolean flag to check whether all items are loaded.
 
   constructor(
     @Inject(PROJECT_BROADCAST_SERVICE_TOKEN) private projectBroadcastService: BroadcastService<ProjectDTO>,
@@ -42,18 +47,35 @@ export class PanelComponent implements OnInit {
     this.getThumbnails();
   }
 
-  getThumbnails() {
+  onScroll() {
+    const element = this.scrollContainer.nativeElement;
+    const closeToBottom = element.scrollHeight - element.scrollTop <= element.clientHeight + this.scrollThreshold;
+    if (closeToBottom && !this.isLoading && !this.isCompleted) {
+      this.getThumbnails(this.currentPage + 1, false);
+    }
+  }
+
+  getThumbnails(page = 0, reset = true) {
     const thumbnailRequest: ThumbnailRequest = {
       projectPath: this.projectDto!.path,
       categoryId: this.category.value!,
       filter: this.filter.value!,
-      page: this.currentPage,
+      page: page,
       perPage: 50
     }
-
+    this.isLoading = true;
     this.eIpc.send<ThumbnailRequest, ThumbnailResponse>('image:get-thumbnails', thumbnailRequest).then((result) => {
       console.log(result);
+      if (reset) {
+        this.thumbnails.length = 0;
+        this.isCompleted = false;
+      }
+      if (result.thumbnails.length === 0) {
+        this.isCompleted = true;
+      }
       this.thumbnails.push(...result.thumbnails);
+      this.currentPage = page;
+      this.isLoading = false;
     });
   }
 }

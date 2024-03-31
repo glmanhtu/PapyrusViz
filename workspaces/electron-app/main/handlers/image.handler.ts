@@ -29,6 +29,7 @@ export class ImageHandler extends BaseHandler {
 
 		const images = database.select().from(imgTbl)
 			.where(and(...filters))
+			.orderBy(imgTbl.name)
 			.limit(request.perPage)
 			.offset(request.page * request.perPage);
 
