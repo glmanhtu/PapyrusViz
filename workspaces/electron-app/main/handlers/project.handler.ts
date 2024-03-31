@@ -59,7 +59,8 @@ export class ProjectHandler extends BaseHandler {
 			const categories = await database.insert(categoryTbl).values({
 				name: rootDir.name,
 				path: rootDir.path,
-				projectId: projectId
+				projectId: projectId,
+				isActivated: data.rootDirs.selected === rootDir.path
 			}).returning({insertedId: categoryTbl.id});
 			categoryMap.set(rootDir.path, categories[0].insertedId);
 		}));
@@ -80,12 +81,6 @@ export class ProjectHandler extends BaseHandler {
 				}
 			}))
 		}));
-
-		await database.insert(categoryTbl).values({
-			name: 'All images',
-			path: '',
-			projectId: projectId
-		}).returning({insertedId: categoryTbl.id});
 
 		await Promise.all(Object.entries(data.assembled).map(async ([_, assembled]) => {
 			const assemblings = await database.insert(assemblingTbl).values({

@@ -6,6 +6,7 @@ export const categoryTbl = sqliteTable('category', {
     id: integer('id').primaryKey({autoIncrement: true}),
     name: text('name'),
     path: text('path'),
+    isActivated: integer('is_activated', { mode: 'boolean' }),
     projectId: integer('project_id').references(() => projectTbl.id),
 }, (categories) => ({
     pathIdx: index('dirPathIndex').on(categories.path),
