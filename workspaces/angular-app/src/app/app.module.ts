@@ -1,5 +1,5 @@
 import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { NgModule } from '@angular/core';
+import { NgModule, NgZone } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
@@ -11,6 +11,8 @@ import { MainComponent } from './components/main/main.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ProjectManagementComponent } from './components/project/management/project.management.component';
 import { ProjectCreationComponent } from './components/project/creation/project.creation.component';
+import { BroadcastService, PROJECT_BROADCAST_SERVICE_TOKEN } from './services/broadcast.service';
+import { ProjectDTO } from 'shared-lib';
 
 
 // AoT requires an exported function for factories
@@ -41,7 +43,13 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
 			},
 		}),
 	],
-	providers: [],
+	providers: [
+		{
+			provide: PROJECT_BROADCAST_SERVICE_TOKEN,
+			useFactory: (ngZone: NgZone) => new BroadcastService<ProjectDTO>(ngZone),
+			deps: [NgZone]
+		}
+	],
 	bootstrap: [AppComponent],
 })
 export class AppModule {}

@@ -86,4 +86,8 @@ export class ProjectCreationComponent implements OnInit {
         }
     });
   }
+
+  openProject(projectPath: string) {
+    this.projectManagement.openProject(projectPath);
+  }
 }

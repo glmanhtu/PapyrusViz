@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
+import { BroadcastService, PROJECT_BROADCAST_SERVICE_TOKEN } from '../../services/broadcast.service';
+import { ProjectDTO } from 'shared-lib';
 
 @Component({
   selector: 'app-panel',
@@ -7,10 +9,14 @@ import { Component, OnInit } from '@angular/core';
 })
 export class PanelComponent implements OnInit {
 
-  constructor() {}
+  constructor(
+    @Inject(PROJECT_BROADCAST_SERVICE_TOKEN) private projectBroadcastService: BroadcastService<ProjectDTO>,
+  ) {}
 
   ngOnInit(): void {
-    console.log('PanelComponent INIT');
-   }
+    this.projectBroadcastService.observe().subscribe((projectDto) => {
+      console.log(projectDto);
+    });
+  }
 
 }

@@ -63,7 +63,7 @@
 			</div>
 		</div>
 		<div class="modal-footer">
-			<button type="submit" class="btn btn-success btn-sm" *ngIf="showComplete">Open
+			<button type="submit" class="btn btn-success btn-sm" (click)="openProject(projectForm.controls.projectPath.value!)" *ngIf="showComplete">Open
 				project</button>
 		</div>
 	</div>

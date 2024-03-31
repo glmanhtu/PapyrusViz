@@ -1,10 +1,11 @@
-import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Inject, Input, OnInit, ViewChild } from '@angular/core';
 import { NgbModal, NgbModalConfig } from '@ng-bootstrap/ng-bootstrap';
 import { ProjectCreationComponent } from '../creation/project.creation.component';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap/modal/modal-ref';
 import { ElectronIpcService } from '../../../services/electron-ipc.service';
 import { ProjectInfo } from '../../../../../../electron-app/main/models/app-data';
 import { ProjectDTO } from 'shared-lib';
+import { BroadcastService, PROJECT_BROADCAST_SERVICE_TOKEN } from '../../../services/broadcast.service';
 
 @Component({
   selector: 'app-project-management',
@@ -21,6 +22,7 @@ export class ProjectManagementComponent implements OnInit, AfterViewInit {
 
   constructor(
     config: NgbModalConfig,
+    @Inject(PROJECT_BROADCAST_SERVICE_TOKEN) private projectBroadcastService: BroadcastService<ProjectDTO>,
     private electronIpc: ElectronIpcService,
     private modalService: NgbModal,
   ) {
@@ -53,7 +55,8 @@ export class ProjectManagementComponent implements OnInit, AfterViewInit {
 
   openProject(projectPath: string) {
     this.electronIpc.send<string, ProjectDTO>('project:load-project', projectPath).then((project) => {
-      console.log(project);
+      this.projectBroadcastService.publish(project);
+      this.modelRef!.close();
     });
   }
 }
