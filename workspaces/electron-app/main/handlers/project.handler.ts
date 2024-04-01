@@ -29,7 +29,7 @@ export class ProjectHandler extends BaseHandler {
 
 	private async getProjects(): Promise<ProjectInfo[]> {
 		const {projects} = await dataUtils.readAppData();
-		return projects;
+		return projects.reverse();
 	}
 
 	private async projectExists(projectPath: string): Promise<boolean> {
@@ -157,9 +157,7 @@ export class ProjectHandler extends BaseHandler {
 		dbService.migrateDatabase(database, path.join(__dirname, 'schema'));
 
 		const result = await database.insert(projectTbl).values({
-			name: payload.name,
-			path: payload.path,
-			dataPath: payload.dataPath,
+			...payload,
 			os: process.platform
 		}).returning({insertedId: projectTbl.id});
 		const projectId = result[0].insertedId;
@@ -218,7 +216,7 @@ export class ProjectHandler extends BaseHandler {
 			const category = await database.select().from(categoryTbl).where(eq(categoryTbl.id, categoryId));
 
 			for (let i = 0; i < images.length; i++) {
-				const thumbnailPath = path.join(payload.path, 'thumbnails', `${i}.jpg`)
+				const thumbnailPath = path.join(payload.path, 'thumbnails', `${count}.jpg`)
 				const image = sharp(images[i]);
 				try {
 					await image
@@ -233,12 +231,10 @@ export class ProjectHandler extends BaseHandler {
 						description: `Generated ${count + 1}/${nImages} thumbnails images...`
 					}));
 					await database.insert(imgTbl).values({
+						...metadata,
 						path: path.relative(category[0].path, images[i]),
 						name: path.basename(images[i]),
 						thumbnail: path.relative(payload.path, thumbnailPath),
-						width: metadata.width,
-						height: metadata.height,
-						format: metadata.format,
 						categoryId: category[0].id
 					});
 				} catch (e) {
