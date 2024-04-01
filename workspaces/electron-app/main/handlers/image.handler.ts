@@ -1,21 +1,21 @@
 import { BaseHandler } from "./base.handler";
-import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { ThumbnailRequest, ThumbnailResponse } from 'shared-lib/.dist/models/img';
 import { imgTbl } from '../entities/img';
 import { and, eq, like, SQLWrapper } from 'drizzle-orm';
 import { categoryTbl } from '../entities/category';
 import { takeUniqueOrThrow } from '../utils/data.utils';
 import path from 'node:path';
+import { dbService } from '../services/database.service';
 
 
 export class ImageHandler extends BaseHandler {
-	constructor(private databases: Map<string, BetterSQLite3Database>) {
+	constructor() {
 		super();
 		this.addRoute<ThumbnailRequest, ThumbnailResponse>('image:get-thumbnails', this.getImages.bind(this));
 	}
 
 	private async getImages(request: ThumbnailRequest): Promise<ThumbnailResponse> {
-		const database = this.databases.get(request.projectPath);
+		const database = dbService.getConnection(request.projectPath);
 		const category = await database.select().from(categoryTbl)
 			.where(eq(categoryTbl.id, request.categoryId)).then(takeUniqueOrThrow);
 

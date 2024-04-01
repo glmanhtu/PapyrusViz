@@ -5,7 +5,6 @@ import { GlobalConfig } from 'shared-lib';
 import { App } from './components/app';
 import { DialogHandler } from './handlers/dialog.handler';
 import { ProjectHandler } from './handlers/project.handler';
-import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { CategoryHandler } from './handlers/category.handler';
 import { ImageHandler } from './handlers/image.handler';
 
@@ -21,16 +20,14 @@ global.appConfig =
 		? defaultConfig
 		: _.merge(defaultConfig, currentConfig);
 
-
-const databases = new Map<string, BetterSQLite3Database>();
 // Launch app
 App.launch((mainWin) => {
 
 	const handlers = [
 		new DialogHandler(mainWin),
-		new ProjectHandler(databases),
-		new CategoryHandler(databases),
-		new ImageHandler(databases)
+		new ProjectHandler(),
+		new CategoryHandler(),
+		new ImageHandler()
 	]
 	App.registerHandlers(handlers);
 });

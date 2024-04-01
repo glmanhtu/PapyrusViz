@@ -2,7 +2,6 @@ import { BaseHandler } from "./base.handler";
 import { GlobalConfig, IMessage, Message, Progress, ProjectDTO } from 'shared-lib';
 import { promises as fs } from 'fs';
 
-import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { projectTbl } from '../entities/project';
 import path from 'node:path';
 import { categoryTbl } from '../entities/category';
@@ -12,15 +11,16 @@ import * as dataUtils from '../utils/data.utils';
 import * as pathUtils from '../utils/path.utils';
 import sharp from 'sharp'
 import { ProjectInfo } from '../models/app-data';
-import * as databaseUtils from '../utils/database.utils';
+import { dbService } from '../services/database.service';
 import { OldProjectModel } from '../models/project';
 import { assemblingTbl } from '../entities/assembling';
 import { imgAssemblingTbl } from '../entities/img-assembling';
 
+
 declare const global: GlobalConfig;
 
 export class ProjectHandler extends BaseHandler {
-	constructor(private databases: Map<string, BetterSQLite3Database>) {
+	constructor() {
 		super();
 		this.addContinuousHandler<ProjectDTO, Progress>('project::create-project', this.creteProject.bind(this));
 		this.addRoute<void, ProjectInfo[]>('project:get-projects', this.getProjects.bind(this));
@@ -42,8 +42,8 @@ export class ProjectHandler extends BaseHandler {
 		const data: OldProjectModel = JSON.parse(await fs.readFile(projectFile, 'utf-8'));
 
 		const databaseFile = pathUtils.projectFile(projectPath)
-		const database = databaseUtils.createConnection(databaseFile);
-		databaseUtils.migrateDatabase(database, path.join(__dirname, 'schema'));
+		const database = dbService.createConnection(databaseFile);
+		dbService.migrateDatabase(database, path.join(__dirname, 'schema'));
 
 		const result = await database.insert(projectTbl).values({
 			name: data.projName,
@@ -112,9 +112,9 @@ export class ProjectHandler extends BaseHandler {
 			}
 		}
 		const projectFile = pathUtils.projectFile(projectPath);
-		const database = databaseUtils.createConnection(projectFile);
-		databaseUtils.migrateDatabase(database, path.join(__dirname, 'schema'));
-		this.databases.set(projectPath, database);
+		const database = dbService.createConnection(projectFile);
+		dbService.migrateDatabase(database, path.join(__dirname, 'schema'));
+		dbService.addConnection(projectPath, database);
 
 		const projects = await database.select()
 			.from(projectTbl);
@@ -153,8 +153,8 @@ export class ProjectHandler extends BaseHandler {
 		}
 
 		const databaseFile = pathUtils.projectFile(payload.path)
-		const database = databaseUtils.createConnection(databaseFile);
-		databaseUtils.migrateDatabase(database, path.join(__dirname, 'schema'));
+		const database = dbService.createConnection(databaseFile);
+		dbService.migrateDatabase(database, path.join(__dirname, 'schema'));
 
 		const result = await database.insert(projectTbl).values({
 			name: payload.name,
