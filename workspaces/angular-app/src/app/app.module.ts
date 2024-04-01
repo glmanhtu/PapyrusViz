@@ -14,6 +14,7 @@ import { ProjectCreationComponent } from './components/project/creation/project.
 import { BroadcastService, PROJECT_BROADCAST_SERVICE_TOKEN } from './services/broadcast.service';
 import { ProjectDTO } from 'shared-lib';
 import { ThumbnailComponent } from './shared/components/thumbnail/thumbnail.component';
+import { BoardMainComponent } from './components/main/board/board.main.component';
 
 
 // AoT requires an exported function for factories
@@ -30,6 +31,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
 		ProjectManagementComponent,
 		ProjectCreationComponent,
 		ThumbnailComponent,
+		BoardMainComponent
   ],
 	imports: [
 		BrowserModule,

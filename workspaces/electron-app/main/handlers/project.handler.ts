@@ -15,6 +15,7 @@ import { dbService } from '../services/database.service';
 import { OldProjectModel } from '../models/project';
 import { assemblingTbl } from '../entities/assembling';
 import { imgAssemblingTbl } from '../entities/img-assembling';
+import { projectService } from '../services/project.service';
 
 
 declare const global: GlobalConfig;
@@ -30,11 +31,6 @@ export class ProjectHandler extends BaseHandler {
 	private async getProjects(): Promise<ProjectInfo[]> {
 		const {projects} = await dataUtils.readAppData();
 		return projects.reverse();
-	}
-
-	private async projectExists(projectPath: string): Promise<boolean> {
-		const projectFile = pathUtils.projectFile(projectPath);
-		return await pathUtils.isFile(projectFile);
 	}
 
 	private async migrateOldProject(projectPath: string): Promise<void> {
@@ -104,7 +100,7 @@ export class ProjectHandler extends BaseHandler {
 	}
 
 	private async loadProject(projectPath: string): Promise<ProjectDTO> {
-		if (!await this.projectExists(projectPath)) {
+		if (!await projectService.projectExists(projectPath)) {
 			if (await pathUtils.isFile(path.join(projectPath, 'project.json'))) {
 				await this.migrateOldProject(projectPath);
 			} else {
@@ -163,57 +159,24 @@ export class ProjectHandler extends BaseHandler {
 		const projectId = result[0].insertedId;
 
 		await reply(Message.success({
-			percentage: 10, title: 'Step 1/3 - Creating project', description: 'Writing project information...'
+			percentage: 5, title: 'Step 1/3 - Creating project', description: 'Writing project information...'
 		}));
 
-		// Step 2: Get image files
-		const category = await database.insert(categoryTbl).values({
-			name: 'All images',
-			path: '',
-			projectId: projectId
-		}).returning({insertedId: categoryTbl.id});
-		const categoryId = category[0].insertedId;
-
-		const imageMap = new Map<number, string[]>();
-		const getFilesRecursively = async (directory: string, categoryId: number, level = 0): Promise<void> => {
-			const filesInDirectory = await fs.readdir(directory);
-			for (let i = 0; i < filesInDirectory.length; i++) {
-				const absolute = path.join(directory, filesInDirectory[i]);
-				let currentDirectoryId = categoryId;
-				if ((await fs.stat(absolute)).isDirectory()) {
-					if (level === 0) {
-						const category = await database.insert(categoryTbl).values({
-							name: filesInDirectory[i],
-							path: absolute,
-							projectId: projectId
-						}).returning({insertedId: categoryTbl.id});
-						currentDirectoryId = category[0].insertedId;
-					}
-					await getFilesRecursively(absolute, currentDirectoryId, level + 1);
-				} else {
-					const fileExt = absolute.split('.').pop().toLowerCase();
-					if (['jpg', 'jpeg', 'png'].includes(fileExt)) {
-						const images: string[] = imageMap.get(currentDirectoryId) || [];
-						images.push(absolute);
-						imageMap.set(currentDirectoryId, images)
-
-						const nImages: number = [...imageMap.values()].reduce((acc, x) => acc + x.length, 0);
-						await reply(Message.success({
-							percentage: 10, title: 'Step 2/3 - Collecting images', description: `Collected ${nImages} images...`
-						}));
-					}
-				}
-			}
-		};
-
-		await getFilesRecursively(payload.dataPath, categoryId);
+		const imageMap = await pathUtils.getFilesRecursively(payload.dataPath);
+		const nImages: number = [...imageMap.values()].reduce((acc, x) => acc + x.length, 0);
+		await reply(Message.success({
+			percentage: 10, title: 'Step 2/3 - Collecting images', description: `Collected ${nImages} images...`
+		}));
 
 		// Step 3: Generate image thumbnails
 		await fs.mkdir(path.join(payload.path, 'thumbnails'));
-		const nImages: number = [...imageMap.values()].reduce((acc, x) => acc + x.length, 0);
 		let count = 0;
-		for (const [categoryId, images] of imageMap) {
-			const category = await database.select().from(categoryTbl).where(eq(categoryTbl.id, categoryId));
+		for (const [rootDir, images] of imageMap) {
+			const category = await database.insert(categoryTbl).values({
+				name: path.basename(rootDir) || 'All images',
+				path: rootDir,
+				projectId: projectId
+			}).returning({insertedId: categoryTbl.id});
 
 			for (let i = 0; i < images.length; i++) {
 				const thumbnailPath = path.join(payload.path, 'thumbnails', `${count}.jpg`)
@@ -232,10 +195,10 @@ export class ProjectHandler extends BaseHandler {
 					}));
 					await database.insert(imgTbl).values({
 						...metadata,
-						path: path.relative(category[0].path, images[i]),
+						path: path.relative(rootDir, images[i]),
 						name: path.basename(images[i]),
 						thumbnail: path.relative(payload.path, thumbnailPath),
-						categoryId: category[0].id
+						categoryId: category[0].insertedId
 					});
 				} catch (e) {
 					await reply(Message.warning("Unable to read " + images[i] + ', Ignoring...'));

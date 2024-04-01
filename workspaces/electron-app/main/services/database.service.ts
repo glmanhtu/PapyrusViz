@@ -5,6 +5,7 @@ import Database from 'better-sqlite3';
 
 class DatabaseService {
     private databases = new Map<string, BetterSQLite3Database>();
+
     public createConnection(databasePath: string) : BetterSQLite3Database {
         const sqlite = new Database(databasePath);
         return drizzle(sqlite);

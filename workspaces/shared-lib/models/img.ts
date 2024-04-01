@@ -15,3 +15,12 @@ export type Thumbnail = {
 export type ThumbnailResponse = {
 	thumbnails: Thumbnail[]
 }
+
+export type ImgDto = {
+	id: number,
+	name: string,
+	path: string,
+	width: number,
+	height: number,
+	categoryId: number
+}

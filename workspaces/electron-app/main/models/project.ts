@@ -7,18 +7,21 @@ export type OldImg = {
 	format: string
 }
 
-export type OldAssembledImage = {
+
+export type Transforms = {
 	zIndex: number,
 	top: number,
 	left: number,
-	scale: number
+	scale: number,
+	rotation: number
 }
+
 
 export type OldAssembled = {
 	name: string,
 	parent: string,
 	activated: boolean,
-	images: Map<string, OldAssembledImage>,
+	images: Map<string, Transforms>,
 	imagesCount: number,
 	createdAt: number
 }

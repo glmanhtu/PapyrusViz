@@ -1,15 +1,32 @@
 <div class="card text-center h-100">
 	<div class="card-header">
-		<ul class="nav nav-tabs card-header-tabs" id="assembling-tabs"
+		<ul class="nav nav-tabs card-header-tabs" ngbNav #nav="ngbNav" [(activeId)]="active"
 			onWheel="this.scrollLeft+=event.deltaY>0?100:-100">
-			<li class="nav-item" id="assembling-tab-template" style="display: none;">
-				<a class="nav-link" role="tab" href="#">Assembling image n1</a>
+
+			<li class="nav-item" role="presentation">
+				<button type="button" class="nav-link" (click)="add($event)">+</button>
 			</li>
-			<li class="nav-item">
-				<a class="nav-link" role="tab" href="#" onclick="createAssembling()">+</a>
-			</li>
+
+			@for (assembling of assemblings; track assembling) {
+				<li [ngbNavItem]="assembling" class="nav-item">
+					<button ngbNavLink class="nav-link" role="tab">
+						Tab {{ assembling.name }}
+						<span class="btn-close ms-3 fw-light" (click)="close($event, assembling.id)"></span>
+					</button>
+					<ng-template ngbNavContent>
+						<app-board-main [assembling]="assembling" [projectDto]="projectDto!"></app-board-main>
+					</ng-template>
+				</li>
+			}
+
+<!--			<li class="nav-item" id="assembling-tab-template" *ngFor="let assembling of assemblings">-->
+<!--				<a class="nav-link" role="tab" href="#">{{assembling.name}}</a>-->
+<!--			</li>-->
+<!--			<li class="nav-item">-->
+<!--				<a class="nav-link" role="tab" href="#" onclick="createAssembling()">+</a>-->
+<!--			</li>-->
 		</ul>
 	</div>
-	<div class="card-body h-100 overflow-auto" id="board">
+	<div class="card-body h-100 overflow-auto" id="board" [ngbNavOutlet]="nav">
 	</div>
 </div>

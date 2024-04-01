@@ -1,0 +1,7 @@
+<img *ngFor="let img of assemblingImages" src="{{img.img.path}}"
+		 class="board-img"
+		 width="{{img.img.width * img.transforms.scale}}"
+		 height="{{img.img.height * img.transforms.scale}}"
+		 title="{{img.img.name}}"
+		 alt="{{img.img.name}}"
+		 [ngStyle]="getStyle(img.transforms)">

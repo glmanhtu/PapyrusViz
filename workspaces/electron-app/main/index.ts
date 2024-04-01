@@ -7,6 +7,7 @@ import { DialogHandler } from './handlers/dialog.handler';
 import { ProjectHandler } from './handlers/project.handler';
 import { CategoryHandler } from './handlers/category.handler';
 import { ImageHandler } from './handlers/image.handler';
+import { AssemblingHandler } from './handlers/assembling.handler';
 
 declare const global: GlobalConfig;
 
@@ -27,7 +28,8 @@ App.launch((mainWin) => {
 		new DialogHandler(mainWin),
 		new ProjectHandler(),
 		new CategoryHandler(),
-		new ImageHandler()
+		new ImageHandler(),
+		new AssemblingHandler()
 	]
 	App.registerHandlers(handlers);
 });
