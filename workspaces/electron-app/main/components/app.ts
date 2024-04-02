@@ -3,6 +3,7 @@ import { Window } from './window';
 import { BaseHandler } from '../handlers/base.handler';
 import { IMessage } from 'shared-lib';
 import { Message } from 'shared-lib/.dist/models/common';
+import { Logger } from '../utils/logger';
 
 export class App {
 	private static _wrapper: Window;
@@ -34,7 +35,8 @@ export class App {
 					.then((response) => {
 						event.reply(`ipc-response:${requestId}`, Message.success(response));
 					}).catch((err) => {
-						event.reply(`ipc-response:${requestId}`, Message.error(err.message));
+					Logger.error(err)
+					event.reply(`ipc-response:${requestId}`, Message.error(err.message));
 				});
 			} else {
 				event.reply(`ipc-response:${requestId}`, Message.error('Handler not found'));
@@ -52,6 +54,7 @@ export class App {
 				}).then(() => {
 					event.reply(`ipc-continuous-response:${requestId}`, Message.complete(''));
 				}).catch((err) => {
+					Logger.error(err)
 					event.reply(`ipc-continuous-response:${requestId}`, Message.error(err.message));
 				});
 			} else {

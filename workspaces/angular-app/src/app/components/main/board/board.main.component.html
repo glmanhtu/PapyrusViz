@@ -1,5 +1,5 @@
 <div id="board" class="h-100">
 	<app-frame *ngFor="let img of assemblingImages"
-						 [transforms]="img.transforms" [image]="img.img">
+						 [transforms]="img.transforms" [image]="img.img" (transformEvent)="onTransform(img, $event)">
 	</app-frame>
 </div>

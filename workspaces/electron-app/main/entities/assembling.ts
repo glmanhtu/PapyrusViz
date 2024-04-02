@@ -7,7 +7,6 @@ export const assemblingTbl = sqliteTable('assembling', {
     id: integer('id').primaryKey({autoIncrement: true}),
     name: text('name'),
     group: text('group'),
-    isActivated: integer('is_activated', { mode: 'boolean' }),
     imgCount: integer('img_count'),
     createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
     projectId: integer('project_id').references(() => projectTbl.id),

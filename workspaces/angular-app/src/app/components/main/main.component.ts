@@ -1,8 +1,8 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { BroadcastService, PROJECT_BROADCAST_SERVICE_TOKEN } from '../../services/broadcast.service';
-import { AssemblingDTO, ProjectDTO } from 'shared-lib';
+import { AssemblingDTO, GetAssemblingRequest, ProjectDTO } from 'shared-lib';
 import { ElectronIpcService } from '../../services/electron-ipc.service';
-import { NgbNav } from '@ng-bootstrap/ng-bootstrap';
+import { NgbNav, NgbNavChangeEvent } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-main',
@@ -14,7 +14,7 @@ export class MainComponent implements OnInit {
 
   projectDto: ProjectDTO | null = null;
   assemblings: AssemblingDTO[] = [];
-  active: AssemblingDTO;
+  active: number;
 
   constructor(
     @Inject(PROJECT_BROADCAST_SERVICE_TOKEN) private projectBroadcastService: BroadcastService<ProjectDTO>,
@@ -31,15 +31,19 @@ export class MainComponent implements OnInit {
     this.eIpc.send<string, AssemblingDTO[]>('assembling:get-assemblings', projectDto.path).then((assemblings) => {
       this.assemblings = assemblings;
       console.log(assemblings)
-      for (let i = 0; i < assemblings.length; i++) {
-        if (assemblings[i].isActivated) {
-          this.active = assemblings[i];
-          break;
-        }
-      }
     });
+
+    this.eIpc.send<string, number>('assembling:get-activated-assembling-id', projectDto.path).then((assemblingId) => {
+      this.active = assemblingId;
+    })
   }
 
+  onNavChange(changeEvent: NgbNavChangeEvent) {
+    this.eIpc.send<GetAssemblingRequest, void>('assembling:set-activated-assembling-id', {
+      projectPath: this.projectDto!.path,
+      assemblingId: changeEvent.nextId
+    })
+  }
 
   close(event: MouseEvent, _: number) {
     event.preventDefault();
@@ -48,5 +52,10 @@ export class MainComponent implements OnInit {
 
   add(event: MouseEvent) {
     event.preventDefault();
+    this.eIpc.send<string, AssemblingDTO>('assembling:create-assembling', this.projectDto!.path).then((assemblingDto) => {
+      console.log(assemblingDto);
+      this.assemblings.push(assemblingDto);
+      this.active = assemblingDto.id;
+    });
   }
 }

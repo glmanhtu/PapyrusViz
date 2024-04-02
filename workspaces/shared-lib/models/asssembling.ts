@@ -4,7 +4,6 @@ export type AssemblingDTO = {
 	id: number,
 	name: string,
 	group: string,
-	isActivated: boolean,
 	imgCount: number,
 	createdAt: string
 }
@@ -24,7 +23,15 @@ export type AssemblingImage = {
 	transforms: Transforms
 }
 
-export type AssemblingImageRequest = {
+export type GetAssemblingRequest = {
 	projectPath: string,
 	assemblingId: number
 }
+
+export type AssemblingImageChangeRequest = {
+	projectPath: string,
+	assemblingId: number,
+	imageId: number,
+	transforms: Transforms
+}
+

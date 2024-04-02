@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/PapyvizV2.iml" filepath="$PROJECT_DIR$/.idea/PapyvizV2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/PapyrusViz.iml" filepath="$PROJECT_DIR$/.idea/PapyrusViz.iml" />
     </modules>
   </component>
 </project>

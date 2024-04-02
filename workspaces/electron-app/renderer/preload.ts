@@ -20,6 +20,7 @@ contextBridge.exposeInMainWorld('api', {
 				if (response.status === 'success') {
 					resolve(response.payload as R);
 				} else {
+					console.log(response);
 					reject(new Error(response.payload as string));
 				}
 			});
@@ -33,6 +34,9 @@ contextBridge.exposeInMainWorld('api', {
 				listener(response)
 				if (response.status === 'error' || response.status === 'complete') {
 					ipcRenderer.removeAllListeners(`ipc-continuous-response:${requestId}`);
+				}
+				if (response.status === 'error') {
+					console.log(response);
 				}
 			});
 

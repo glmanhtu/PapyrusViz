@@ -1,4 +1,4 @@
-import { Component, ElementRef, Inject, Input, ViewChild } from '@angular/core';
+import { Component, ElementRef, Inject, Input, ViewChild, Output, EventEmitter } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { ImgDto } from 'shared-lib/.dist/models/img';
 import { Transforms } from 'shared-lib';
@@ -30,6 +30,10 @@ export class FrameComponent {
   @Input()
   transforms: Transforms;
 
+  @Output()
+  transformEvent = new EventEmitter<Transforms>();
+
+
   minSize: { w: number, h: number } = { w: 200, h: 200 };
 
 
@@ -54,6 +58,7 @@ export class FrameComponent {
     const finishDrag = (_: MouseEvent) => {
       this._document.removeEventListener('mousemove', duringDrag);
       this._document.removeEventListener('mouseup', finishDrag);
+      this.transformEvent.emit(this.transforms);
     };
 
     this._document.addEventListener('mousemove', duringDrag);
@@ -104,6 +109,7 @@ export class FrameComponent {
     const finishResize = (_: MouseEvent) => {
       this._document.removeEventListener('mousemove', duringResize);
       this._document.removeEventListener('mouseup', finishResize);
+      this.transformEvent.emit(this.transforms);
     };
 
     this._document.addEventListener('mousemove', duringResize);

@@ -16,6 +16,7 @@ import { OldProjectModel } from '../models/project';
 import { assemblingTbl } from '../entities/assembling';
 import { imgAssemblingTbl } from '../entities/img-assembling';
 import { projectService } from '../services/project.service';
+import { assemblingService } from '../services/assembling.service';
 
 
 declare const global: GlobalConfig;
@@ -40,6 +41,7 @@ export class ProjectHandler extends BaseHandler {
 		const databaseFile = pathUtils.projectFile(projectPath)
 		const database = dbService.createConnection(databaseFile);
 		dbService.migrateDatabase(database, path.join(__dirname, 'schema'));
+		dbService.addConnection(projectPath, database)
 
 		const result = await database.insert(projectTbl).values({
 			name: data.projName,
@@ -82,11 +84,14 @@ export class ProjectHandler extends BaseHandler {
 			const assemblings = await database.insert(assemblingTbl).values({
 				name: assembled.name,
 				group: assembled.parent,
-				isActivated: assembled.activated,
 				imgCount: assembled.imagesCount,
 				projectId: projectId
 			}).returning({insertedId: assemblingTbl.id});
 			const assemblingId = assemblings[0].insertedId;
+
+			if (assembled.activated) {
+				await assemblingService.updateActivatedAssembling(projectPath, assemblingId);
+			}
 
 			await Promise.all(Object.entries(assembled.images).map(async ([imgId, imgTransform]) => {
 				await database.insert(imgAssemblingTbl).values({
