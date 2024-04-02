@@ -36,6 +36,8 @@ export class FrameComponent {
 
   minSize: { w: number, h: number } = { w: 200, h: 200 };
 
+  isResizing = false;
+
 
   constructor(@Inject(DOCUMENT) private _document: Document,
               private _el: ElementRef) { }
@@ -65,6 +67,9 @@ export class FrameComponent {
     this._document.addEventListener('mouseup', finishDrag);
   }
 
+
+  // Need to reimplement this function
+  // Because after the rotation, the positions of anchors are no longer correct
   startResize($event: MouseEvent, anchors: ResizeAnchorType[], direction: ResizeDirectionType): void {
     $event.preventDefault();
     const mouseX = $event.clientX;
@@ -114,5 +119,41 @@ export class FrameComponent {
 
     this._document.addEventListener('mousemove', duringResize);
     this._document.addEventListener('mouseup', finishResize);
+  }
+
+
+  startRotate($event: MouseEvent, anchors: ResizeAnchorType[], direction: ResizeDirectionType): void {
+    $event.preventDefault();
+    if (direction !== 'xy') {
+      return;
+    }
+    const mouseX = $event.clientX;
+    const mouseY = $event.clientY
+    const dimensionWidth: number = this.resizeCornerRef.nativeElement.parentNode.offsetWidth;
+    const dimensionHeight: number = this.resizeCornerRef.nativeElement.parentNode.offsetHeight;
+    const centerX = parseInt(this.resizeCornerRef.nativeElement.parentNode.offsetLeft + dimensionWidth / 2)
+    const centerY = parseInt(this.resizeCornerRef.nativeElement.parentNode.offsetTop + dimensionHeight / 2)
+    const lastRadians = Math.atan2(centerX - mouseX, centerY - mouseY);
+    const lastDegree = (lastRadians * (180 / Math.PI) * -1) + 100;
+    const rotation = this.transforms.rotation
+
+    const duringRotate = (e: MouseEvent) => {
+      if (anchors.includes('top') && anchors.includes('left')) {
+        const radians = Math.atan2(centerX - e.clientX, centerY - e.clientY);
+        const degree = (radians * (180 / Math.PI) * -1) + 100;
+        const degreeChange = lastDegree - degree
+        this.transforms.rotation = rotation + degreeChange;
+      }
+
+    };
+
+    const finishRotate = (_: MouseEvent) => {
+      this._document.removeEventListener('mousemove', duringRotate);
+      this._document.removeEventListener('mouseup', finishRotate);
+      this.transformEvent.emit(this.transforms);
+    };
+
+    this._document.addEventListener('mousemove', duringRotate);
+    this._document.addEventListener('mouseup', finishRotate);
   }
 }

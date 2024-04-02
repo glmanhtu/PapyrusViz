@@ -11,10 +11,10 @@
 		<div (mousedown)="startResize($event, ['left'], 'x')" class="resizer left"></div>
 		<div (mousedown)="startResize($event, ['bottom'],'y')" class="resizer bottom"></div>
 		<div (mousedown)="startResize($event, ['top'], 'y')" class="resizer top"></div>
-		<div (mousedown)="startResize($event, ['top','right'], 'xy')" class="resizer top-right"></div>
-		<div (mousedown)="startResize($event, ['top','left'], 'xy')" class="resizer top-left"></div>
-		<div (mousedown)="startResize($event, ['bottom','left'], 'xy')" class="resizer bottom-left"></div>
-		<div #resizeCorner (mousedown)="startResize($event, ['bottom','right'], 'xy')" class="resizer bottom-right"></div>
+		<div (mousedown)="startRotate($event, ['top','right'], 'xy')" class="resizer top-right"></div>
+		<div (mousedown)="startRotate($event, ['top','left'], 'xy')" class="resizer top-left"></div>
+		<div (mousedown)="startRotate($event, ['bottom','left'], 'xy')" class="resizer bottom-left"></div>
+		<div #resizeCorner (mousedown)="startRotate($event, ['bottom','right'], 'xy')" class="resizer bottom-right"></div>
 	</div>
 	<img class="content-wrapper"
 			 [style.width.px]="image.width * transforms.scale"
