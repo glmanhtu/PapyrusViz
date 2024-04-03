@@ -5,7 +5,7 @@ import { FileDialogRequest, FileDialogResponse } from 'shared-lib';
 export class DialogHandler extends BaseHandler {
 	constructor(private readonly mainWin: BrowserWindow) {
 		super();
-		this.addRoute<FileDialogRequest, FileDialogResponse>('dialogs:open-file-folder', this.openFileFolder.bind(this));
+		this.addRoute('dialogs:open-file-folder', this.openFileFolder.bind(this));
 		this.mainWin = mainWin;
 	}
 

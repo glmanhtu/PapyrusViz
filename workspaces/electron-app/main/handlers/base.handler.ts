@@ -10,11 +10,11 @@ export abstract class BaseHandler {
 		this.continuousHandlers = new Map();
 	}
 
-	protected addRoute<T, R>(action: string, method: (payload: T) => Promise<R>): void {
+	protected addRoute(action: string, method: (payload: unknown) => Promise<unknown>): void {
 		this.routes.set(action, method);
 	}
 
-	protected addContinuousHandler<T, R>(action: string, method: (payload: T, reply: (message: IMessage<R>) => void) => Promise<void>): void {
+	protected addContinuousRoute(action: string, method: (payload: unknown, reply: (message: IMessage<unknown>) => void) => Promise<void>): void {
 		this.continuousHandlers.set(action, method);
 	}
 

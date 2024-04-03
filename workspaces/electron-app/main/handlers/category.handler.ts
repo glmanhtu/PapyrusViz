@@ -7,7 +7,7 @@ import { dbService } from '../services/database.service';
 export class CategoryHandler extends BaseHandler {
 	constructor() {
 		super();
-		this.addRoute<string, CategoryDTO>('category:get-categories', this.getCategories.bind(this))
+		this.addRoute('category:get-categories', this.getCategories.bind(this))
 	}
 
 	private async getCategories(projectPath: string): Promise<CategoryDTO[]> {

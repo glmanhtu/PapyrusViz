@@ -19,12 +19,12 @@ import { assemblingService } from '../services/assembling.service';
 export class AssemblingHandler extends BaseHandler {
 	constructor() {
 		super();
-		this.addRoute<string, AssemblingDTO[]>('assembling:get-assemblings', this.getAssemblings.bind(this));
-		this.addRoute<string, AssemblingDTO>('assembling:create-assembling', this.createAssembling.bind(this));
-		this.addRoute<string, number>('assembling:get-activated-assembling-id', this.getActivatedAssemblingId.bind(this));
-		this.addRoute<string, void>('assembling:update-assembling-img', this.updateAssemblingImage.bind(this));
-		this.addRoute<GetAssemblingRequest, void>('assembling:set-activated-assembling-id', this.setActivatedAssemblingId.bind(this));
-		this.addRoute<GetAssemblingRequest, AssemblingImage[]>('assembling:get-images', this.getAssemblingImages.bind(this));
+		this.addRoute('assembling:get-assemblings', this.getAssemblings.bind(this));
+		this.addRoute('assembling:create-assembling', this.createAssembling.bind(this));
+		this.addRoute('assembling:get-activated-assembling-id', this.getActivatedAssemblingId.bind(this));
+		this.addRoute('assembling:update-assembling-img', this.updateAssemblingImage.bind(this));
+		this.addRoute('assembling:set-activated-assembling-id', this.setActivatedAssemblingId.bind(this));
+		this.addRoute('assembling:get-images', this.getAssemblingImages.bind(this));
 	}
 
 	private async getAssemblings(projectPath: string): Promise<AssemblingDTO[]> {

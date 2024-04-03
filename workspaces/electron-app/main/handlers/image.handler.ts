@@ -11,7 +11,7 @@ import { dbService } from '../services/database.service';
 export class ImageHandler extends BaseHandler {
 	constructor() {
 		super();
-		this.addRoute<ThumbnailRequest, ThumbnailResponse>('image:get-thumbnails', this.getImages.bind(this));
+		this.addRoute('image:get-thumbnails', this.getImages.bind(this));
 	}
 
 	private async getImages(request: ThumbnailRequest): Promise<ThumbnailResponse> {

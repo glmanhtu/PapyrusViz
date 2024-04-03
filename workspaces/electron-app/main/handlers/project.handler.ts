@@ -24,9 +24,9 @@ declare const global: GlobalConfig;
 export class ProjectHandler extends BaseHandler {
 	constructor() {
 		super();
-		this.addContinuousHandler<ProjectDTO, Progress>('project::create-project', this.creteProject.bind(this));
-		this.addRoute<void, ProjectInfo[]>('project:get-projects', this.getProjects.bind(this));
-		this.addRoute<string, ProjectDTO>('project:load-project', this.loadProject.bind(this))
+		this.addContinuousRoute('project::create-project', this.creteProject.bind(this));
+		this.addRoute('project:get-projects', this.getProjects.bind(this));
+		this.addRoute('project:load-project', this.loadProject.bind(this))
 	}
 
 	private async getProjects(): Promise<ProjectInfo[]> {
