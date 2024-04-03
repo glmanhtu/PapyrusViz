@@ -49,27 +49,35 @@ img {
   }
 
   .bottom-right {
-    right: -3px;
-    bottom: -3px;
+    right: -6px;
+    bottom: -6px;
+    width: 12px;
+    height: 12px;
     cursor: nwse-resize;
   }
 
   .top-right {
-    right: -3px;
-    top: -3px;
+    right: -6px;
+    top: -6px;
+    width: 12px;
+    height: 12px;
     cursor: nesw-resize;
   }
 
   .top-left {
-    left: -3px;
-    top: -3px;
+    left: -6px;
+    top: -6px;
+    width: 12px;
+    height: 12px;
     cursor: nwse-resize;
-    background: red;
   }
 
   .bottom-left {
-    left: -3px;
-    bottom: -3px;
+    left: -6px;
+    bottom: -6px;
+    width: 12px;
+    height: 12px;
+
     cursor: nesw-resize;
   }
 }
