@@ -1,4 +1,4 @@
-import { Component, ElementRef, Inject, Input, ViewChild, Output, EventEmitter } from '@angular/core';
+import { Component, ElementRef, Inject, Input, ViewChild, Output, EventEmitter, HostListener } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { ImgDto } from 'shared-lib/.dist/models/img';
 import { Transforms } from 'shared-lib';
@@ -23,15 +23,19 @@ export class FrameComponent {
   @Output()
   transformEvent = new EventEmitter<Transforms>();
 
-
+  showController = false;
   minSize: { w: number, h: number } = { w: 200, h: 200 };
 
   isResizing = false;
   isRotating = false;
 
-
   constructor(@Inject(DOCUMENT) private _document: Document,
               private _el: ElementRef) { }
+
+  @HostListener('document:mousedown', ['$event'])
+  onGlobalClick(event: MouseEvent): void {
+    this.showController = !!this.wrapperRef.nativeElement.contains(event.target);
+  }
 
   startDrag($event: MouseEvent): void {
     $event.preventDefault();
