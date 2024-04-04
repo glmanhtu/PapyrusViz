@@ -12,9 +12,10 @@ import { imgAssemblingTbl } from '../entities/img-assembling';
 import { imgTbl } from '../entities/img';
 import { and, eq } from 'drizzle-orm';
 import { categoryTbl } from '../entities/category';
-import path from 'node:path';
-import { projectTbl } from '../entities/project';
 import { assemblingService } from '../services/assembling.service';
+import { takeUniqueOrThrow } from '../utils/data.utils';
+import { projectService } from '../services/project.service';
+import { imageService } from '../services/image.service';
 
 export class AssemblingHandler extends BaseHandler {
 	constructor() {
@@ -42,20 +43,19 @@ export class AssemblingHandler extends BaseHandler {
 
 	private async createAssembling(projectPath: string): Promise<AssemblingDTO> {
 		const database = dbService.getConnection(projectPath);
-		const project = await database.select().from(projectTbl).where(eq(projectTbl.path, projectPath));
+		const project = await projectService.getProjectByPath(projectPath);
 		const assembling = await database.insert(assemblingTbl).values({
 			name: 'Assembling #',
 			group: 'default',
-			projectId: project[0].id
-		}).returning({insertedId: assemblingTbl.id});
-		const assemblingId = assembling[0].insertedId;
+			projectId: project.id
+		}).returning({insertedId: assemblingTbl.id}).then(takeUniqueOrThrow)
+		const assemblingId = assembling.insertedId;
 		await assemblingService.updateActivatedAssembling(projectPath, assemblingId);
 
 		await database.update(assemblingTbl)
 			.set({name: 'Assembling #' + assemblingId})
 			.where(eq(assemblingTbl.id, assemblingId));
-		const result = await database.select().from(assemblingTbl).where(eq(assemblingTbl.id, assemblingId));
-		return result[0];
+		return await database.select().from(assemblingTbl).where(eq(assemblingTbl.id, assemblingId)).then(takeUniqueOrThrow)
 	}
 
 
@@ -84,10 +84,7 @@ export class AssemblingHandler extends BaseHandler {
 			.leftJoin(categoryTbl, eq(imgTbl.categoryId, categoryTbl.id))
 			.where(eq(imgAssemblingTbl.assemblingId, request.assemblingId))
 			.then(items => items.map((x) => ({
-				img: {
-					...x.img,
-					path: 'atom://' + path.join(x.category.path, x.img.path)
-				},
+				img: imageService.resolveImg(x.category, x.img),
 				transforms: {
 					zIndex: (x.img_assembling.transforms as Transforms).zIndex || 1,
 					top: (x.img_assembling.transforms as Transforms).top || 10,

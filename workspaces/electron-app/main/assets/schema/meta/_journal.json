@@ -8,6 +8,13 @@
       "when": 1712064494476,
       "tag": "0000_lazy_roland_deschain",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1712143053440,
+      "tag": "0001_dashing_obadiah_stane",
+      "breakpoints": true
     }
   ]
 }

@@ -1,6 +1,10 @@
 import { Config, userConfigTbl } from '../entities/user-config-tbl';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { dbService } from './database.service';
+import { Img } from '../entities/img';
+import { imgAssemblingTbl } from '../entities/img-assembling';
+import { takeUniqueOrThrow } from '../utils/data.utils';
+import { AssemblingImage, Transforms } from 'shared-lib';
 
 class AssemblingService {
 
@@ -29,6 +33,18 @@ class AssemblingService {
 			return parseInt(result[0].value);
 		}
 		return 0;
+	}
+
+	public async swapAssembledImage(projectPath: string, assemblingId: number, fromImg: Img, toImg: Img) : Promise<AssemblingImage> {
+		const database = dbService.getConnection(projectPath);
+		const imgAssembling = await database.select().from(imgAssemblingTbl)
+			.where(and(eq(imgAssemblingTbl.assemblingId, assemblingId), eq(imgAssemblingTbl.imgId, fromImg.id)))
+			.then(takeUniqueOrThrow);
+		const transforms = imgAssembling.transforms as Transforms
+		transforms.scale = (transforms.scale * fromImg.width) / toImg.width
+		await database.update(imgAssemblingTbl).set({imgId: toImg.id, transforms: transforms})
+			.where(and(eq(imgAssemblingTbl.assemblingId, assemblingId), eq(imgAssemblingTbl.imgId, fromImg.id)));
+		return { img: toImg, transforms: transforms }
 	}
 }
 

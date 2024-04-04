@@ -8,6 +8,7 @@ import { ProjectHandler } from './handlers/project.handler';
 import { CategoryHandler } from './handlers/category.handler';
 import { ImageHandler } from './handlers/image.handler';
 import { AssemblingHandler } from './handlers/assembling.handler';
+import { MenuHandler } from './handlers/menu.handler';
 
 declare const global: GlobalConfig;
 
@@ -26,10 +27,11 @@ App.launch((mainWin) => {
 
 	const handlers = [
 		new DialogHandler(mainWin),
+		new MenuHandler(mainWin),
 		new ProjectHandler(),
 		new CategoryHandler(),
 		new ImageHandler(),
-		new AssemblingHandler()
+		new AssemblingHandler(),
 	]
 	App.registerHandlers(handlers);
 });

@@ -1,5 +1,6 @@
 <div id="board" class="h-100">
-	<app-frame *ngFor="let img of assemblingImages"
-						 [transforms]="img.transforms" [image]="img.img" (transformEvent)="onTransform(img, $event)">
+	<app-frame *ngFor="let img of assemblingImages; index as i"
+						 [transforms]="img.transforms" [image]="img.img"
+						 (transformEvent)="onTransform(img, $event)" (contextMenuEvent)="handleContextMenu(i)">
 	</app-frame>
 </div>

@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import {
   AssemblingDTO,
   AssemblingImage,
-  AssemblingImageChangeRequest,
+  AssemblingImageChangeRequest, AssemblingImageRequest, ContextAction,
   GetAssemblingRequest,
   ProjectDTO,
   Transforms,
@@ -32,6 +32,19 @@ export class BoardMainComponent implements OnInit {
     })
   }
 
+  handleContextMenu(imgIdx: number): void {
+    const assemblingImage = this.assemblingImages[imgIdx];
+    this.eIpc.send<AssemblingImageRequest, ContextAction<AssemblingImage>>('menu:context:get-image-context', {
+      projectPath: this.projectDto.path,
+      imageId: assemblingImage.img.id,
+      assemblingId: this.assembling.id
+    }).then(x => {
+      switch (x.name) {
+        case 'replace':
+          this.assemblingImages[imgIdx] = x.data
+      }
+    })
+  }
 
   onTransform(assemblingImage: AssemblingImage, transforms: Transforms) {
     this.eIpc.send<AssemblingImageChangeRequest, void>('assembling:update-assembling-img', {

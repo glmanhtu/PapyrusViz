@@ -2,12 +2,13 @@ import { Component, ElementRef, Inject, Input, ViewChild, Output, EventEmitter, 
 import { DOCUMENT } from '@angular/common';
 import { ImgDto } from 'shared-lib/.dist/models/img';
 import { Transforms } from 'shared-lib';
+import { ElectronIpcService } from '../../../services/electron-ipc.service';
 
 
 @Component({
   selector: 'app-frame',
   templateUrl: './frame.component.html',
-  styleUrls: [ './frame.component.scss' ]
+  styleUrls: [ './frame.component.scss' ],
 })
 export class FrameComponent {
 
@@ -23,6 +24,9 @@ export class FrameComponent {
   @Output()
   transformEvent = new EventEmitter<Transforms>();
 
+  @Output()
+  contextMenuEvent = new EventEmitter<void>();
+
   showController = false;
   minSize: { w: number, h: number } = { w: 200, h: 200 };
 
@@ -30,17 +34,28 @@ export class FrameComponent {
   isRotating = false;
 
   constructor(@Inject(DOCUMENT) private _document: Document,
+              private eIpc: ElectronIpcService,
               private _el: ElementRef) { }
 
   @HostListener('document:mousedown', ['$event'])
   onGlobalClick(event: MouseEvent): void {
-    this.showController = !!this.wrapperRef.nativeElement.contains(event.target);
+    if (this.wrapperRef.nativeElement.contains(event.target)) {
+      this.showController = true;
+      if (event.button === 2) {
+        this.contextMenuEvent.emit();
+      }
+    } else {
+      this.showController = false;
+    }
   }
 
   startDrag($event: MouseEvent): void {
     $event.preventDefault();
+    if ($event.button !== 0) {
+      return;
+    }
     if (this.isResizing || this.isRotating) {
-      return
+      return;
     }
     const mouseX = $event.clientX;
     const mouseY = $event.clientY;
@@ -79,6 +94,10 @@ export class FrameComponent {
   // Because after the rotation, the positions of anchors are no longer correct
   startResize($event: MouseEvent): void {
     $event.preventDefault();
+    if ($event.button !== 0) {
+      return;
+    }
+
     if (this.isRotating) {
       return;
     }
@@ -151,6 +170,10 @@ export class FrameComponent {
 
   startRotate($event: MouseEvent): void {
     $event.preventDefault();
+    if ($event.button !== 0) {
+      return;
+    }
+
     this.isRotating = true;
     const mouseX = $event.clientX;
     const mouseY = $event.clientY

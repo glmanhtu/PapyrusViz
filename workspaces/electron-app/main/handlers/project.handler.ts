@@ -9,7 +9,6 @@ import { eq } from 'drizzle-orm';
 import { imgTbl } from '../entities/img';
 import * as dataUtils from '../utils/data.utils';
 import * as pathUtils from '../utils/path.utils';
-import sharp from 'sharp'
 import { ProjectInfo } from '../models/app-data';
 import { dbService } from '../services/database.service';
 import { OldProjectModel } from '../models/project';
@@ -17,6 +16,8 @@ import { assemblingTbl } from '../entities/assembling';
 import { imgAssemblingTbl } from '../entities/img-assembling';
 import { projectService } from '../services/project.service';
 import { assemblingService } from '../services/assembling.service';
+import { takeUniqueOrThrow } from '../utils/data.utils';
+import { imageService } from '../services/image.service';
 
 
 declare const global: GlobalConfig;
@@ -43,24 +44,23 @@ export class ProjectHandler extends BaseHandler {
 		dbService.migrateDatabase(database, path.join(__dirname, 'schema'));
 		dbService.addConnection(projectPath, database)
 
-		const result = await database.insert(projectTbl).values({
+		const project = await database.insert(projectTbl).values({
 			name: data.projName,
 			path: data.projPath,
 			dataPath: data.datasetPath,
 			os: process.platform
-		}).returning({insertedId: projectTbl.id});
-		const projectId = result[0].insertedId;
+		}).returning({insertedId: projectTbl.id}).then(takeUniqueOrThrow)
 
 
 		const categoryMap = new Map<string, number>;
 		await Promise.all(data.rootDirs.available.map(async (rootDir) => {
-			const categories = await database.insert(categoryTbl).values({
+			const category = await database.insert(categoryTbl).values({
 				name: rootDir.name,
 				path: rootDir.path,
-				projectId: projectId,
+				projectId: project.insertedId,
 				isActivated: data.rootDirs.selected === rootDir.path
-			}).returning({insertedId: categoryTbl.id});
-			categoryMap.set(rootDir.path, categories[0].insertedId);
+			}).returning({insertedId: categoryTbl.id}).then(takeUniqueOrThrow)
+			categoryMap.set(rootDir.path, category.insertedId);
 		}));
 
 		await Promise.all(Object.entries(data.images).map(async ([key, oldImg]) => {
@@ -81,13 +81,12 @@ export class ProjectHandler extends BaseHandler {
 		}));
 
 		await Promise.all(Object.entries(data.assembled).map(async ([_, assembled]) => {
-			const assemblings = await database.insert(assemblingTbl).values({
+			const assembling = await database.insert(assemblingTbl).values({
 				name: assembled.name,
 				group: assembled.parent,
-				imgCount: assembled.imagesCount,
-				projectId: projectId
-			}).returning({insertedId: assemblingTbl.id});
-			const assemblingId = assemblings[0].insertedId;
+				projectId: project.insertedId
+			}).returning({insertedId: assemblingTbl.id}).then(takeUniqueOrThrow)
+			const assemblingId = assembling.insertedId;
 
 			if (assembled.activated) {
 				await assemblingService.updateActivatedAssembling(projectPath, assemblingId);
@@ -157,11 +156,11 @@ export class ProjectHandler extends BaseHandler {
 		const database = dbService.createConnection(databaseFile);
 		dbService.migrateDatabase(database, path.join(__dirname, 'schema'));
 
-		const result = await database.insert(projectTbl).values({
+		const project = await database.insert(projectTbl).values({
 			...payload,
 			os: process.platform
-		}).returning({insertedId: projectTbl.id});
-		const projectId = result[0].insertedId;
+		}).returning({insertedId: projectTbl.id}).then(takeUniqueOrThrow)
+		const projectId = project.insertedId;
 
 		await reply(Message.success({
 			percentage: 5, title: 'Step 1/3 - Creating project', description: 'Writing project information...'
@@ -181,17 +180,13 @@ export class ProjectHandler extends BaseHandler {
 				name: path.basename(rootDir) || 'All images',
 				path: rootDir,
 				projectId: projectId
-			}).returning({insertedId: categoryTbl.id});
+			}).returning({insertedId: categoryTbl.id}).then(takeUniqueOrThrow)
 
 			for (let i = 0; i < images.length; i++) {
 				const thumbnailPath = path.join(payload.path, 'thumbnails', `${count}.jpg`)
-				const image = sharp(images[i]);
 				try {
-					await image
-						.resize({ height: global.appConfig.thumbnailImgSize })
-						.flatten({ background: { r: 255, g: 255, b: 255 } })
-						.toFile(thumbnailPath);
-					const metadata = await image.metadata();
+					await imageService.resize(images[i], thumbnailPath, undefined, global.appConfig.thumbnailImgSize);
+					const metadata = await imageService.metadata(images[i]);
 
 					const per = (count + 1) * 90 / nImages;
 					await reply(Message.success({
@@ -203,7 +198,7 @@ export class ProjectHandler extends BaseHandler {
 						path: path.relative(rootDir, images[i]),
 						name: path.basename(images[i]),
 						thumbnail: path.relative(payload.path, thumbnailPath),
-						categoryId: category[0].insertedId
+						categoryId: category.insertedId
 					});
 				} catch (e) {
 					await reply(Message.warning("Unable to read " + images[i] + ', Ignoring...'));
