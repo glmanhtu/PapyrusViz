@@ -7,6 +7,7 @@ export * from './models/project';
 export * from './models/category';
 export * from './models/asssembling';
 export * from './models/context';
+export * from './models/img';
 
 declare global {
 	// Global augmentation of the `Window` interface

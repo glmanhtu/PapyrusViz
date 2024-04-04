@@ -1,11 +1,11 @@
 import { BaseHandler } from "./base.handler";
-import { ThumbnailRequest, ThumbnailResponse } from 'shared-lib/.dist/models/img';
 import { imgTbl } from '../entities/img';
 import { and, eq, like, SQLWrapper } from 'drizzle-orm';
 import { categoryTbl } from '../entities/category';
 import { takeUniqueOrThrow } from '../utils/data.utils';
 import path from 'node:path';
 import { dbService } from '../services/database.service';
+import { ThumbnailRequest, ThumbnailResponse } from 'shared-lib';
 
 
 export class ImageHandler extends BaseHandler {

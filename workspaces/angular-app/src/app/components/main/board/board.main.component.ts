@@ -1,13 +1,14 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Inject, Input, OnInit } from '@angular/core';
 import {
   AssemblingDTO,
   AssemblingImage,
   AssemblingImageChangeRequest, AssemblingImageRequest, ContextAction,
   GetAssemblingRequest,
-  ProjectDTO,
+  ProjectDTO, Thumbnail,
   Transforms,
 } from 'shared-lib';
 import { ElectronIpcService } from '../../../services/electron-ipc.service';
+import { BroadcastService, IMG_BROADCAST_SERVICE_TOKEN } from '../../../services/broadcast.service';
 
 @Component({
   selector: 'app-board-main',
@@ -22,6 +23,7 @@ export class BoardMainComponent implements OnInit {
   assemblingImages: AssemblingImage[] = [];
 
   constructor(
+    @Inject(IMG_BROADCAST_SERVICE_TOKEN) private imgBroadcastService: BroadcastService<Thumbnail>,
     private eIpc: ElectronIpcService) {
   }
   ngOnInit(): void {
@@ -29,6 +31,25 @@ export class BoardMainComponent implements OnInit {
       {projectPath: this.projectDto!.path, assemblingId: this.assembling.id}).then((items) => {
         this.assemblingImages = items;
         console.log(items);
+    });
+    this.imgBroadcastService.observe().subscribe((thumbnail) => {
+      if (this.assemblingImages.some((x) => x.img.id === thumbnail.imgId)) {
+        return;
+      }
+      this.eIpc.send<AssemblingImageChangeRequest, AssemblingImage>('assembling:create-assembling-img', {
+        projectPath: this.projectDto.path,
+        assemblingId: this.assembling.id,
+        imageId: thumbnail.imgId,
+        transforms: {
+          zIndex: 1 + this.assemblingImages.reduce((acc, x) => Math.max(acc, x.transforms.zIndex), 0),
+          top: 10,
+          left: 10,
+          scale: 1,
+          rotation: 0
+        }
+      }).then((x) => {
+        this.assemblingImages.push(x);
+      })
     })
   }
 
@@ -57,10 +78,6 @@ export class BoardMainComponent implements OnInit {
       assemblingId: this.assembling.id,
       imageId: assemblingImage.img.id,
       transforms: transforms
-    }).then(() => {
-      console.log(assemblingImage, transforms);
-    }).catch((err) => {
-      console.error(err);
-    })
+    });
   }
 }

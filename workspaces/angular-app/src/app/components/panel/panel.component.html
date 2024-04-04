@@ -14,7 +14,7 @@
 						</form>
 
 						<div id="thumbnail-images" class="container">
-							<app-thumbnail *ngFor="let thumbnail of thumbnails" [path]="thumbnail.path" [caption]="thumbnail.imgName"></app-thumbnail>
+							<app-thumbnail *ngFor="let thumbnail of thumbnails" [thumbnail]="thumbnail"></app-thumbnail>
 						</div>
 					</ng-template>
 				</li>

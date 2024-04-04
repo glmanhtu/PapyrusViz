@@ -1,9 +1,8 @@
 import { Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
 import { BroadcastService, PROJECT_BROADCAST_SERVICE_TOKEN } from '../../services/broadcast.service';
-import { CategoryDTO, ProjectDTO } from 'shared-lib';
+import { CategoryDTO, ProjectDTO, Thumbnail, ThumbnailRequest, ThumbnailResponse } from 'shared-lib';
 import { NgbNav } from '@ng-bootstrap/ng-bootstrap';
 import { ElectronIpcService } from '../../services/electron-ipc.service';
-import { Thumbnail, ThumbnailRequest, ThumbnailResponse } from 'shared-lib/.dist/models/img';
 import { FormControl } from '@angular/forms';
 
 @Component({

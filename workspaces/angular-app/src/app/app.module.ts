@@ -11,8 +11,12 @@ import { MainComponent } from './components/main/main.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ProjectManagementComponent } from './components/project/management/project.management.component';
 import { ProjectCreationComponent } from './components/project/creation/project.creation.component';
-import { BroadcastService, PROJECT_BROADCAST_SERVICE_TOKEN } from './services/broadcast.service';
-import { ProjectDTO } from 'shared-lib';
+import {
+	BroadcastService,
+	IMG_BROADCAST_SERVICE_TOKEN,
+	PROJECT_BROADCAST_SERVICE_TOKEN,
+} from './services/broadcast.service';
+import { ProjectDTO, Thumbnail } from 'shared-lib';
 import { ThumbnailComponent } from './shared/components/thumbnail/thumbnail.component';
 import { BoardMainComponent } from './components/main/board/board.main.component';
 import { FrameComponent } from './shared/components/frame/frame.component';
@@ -50,6 +54,11 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
 		}),
 	],
 	providers: [
+		{
+			provide: IMG_BROADCAST_SERVICE_TOKEN,
+			useFactory: (ngZone: NgZone) => new BroadcastService<Thumbnail>(ngZone),
+			deps: [NgZone]
+		},
 		{
 			provide: PROJECT_BROADCAST_SERVICE_TOKEN,
 			useFactory: (ngZone: NgZone) => new BroadcastService<ProjectDTO>(ngZone),

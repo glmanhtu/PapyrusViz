@@ -24,6 +24,7 @@ export class AssemblingHandler extends BaseHandler {
 		this.addRoute('assembling:create-assembling', this.createAssembling.bind(this));
 		this.addRoute('assembling:get-activated-assembling-id', this.getActivatedAssemblingId.bind(this));
 		this.addRoute('assembling:update-assembling-img', this.updateAssemblingImage.bind(this));
+		this.addRoute('assembling:create-assembling-img', this.createAssemblingImage.bind(this));
 		this.addRoute('assembling:set-activated-assembling-id', this.setActivatedAssemblingId.bind(this));
 		this.addRoute('assembling:get-images', this.getAssemblingImages.bind(this));
 	}
@@ -58,6 +59,26 @@ export class AssemblingHandler extends BaseHandler {
 		return await database.select().from(assemblingTbl).where(eq(assemblingTbl.id, assemblingId)).then(takeUniqueOrThrow)
 	}
 
+	private async createAssemblingImage(request: AssemblingImageChangeRequest): Promise<AssemblingImage> {
+		const database = dbService.getConnection(request.projectPath);
+		await this.updateAssemblingImage(request);
+		return database.select()
+			.from(imgAssemblingTbl)
+			.leftJoin(imgTbl, eq(imgAssemblingTbl.imgId, imgTbl.id))
+			.leftJoin(categoryTbl, eq(imgTbl.categoryId, categoryTbl.id))
+			.where(and(eq(imgAssemblingTbl.assemblingId, request.assemblingId), eq(imgAssemblingTbl.imgId, request.imageId)))
+			.then(takeUniqueOrThrow)
+			.then(x => ({
+				img: imageService.resolveImg(x.category, x.img),
+				transforms: {
+					zIndex: (x.img_assembling.transforms as Transforms).zIndex || 1,
+					top: (x.img_assembling.transforms as Transforms).top || 10,
+					left: (x.img_assembling.transforms as Transforms).left || 10,
+					scale: (x.img_assembling.transforms as Transforms).scale || 1,
+					rotation: (x.img_assembling.transforms as Transforms).rotation || 0
+				}
+			}));
+	}
 
 	private async updateAssemblingImage(request: AssemblingImageChangeRequest): Promise<void> {
 		const database = dbService.getConnection(request.projectPath);
