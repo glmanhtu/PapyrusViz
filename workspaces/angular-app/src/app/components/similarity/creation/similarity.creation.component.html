@@ -1,0 +1,83 @@
+<ng-template #content let-modal>
+	<form class="was-validated" [formGroup]="matchingForm" (ngSubmit)="onSubmit()">
+		<div class="modal-header text-center">
+			<h4 class="modal-title w-100">Create Similarity Matrix Matching</h4>
+		</div>
+		<div class="modal-body">
+				<div class="form-group row mt-3">
+					<label for="matchingName" class="col-sm-3 col-form-label">Name</label>
+					<div class="col-sm-9">
+						<input type="text" class="form-control form-control-sm" id="matchingName" placeholder="Matching name"
+									 formControlName="matchingName" required>
+					</div>
+				</div>
+				<div class="form-group row mt-2">
+					<label for="matchingFile" class="col-sm-3 col-form-label">Matrix file</label>
+					<div class="col-sm-9">
+						<div class="input-group input-group-sm custom-file-button">
+							<input type="text" class="form-control form-control-sm disabled-input" id="matchingFile" (click)="folderSelection($event)"
+										 formControlName="matchingFile" placeholder="No file chosen" required>
+							<label class="input-group-text" for="matchingFile">Select file</label>
+						</div>
+					</div>
+				</div>
+
+
+			<fieldset class="form-group">
+				<div class="row">
+					<legend class="col-form-label col-sm-3 pt-0">Matrix type</legend>
+					<div class="col-sm-9">
+						<div class="form-check">
+							<input class="form-check-input" type="radio" value="similarity" id="matrix-type-1" formControlName="matchingType">
+							<label class="form-check-label" for="matrix-type-1"
+										 title="The column names of the similarity matrix are matched with the image file names.">
+								Similarity matrix
+							</label>
+						</div>
+						<div class="form-check">
+							<input class="form-check-input" type="radio" value="distance" id="matrix-type-2" formControlName="matchingType" checked>
+							<label class="form-check-label" for="matrix-type-2"
+										 title="The column names of the similarity matrix are matched with a folder in file names.">
+								Distance matrix
+							</label>
+						</div>
+					</div>
+				</div>
+			</fieldset>
+
+			<fieldset class="form-group">
+				<div class="row">
+					<legend class="col-form-label col-sm-3 pt-0">Matching method</legend>
+					<div class="col-sm-9">
+						<div class="form-check">
+							<input class="form-check-input" type="radio" value="name" formControlName="matchingMethod" id="matching-method-1" checked>
+							<label class="form-check-label" for="matching-method-1"
+										 title="The column names of the similarity matrix are matched with the image file names.">
+								File name
+							</label>
+						</div>
+						<div class="form-check">
+							<input class="form-check-input" type="radio" value="path" formControlName="matchingMethod" id="matching-method-2">
+							<label class="form-check-label" for="matching-method-2"
+										 title="The column names of the similarity matrix are matched with a folder in file names.">
+								File path
+							</label>
+						</div>
+					</div>
+				</div>
+			</fieldset>
+
+			<div class="progress row mt-3 ms-1 me-1" style="height: 20px;" *ngIf="showProgress">
+
+				<div class="progress-bar" id="progressBar" role="progressbar" [ngStyle]="{'width.%': progress.percentage}"
+						 aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="progress.percentage"></div>
+			</div>
+
+		</div>
+		<div class="modal-footer">
+			<button type="submit" class="btn btn-success btn-sm" *ngIf="!isFinished" [disabled]="!matchingForm.valid">Create</button>
+			<button type="button" class="btn btn-secondary btn-sm" *ngIf="!isFinished" (click)="cancel()">Cancel</button>
+			<button type="button" class="btn btn-secondary btn-sm" *ngIf="isFinished" (click)="cancel()">Close</button>
+		</div>
+	</form>
+</ng-template>

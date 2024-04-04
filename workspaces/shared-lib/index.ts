@@ -8,6 +8,7 @@ export * from './models/category';
 export * from './models/asssembling';
 export * from './models/context';
 export * from './models/img';
+export * from './models/matching';
 
 declare global {
 	// Global augmentation of the `Window` interface

@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "sqlite",
-  "id": "034b7882-d3c2-4565-b632-b172fd6544f2",
+  "id": "ea63b2f1-cb49-45f4-8b82-7f973ad332c7",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "assembling": {
@@ -24,13 +24,6 @@
         "group": {
           "name": "group",
           "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "img_count": {
-          "name": "img_count",
-          "type": "integer",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
@@ -268,6 +261,13 @@
             "path"
           ],
           "isUnique": false
+        },
+        "img_name_idx": {
+          "name": "img_name_idx",
+          "columns": [
+            "name"
+          ],
+          "isUnique": false
         }
       },
       "foreignKeys": {
@@ -288,9 +288,16 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "matching": {
-      "name": "matching",
+    "matching-img": {
+      "name": "matching-img",
       "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
         "source_img_id": {
           "name": "source_img_id",
           "type": "integer",
@@ -311,13 +318,35 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
+        },
+        "matching_id": {
+          "name": "matching_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "matching_src_index": {
+          "name": "matching_src_index",
+          "columns": [
+            "source_img_id"
+          ],
+          "isUnique": false
+        },
+        "matching_target_index": {
+          "name": "matching_target_index",
+          "columns": [
+            "target_img_id"
+          ],
+          "isUnique": false
+        }
+      },
       "foreignKeys": {
-        "matching_source_img_id_img_id_fk": {
-          "name": "matching_source_img_id_img_id_fk",
-          "tableFrom": "matching",
+        "matching-img_source_img_id_img_id_fk": {
+          "name": "matching-img_source_img_id_img_id_fk",
+          "tableFrom": "matching-img",
           "tableTo": "img",
           "columnsFrom": [
             "source_img_id"
@@ -328,9 +357,9 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "matching_target_img_id_img_id_fk": {
-          "name": "matching_target_img_id_img_id_fk",
-          "tableFrom": "matching",
+        "matching-img_target_img_id_img_id_fk": {
+          "name": "matching-img_target_img_id_img_id_fk",
+          "tableFrom": "matching-img",
           "tableTo": "img",
           "columnsFrom": [
             "target_img_id"
@@ -340,17 +369,103 @@
           ],
           "onDelete": "no action",
           "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {
-        "matching_source_img_id_target_img_id_pk": {
-          "columns": [
-            "source_img_id",
-            "target_img_id"
+        },
+        "matching-img_matching_id_matching_id_fk": {
+          "name": "matching-img_matching_id_matching_id_fk",
+          "tableFrom": "matching-img",
+          "tableTo": "matching",
+          "columnsFrom": [
+            "matching_id"
           ],
-          "name": "matching_source_img_id_target_img_id_pk"
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
         }
       },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "matching": {
+      "name": "matching",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "matrix_path": {
+          "name": "matrix_path",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "matching_type": {
+          "name": "matching_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "matching_method": {
+          "name": "matching_method",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "project_id": {
+          "name": "project_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "matrix_path_index": {
+          "name": "matrix_path_index",
+          "columns": [
+            "matrix_path"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "matching_project_id_project_id_fk": {
+          "name": "matching_project_id_project_id_fk",
+          "tableFrom": "matching",
+          "tableTo": "project",
+          "columnsFrom": [
+            "project_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
     "project": {

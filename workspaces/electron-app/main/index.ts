@@ -9,6 +9,7 @@ import { CategoryHandler } from './handlers/category.handler';
 import { ImageHandler } from './handlers/image.handler';
 import { AssemblingHandler } from './handlers/assembling.handler';
 import { MenuHandler } from './handlers/menu.handler';
+import { MatchingHandler } from './handlers/matching.handler';
 
 declare const global: GlobalConfig;
 
@@ -32,6 +33,7 @@ App.launch((mainWin) => {
 		new CategoryHandler(),
 		new ImageHandler(),
 		new AssemblingHandler(),
+		new MatchingHandler()
 	]
 	App.registerHandlers(handlers);
 });

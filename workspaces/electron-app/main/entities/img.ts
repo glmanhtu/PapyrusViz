@@ -14,7 +14,8 @@ export const imgTbl = sqliteTable('img', {
 }, (table) => {
   return {
     pathIdx: index("img_path_idx").on(table.path),
-  };  
+    nameIdx: index("img_name_idx").on(table.name),
+  };
 });
 
 

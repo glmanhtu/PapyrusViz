@@ -1,9 +1,10 @@
-import { Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, Inject, Input, OnInit, ViewChild } from '@angular/core';
 import { BroadcastService, PROJECT_BROADCAST_SERVICE_TOKEN } from '../../services/broadcast.service';
 import { CategoryDTO, ProjectDTO, Thumbnail, ThumbnailRequest, ThumbnailResponse } from 'shared-lib';
 import { NgbNav } from '@ng-bootstrap/ng-bootstrap';
 import { ElectronIpcService } from '../../services/electron-ipc.service';
 import { FormControl } from '@angular/forms';
+import { SimilarityCreationComponent } from '../similarity/creation/similarity.creation.component';
 
 @Component({
   selector: 'app-panel',
@@ -15,6 +16,9 @@ export class PanelComponent implements OnInit {
 
   @ViewChild('scrollContainer') scrollContainer!: ElementRef;
   private scrollThreshold = 100; // Adjust this value as needed
+
+  @Input()
+  similarityCreationComponent: SimilarityCreationComponent;
 
   active = 1;
   projectDto: ProjectDTO | null = null;
@@ -46,6 +50,11 @@ export class PanelComponent implements OnInit {
     this.getThumbnails();
   }
 
+
+  createMatching() {
+    this.similarityCreationComponent.open();
+  }
+
   onScroll() {
     const element = this.scrollContainer.nativeElement;
     const closeToBottom = element.scrollHeight - element.scrollTop <= element.clientHeight + this.scrollThreshold;
@@ -53,6 +62,7 @@ export class PanelComponent implements OnInit {
       this.getThumbnails(this.currentPage + 1, false);
     }
   }
+
 
   getThumbnails(page = 0, reset = true) {
     const thumbnailRequest: ThumbnailRequest = {

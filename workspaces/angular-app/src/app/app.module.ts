@@ -20,6 +20,7 @@ import { ProjectDTO, Thumbnail } from 'shared-lib';
 import { ThumbnailComponent } from './shared/components/thumbnail/thumbnail.component';
 import { BoardMainComponent } from './components/main/board/board.main.component';
 import { FrameComponent } from './shared/components/frame/frame.component';
+import { SimilarityCreationComponent } from './components/similarity/creation/similarity.creation.component';
 
 
 // AoT requires an exported function for factories
@@ -38,6 +39,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
 		ThumbnailComponent,
 		BoardMainComponent,
 		FrameComponent,
+		SimilarityCreationComponent
   ],
 	imports: [
 		BrowserModule,

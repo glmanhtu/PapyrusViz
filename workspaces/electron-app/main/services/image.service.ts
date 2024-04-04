@@ -1,8 +1,11 @@
 import { Category } from '../entities/category';
-import { Img } from '../entities/img';
+import { Img, imgTbl } from '../entities/img';
 import path from 'node:path';
 import { ImgDto } from 'shared-lib/.dist/models/img';
 import sharp from 'sharp';
+import { like } from 'drizzle-orm';
+import { dbService } from './database.service';
+import { takeFirstOrThrow } from '../utils/data.utils';
 
 class ImageService {
 
@@ -11,6 +14,14 @@ class ImageService {
 			...img,
 			path: 'atom://' + path.join(category.path, img.path)
 		}
+	}
+
+	public async findBestMatch(projectPath: string, name: string): Promise<Img> {
+		const database = dbService.getConnection(projectPath);
+		return database.select()
+			.from(imgTbl).where(like(imgTbl.name, '%' + name + '%'))
+			.orderBy(imgTbl.name)
+			.then(takeFirstOrThrow);
 	}
 
 	public async resize(inputFile: string, outputFile: string, width: number, height: number) {
