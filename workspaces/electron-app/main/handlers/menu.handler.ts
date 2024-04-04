@@ -23,7 +23,6 @@ export class MenuHandler extends BaseHandler {
 		const imgVersions = await database.select().from(categoryTbl)
 			.leftJoin(imgTbl, eq(categoryTbl.id, imgTbl.categoryId)).where(eq(imgTbl.path, img.path));
 
-
 		return new Promise<ContextAction<AssemblingImage>>((resolve, reject) => {
 			const subMenuVersion = imgVersions.map((x) => ({
 				label: x.category.name,
@@ -55,7 +54,9 @@ export class MenuHandler extends BaseHandler {
 					label: 'Delete',
 					accelerator: 'Backspace',
 					click: () => {
-
+						assemblingService.deleteAssembledImage(payload.projectPath, payload.assemblingId, img)
+							.then(() => resolve({ name: 'delete', data: null }))
+							.catch(reject)
 					}
 				},
 				{ type: 'separator' },

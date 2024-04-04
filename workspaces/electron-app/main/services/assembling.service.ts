@@ -35,6 +35,12 @@ class AssemblingService {
 		return 0;
 	}
 
+	public async deleteAssembledImage(projectPath: string, assemblingId: number, img: Img): Promise<void> {
+		const database = dbService.getConnection(projectPath);
+		await database.delete(imgAssemblingTbl)
+				.where(and(eq(imgAssemblingTbl.assemblingId, assemblingId), eq(imgAssemblingTbl.imgId, img.id)));
+  }
+
 	public async swapAssembledImage(projectPath: string, assemblingId: number, fromImg: Img, toImg: Img) : Promise<AssemblingImage> {
 		const database = dbService.getConnection(projectPath);
 		const imgAssembling = await database.select().from(imgAssemblingTbl)

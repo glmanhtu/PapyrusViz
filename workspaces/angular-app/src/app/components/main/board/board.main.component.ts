@@ -41,7 +41,12 @@ export class BoardMainComponent implements OnInit {
     }).then(x => {
       switch (x.name) {
         case 'replace':
-          this.assemblingImages[imgIdx] = x.data
+          this.assemblingImages[imgIdx] = x.data;
+          break
+        case 'delete':
+          delete this.assemblingImages[imgIdx];
+          this.assemblingImages = this.assemblingImages.filter((x) => x.img.id != assemblingImage.img.id)
+          break
       }
     })
   }
