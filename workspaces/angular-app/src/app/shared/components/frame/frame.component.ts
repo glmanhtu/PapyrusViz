@@ -1,4 +1,4 @@
-import { Component, ElementRef, Inject, Input, ViewChild, Output, EventEmitter, HostListener } from '@angular/core';
+import { Component, ElementRef, Inject, Input, ViewChild, Output, EventEmitter } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { ImgDto } from 'shared-lib/.dist/models/img';
 import { Transforms } from 'shared-lib';
@@ -14,6 +14,7 @@ export class FrameComponent {
 
   @ViewChild('wrapper') wrapperRef!: ElementRef;
   @ViewChild('resizeCorner') resizeCornerRef!: ElementRef;
+  @ViewChild('imgElement') imgElementRef!: ElementRef;
 
   @Input()
   image: ImgDto;
@@ -35,25 +36,19 @@ export class FrameComponent {
 
   constructor(@Inject(DOCUMENT) private _document: Document,
               private eIpc: ElectronIpcService,
-              private _el: ElementRef) { }
-
-  @HostListener('document:mousedown', ['$event'])
-  onGlobalClick(event: MouseEvent): void {
-    if (this.wrapperRef.nativeElement.contains(event.target)) {
-      this.showController = true;
-      if (event.button === 2) {
-        this.contextMenuEvent.emit();
-      }
-    } else {
-      this.showController = false;
-    }
+              private _el: ElementRef) {
   }
 
-  startDrag($event: MouseEvent): void {
+  isMouseSelected(event: MouseEvent): boolean {
+    return this.wrapperRef.nativeElement.contains(event.target)
+  }
+
+  currentFrameDrag($event: MouseEvent): void {
     $event.preventDefault();
     if ($event.button !== 0) {
       return;
     }
+
     if (this.isResizing || this.isRotating) {
       return;
     }
@@ -110,14 +105,14 @@ export class FrameComponent {
     const dimensionWidth: number = this.resizeCornerRef.nativeElement.parentNode.offsetWidth;
     const dimensionHeight: number = this.resizeCornerRef.nativeElement.parentNode.offsetHeight;
     const clientRect = this.resizeCornerRef.nativeElement.parentNode.getBoundingClientRect();
-    const centerX = parseInt(clientRect.left + dimensionWidth / 2)
-    const centerY = parseInt(clientRect.top + dimensionHeight / 2)
+    const centerX = parseInt(clientRect.left + clientRect.width / 2)
+    const centerY = parseInt(clientRect.top + clientRect.height / 2)
 
 
     const targetElement = $event.target as Element;
     const rect = targetElement.getBoundingClientRect();
-    const targetXs = this.generateEvenlyDistribution(rect.left, rect.right, 10);
-    const targetYs = this.generateEvenlyDistribution(rect.top, rect.bottom, 10);
+    const targetXs = this.generateEvenlyDistribution(rect.left, rect.right, 100);
+    const targetYs = this.generateEvenlyDistribution(rect.top, rect.bottom, 100);
     const diffX = targetXs.reduce((acc, x) => acc + x - centerX, 0);
     const diffY = targetYs.reduce((acc, y) => acc + y - centerY, 0)
     const sumX = targetXs.reduce((acc, x) => acc + x - rect.left, 0);
@@ -177,11 +172,9 @@ export class FrameComponent {
     this.isRotating = true;
     const mouseX = $event.clientX;
     const mouseY = $event.clientY
-    const dimensionWidth: number = this.resizeCornerRef.nativeElement.parentNode.offsetWidth;
-    const dimensionHeight: number = this.resizeCornerRef.nativeElement.parentNode.offsetHeight;
     const clientRect = this.resizeCornerRef.nativeElement.parentNode.getBoundingClientRect();
-    const centerX = parseInt(clientRect.left + dimensionWidth / 2)
-    const centerY = parseInt(clientRect.top + dimensionHeight / 2)
+    const centerX = parseInt(clientRect.left + clientRect.width / 2)
+    const centerY = parseInt(clientRect.top + clientRect.height / 2)
 
 
     const lastRadians = Math.atan2(centerX - mouseX, centerY - mouseY);

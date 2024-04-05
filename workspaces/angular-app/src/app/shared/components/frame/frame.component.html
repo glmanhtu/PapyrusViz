@@ -16,12 +16,11 @@
 		<div (mousedown)="startRotate($event)" class="resizer bottom-left"></div>
 		<div #resizeCorner (mousedown)="startRotate($event)" class="resizer bottom-right"></div>
 	</div>
-	<img class="content-wrapper"
+	<img class="content-wrapper" #imgElement
 			 [style.width.px]="image.width * transforms.scale"
 			 [style.height.px]="image.height * transforms.scale"
 			 [style.z-index]="transforms.zIndex"
 			 [style.transform]="'rotate(' + transforms.rotation + 'deg)'"
 			 [alt]="image.name"
-			 [src]="image.path"
-			 (mousedown)="startDrag($event)">
+			 [src]="image.path">
 </div>

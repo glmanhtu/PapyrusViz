@@ -1,4 +1,4 @@
-import { Component, Inject, Input, OnInit } from '@angular/core';
+import { Component, HostListener, Inject, Input, OnInit, QueryList, ViewChildren } from '@angular/core';
 import {
   AssemblingDTO,
   AssemblingImage,
@@ -9,6 +9,7 @@ import {
 } from 'shared-lib';
 import { ElectronIpcService } from '../../../services/electron-ipc.service';
 import { BroadcastService, IMG_BROADCAST_SERVICE_TOKEN } from '../../../services/broadcast.service';
+import { FrameComponent } from '../../../shared/components/frame/frame.component';
 
 @Component({
   selector: 'app-board-main',
@@ -20,7 +21,11 @@ export class BoardMainComponent implements OnInit {
   @Input() assembling: AssemblingDTO;
   @Input() projectDto: ProjectDTO;
 
+  @ViewChildren(FrameComponent) frameComponents!: QueryList<FrameComponent>;
+
   assemblingImages: AssemblingImage[] = [];
+  selectedFrames = new Map<number, FrameComponent>;
+
 
   constructor(
     @Inject(IMG_BROADCAST_SERVICE_TOKEN) private imgBroadcastService: BroadcastService<Thumbnail>,
@@ -51,6 +56,43 @@ export class BoardMainComponent implements OnInit {
         this.assemblingImages.push(x);
       })
     })
+  }
+
+  @HostListener('document:mousedown', ['$event'])
+  onGlobalClick(event: MouseEvent): void {
+    let hasSelected = false;
+    this.frameComponents.forEach((item) => {
+      if (item.isMouseSelected(event)) {
+        item.showController = true;
+        if (event.button === 2) {
+          item.contextMenuEvent.emit();
+          return;
+        }
+
+        const isMultiSelect = this.selectedFrames.size >= 2 && this.selectedFrames.has(item.image.id)
+
+        if (!event.shiftKey && !isMultiSelect) {
+          this.selectedFrames.forEach((x, key) => {
+            if (x.image.id !== item.image.id) {
+              x.showController = false;
+            }
+            this.selectedFrames.delete(key);
+          })
+        }
+        this.selectedFrames.set(item.image.id, item);
+        hasSelected = true;
+      }
+    });
+
+    // Perform dragging
+    this.selectedFrames.forEach((x, key) => {
+      if (!hasSelected) {
+        x.showController = false;
+        this.selectedFrames.delete(key);
+      } else {
+        x.currentFrameDrag(event);
+      }
+    });
   }
 
   handleContextMenu(imgIdx: number): void {
