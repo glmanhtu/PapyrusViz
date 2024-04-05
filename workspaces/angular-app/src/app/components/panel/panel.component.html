@@ -1,7 +1,7 @@
   <div class="card text-center sidebar-content h-100" id="thumbnail-container" *ngIf="projectDto">
 		<div class="card-header">
 			<ul ngbNav #nav="ngbNav" [(activeId)]="active" class="nav nav-tabs card-header-tabs thumbnail-tabs"
-					[destroyOnHide]="false" (navChange)="onNavChange($event)" (shown)="onNavShown()">
+					[destroyOnHide]="false">
 				<li [ngbNavItem]="1" class="nav-item">
 					<a ngbNavLink>Images</a>
 					<ng-template ngbNavContent>

@@ -1,42 +1,47 @@
-<div class="form-group" *ngIf="matchings.length === 0">
+<div class="form-group" *ngIf="!activatedMatching">
 	<label>No similarity matrix found!</label>
 
 	<button type="button" class="btn btn-success btn-sm mt-2" (click)="createMatching()">Create matching</button>
 </div>
-<div ngbDropdown class="d-inline-block" container="body" *ngIf="matchings.length > 0">
-	<button type="button" class="btn btn-outline-success btn-sm" id="dropdownForm1" ngbDropdownToggle>
-		Toggle dropdown
-	</button>
-	<div ngbDropdownMenu aria-labelledby="dropdownForm1">
-		<form class="px-4 py-3">
-			<div class="mb-3">
-				<label for="exampleDropdownFormEmail1">Email address</label>
-				<input
-					type="email"
-					class="form-control"
-					id="exampleDropdownFormEmail1"
-					placeholder="email@example.com"
-					autocomplete="username"
-				/>
+<form  *ngIf="activatedMatching">
+
+	<div ngbDropdown class="d-flex align-items-center" container="body">
+
+		<div class="input-group input-group-sm mb-1">
+			<span class="input-group-text" id="basic-addon3">Matching: </span>
+			<button type="button" class="btn btn-outline-success btn-sm flex-grow-1" id="dropdownForm1" ngbDropdownToggle>
+				{{activatedMatching.name}}
+			</button>
+		</div>
+
+		<div ngbDropdownMenu aria-labelledby="dropdownForm1">
+			<div class="overflow-auto">
+				<table class="table table-sm p-3">
+					<tbody>
+					<tr *ngFor="let matching of matchings" >
+						<td class="ps-2 pe-5">{{matching.name}}</td>
+						<td>
+							<div class="text-right d-flex justify-content-end">
+								<button type="button" class="btn btn-outline-success btn-sm me-1">Select</button>
+								<button type="button" class="btn btn-outline-danger btn-sm">X</button>
+							</div>
+						</td>
+					</tr>
+					</tbody>
+				</table>
 			</div>
-			<div class="mb-3">
-				<label for="exampleDropdownFormPassword1">Password</label>
-				<input
-					type="password"
-					class="form-control"
-					id="exampleDropdownFormPassword1"
-					placeholder="Password"
-					autocomplete="current-password"
-				/>
+
+			<div class="text-right d-flex justify-content-end">
+				<button type="button" class="btn btn-outline-success btn-sm me-2" (click)="createMatching()" >Create matching</button>
 			</div>
-			<div class="form-check">
-				<input type="checkbox" class="form-check-input" id="dropdownCheck" />
-				<label class="form-check-label" for="dropdownCheck"> Remember me </label>
-			</div>
-			<button type="submit" class="btn btn-primary">Sign in</button>
-		</form>
-		<div class="dropdown-divider"></div>
-		<button type="button" ngbDropdownItem>New around here? Sign up</button>
-		<button type="button" ngbDropdownItem>Forgot password?</button>
+		</div>
 	</div>
+
+	<select class="form-control form-control-sm mb-1" [formControl]="category">
+		<option *ngFor="let category of categories" [selected]="category.isActivated" value="{{category.id}}">{{category.name}}</option>
+	</select>
+</form>
+
+<div class="container">
+	<app-thumbnail *ngFor="let thumbnail of thumbnails" [thumbnail]="thumbnail"></app-thumbnail>
 </div>

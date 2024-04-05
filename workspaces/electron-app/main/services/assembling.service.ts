@@ -14,7 +14,7 @@ class AssemblingService {
 	}
 
 	public async getActivatedAssembling(projectPath: string): Promise<number> {
-		return await configService.getConfig(projectPath, Config.ACTIVATED_ASSEMBLING_ID, "0")
+		return await configService.getConfig(projectPath, Config.ACTIVATED_ASSEMBLING_ID, "1")
 			.then(x => parseInt(x))
 	}
 

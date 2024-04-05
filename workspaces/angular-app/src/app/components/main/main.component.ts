@@ -1,8 +1,9 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, Input, OnInit } from '@angular/core';
 import { BroadcastService, PROJECT_BROADCAST_SERVICE_TOKEN } from '../../services/broadcast.service';
-import { AssemblingDTO, GetAssemblingRequest, ProjectDTO } from 'shared-lib';
+import { AssemblingDTO, GetAssemblingRequest, ImgDto, ProjectDTO } from 'shared-lib';
 import { ElectronIpcService } from '../../services/electron-ipc.service';
 import { NgbNav, NgbNavChangeEvent } from '@ng-bootstrap/ng-bootstrap';
+import { PanelComponent } from '../panel/panel.component';
 
 @Component({
   selector: 'app-main',
@@ -15,6 +16,9 @@ export class MainComponent implements OnInit {
   projectDto: ProjectDTO | null = null;
   assemblings: AssemblingDTO[] = [];
   active: number;
+
+  @Input()
+  panel: PanelComponent;
 
   constructor(
     @Inject(PROJECT_BROADCAST_SERVICE_TOKEN) private projectBroadcastService: BroadcastService<ProjectDTO>,
@@ -55,5 +59,9 @@ export class MainComponent implements OnInit {
       this.assemblings.push(assemblingDto);
       this.active = assemblingDto.id;
     });
+  }
+
+  findMatching(img: ImgDto) {
+    this.panel.findMatching(img);
   }
 }

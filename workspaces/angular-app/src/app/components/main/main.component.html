@@ -15,7 +15,7 @@
 						<span class="btn-close ms-3 fw-light" (click)="close($event, assembling.id)"></span>
 					</button>
 					<ng-template ngbNavContent>
-						<app-board-main [assembling]="assembling" [projectDto]="projectDto!"></app-board-main>
+						<app-board-main [assembling]="assembling" [projectDto]="projectDto" (queryImage)="findMatching($event)"></app-board-main>
 					</ng-template>
 				</li>
 			}

@@ -9,7 +9,8 @@ export type ThumbnailRequest = {
 export type Thumbnail = {
 	imgId: number,
 	path: string,
-	imgName: string
+	imgName: string,
+	score?: number
 }
 
 export type ThumbnailResponse = {

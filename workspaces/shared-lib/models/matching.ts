@@ -28,3 +28,12 @@ export type MatchingRequest = {
 	projectPath: string,
 	matchingId: number
 }
+
+export type MatchingImgRequest = {
+	projectPath: string,
+	categoryId: number,
+	matchingId: number,
+	imgId: number,
+	page: number,
+	perPage: number
+}

@@ -42,7 +42,7 @@ export class ImagesPanelComponent implements OnInit, AfterViewInit {
   }
 
   getThumbnails(page = 0, reset = true) {
-    if (this.isLoading || this.isCompleted) {
+    if (this.isLoading || (this.isCompleted && !reset)) {
       return;
     }
     this.isLoading = true;
@@ -54,7 +54,6 @@ export class ImagesPanelComponent implements OnInit, AfterViewInit {
       perPage: 20
     }
     this.eIpc.send<ThumbnailRequest, ThumbnailResponse>('image:get-thumbnails', thumbnailRequest).then((result) => {
-      console.log(result);
       if (reset) {
         this.thumbnails.length = 0;
         this.isCompleted = false;

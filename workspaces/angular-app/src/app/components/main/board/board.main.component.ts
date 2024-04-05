@@ -1,9 +1,19 @@
-import { Component, HostListener, Inject, Input, OnInit, QueryList, ViewChildren } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  HostListener,
+  Inject,
+  Input,
+  OnInit,
+  Output,
+  QueryList,
+  ViewChildren,
+} from '@angular/core';
 import {
   AssemblingDTO,
   AssemblingImage,
   AssemblingImageChangeRequest, AssemblingImageRequest, ContextAction,
-  GetAssemblingRequest,
+  GetAssemblingRequest, ImgDto,
   ProjectDTO, Thumbnail,
   Transforms,
 } from 'shared-lib';
@@ -22,6 +32,7 @@ export class BoardMainComponent implements OnInit {
   @Input() projectDto: ProjectDTO;
 
   @ViewChildren(FrameComponent) frameComponents!: QueryList<FrameComponent>;
+  @Output() queryImage = new EventEmitter<ImgDto>();
 
   assemblingImages: AssemblingImage[] = [];
   selectedFrames = new Map<number, FrameComponent>;
@@ -65,7 +76,6 @@ export class BoardMainComponent implements OnInit {
         item.showController = true;
         if (event.button === 2) {
           item.contextMenuEvent.emit();
-          return;
         }
 
         const isMultiSelect = this.selectedFrames.size >= 2 && this.selectedFrames.has(item.image.id)
@@ -109,6 +119,9 @@ export class BoardMainComponent implements OnInit {
           delete this.assemblingImages[imgIdx];
           this.assemblingImages = this.assemblingImages.filter((x) => x.img.id != assemblingImage.img.id)
           break
+        case 'similarity':
+          this.queryImage.emit(assemblingImage.img);
+          break;
       }
     })
   }

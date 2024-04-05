@@ -60,12 +60,13 @@ export class MenuHandler extends BaseHandler {
 					}
 				},
 				{ type: 'separator' },
-				// {
-				// 	label: 'Find similarities',
-				// 	accelerator: 'CmdOrCtrl+F',
-				// 	enabled: (matching !== undefined) && (matching !== null),
-				// 	click: () => { event.reply('main:menu:img-find-similarity', args) }
-				// },
+				{
+					label: 'Find similarities',
+					accelerator: 'CmdOrCtrl+F',
+					click: () => {
+						resolve({ name: 'similarity', data: null })
+					}
+				},
 				{
 					label: 'Switch version',
 					enabled: subMenuVersion.length > 0,

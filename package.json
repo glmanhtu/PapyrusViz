@@ -164,7 +164,7 @@
 		"@electron/remote": "^2.1.0",
 		"@types/better-sqlite3": "^7.6.9",
 		"better-sqlite3": "^9.4.3",
-		"drizzle-orm": "^0.30.4",
+		"drizzle-orm": "^0.30.7",
 		"electron-squirrel-startup": "^1.0.0",
 		"fs-extra": "^11.1.1",
 		"pretty-quick": "^2.0.2",
