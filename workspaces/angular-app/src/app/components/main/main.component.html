@@ -1,4 +1,4 @@
-<div class="card text-center h-100">
+<div class="card text-center h-100" *ngIf="projectDto">
 	<div class="card-header">
 		<ul class="nav nav-tabs card-header-tabs" id="assembling-tabs" ngbNav #nav="ngbNav"
 				[(activeId)]="active" (navChange)="onNavChange($event)"
@@ -19,13 +19,6 @@
 					</ng-template>
 				</li>
 			}
-
-<!--			<li class="nav-item" id="assembling-tab-template" *ngFor="let assembling of assemblings">-->
-<!--				<a class="nav-link" role="tab" href="#">{{assembling.name}}</a>-->
-<!--			</li>-->
-<!--			<li class="nav-item">-->
-<!--				<a class="nav-link" role="tab" href="#" onclick="createAssembling()">+</a>-->
-<!--			</li>-->
 		</ul>
 	</div>
 	<div class="card-body h-100 overflow-auto" [ngbNavOutlet]="nav">

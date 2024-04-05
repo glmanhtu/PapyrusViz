@@ -35,7 +35,6 @@ export class BoardMainComponent implements OnInit {
     this.eIpc.send<GetAssemblingRequest, AssemblingImage[]>('assembling:get-images',
       {projectPath: this.projectDto!.path, assemblingId: this.assembling.id}).then((items) => {
         this.assemblingImages = items;
-        console.log(items);
     });
     this.imgBroadcastService.observe().subscribe((thumbnail) => {
       if (this.assemblingImages.some((x) => x.img.id === thumbnail.imgId)) {

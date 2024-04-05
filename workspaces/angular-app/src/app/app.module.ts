@@ -21,6 +21,8 @@ import { ThumbnailComponent } from './shared/components/thumbnail/thumbnail.comp
 import { BoardMainComponent } from './components/main/board/board.main.component';
 import { FrameComponent } from './shared/components/frame/frame.component';
 import { SimilarityCreationComponent } from './components/similarity/creation/similarity.creation.component';
+import { MatchingPanelComponent } from './components/panel/matching/matching.panel.component';
+import { ImagesPanelComponent } from './components/panel/images/images.panel.component';
 
 
 // AoT requires an exported function for factories
@@ -39,7 +41,9 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
 		ThumbnailComponent,
 		BoardMainComponent,
 		FrameComponent,
-		SimilarityCreationComponent
+		SimilarityCreationComponent,
+		MatchingPanelComponent,
+		ImagesPanelComponent
   ],
 	imports: [
 		BrowserModule,

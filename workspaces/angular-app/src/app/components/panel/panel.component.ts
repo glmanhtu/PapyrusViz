@@ -1,14 +1,15 @@
 import { Component, ElementRef, Inject, Input, OnInit, ViewChild } from '@angular/core';
 import { BroadcastService, PROJECT_BROADCAST_SERVICE_TOKEN } from '../../services/broadcast.service';
-import { CategoryDTO, ProjectDTO, Thumbnail, ThumbnailRequest, ThumbnailResponse } from 'shared-lib';
-import { NgbNav } from '@ng-bootstrap/ng-bootstrap';
+import { CategoryDTO, ProjectDTO } from 'shared-lib';
+import { NgbDropdown, NgbNav, NgbNavChangeEvent } from '@ng-bootstrap/ng-bootstrap';
 import { ElectronIpcService } from '../../services/electron-ipc.service';
-import { FormControl } from '@angular/forms';
 import { SimilarityCreationComponent } from '../similarity/creation/similarity.creation.component';
+import { ImagesPanelComponent } from './images/images.panel.component';
+import { MatchingPanelComponent } from './matching/matching.panel.component';
 
 @Component({
   selector: 'app-panel',
-  providers: [NgbNav],
+  providers: [NgbNav, NgbDropdown],
   templateUrl: './panel.component.html',
   styleUrls: ['./panel.component.scss'],
 })
@@ -17,18 +18,17 @@ export class PanelComponent implements OnInit {
   @ViewChild('scrollContainer') scrollContainer!: ElementRef;
   private scrollThreshold = 100; // Adjust this value as needed
 
+  @ViewChild('thumbnails') thumbnailsPanel: ImagesPanelComponent;
+
+  @ViewChild('matching') matchingPanel: MatchingPanelComponent;
+
   @Input()
   similarityCreationComponent: SimilarityCreationComponent;
+  scrollTop = new Map<number, number>;
 
   active = 1;
-  projectDto: ProjectDTO | null = null;
+  projectDto: ProjectDTO;
   categories: CategoryDTO[] = [];
-  category = new FormControl(1);
-  filter = new FormControl('');
-  currentPage = 0;
-  thumbnails: Thumbnail[] = [];
-  isLoading: boolean = false; // is a boolean flag to track whether new items are being loaded.
-  isCompleted = false;  // a boolean flag to check whether all items are loaded.
 
   constructor(
     @Inject(PROJECT_BROADCAST_SERVICE_TOKEN) private projectBroadcastService: BroadcastService<ProjectDTO>,
@@ -37,54 +37,32 @@ export class PanelComponent implements OnInit {
 
   ngOnInit(): void {
     this.projectBroadcastService.observe().subscribe((projectDto) => {
-      this.initProject(projectDto);
+      this.projectDto = projectDto;
+      this.eIpc.send<string, CategoryDTO[]>('category:get-categories', projectDto.path).then((categories) => {
+        this.categories = categories;
+      });
     });
   }
 
-  initProject(projectDto: ProjectDTO) {
-    this.projectDto = projectDto;
-    this.eIpc.send<string, CategoryDTO[]>('category:get-categories', projectDto.path).then((categories) => {
-      this.categories = categories;
-    });
-
-    this.getThumbnails();
+  onNavChange(changeEvent: NgbNavChangeEvent) {
+    const element = this.scrollContainer.nativeElement;
+    this.scrollTop.set(changeEvent.activeId, element.scrollTop);
   }
 
-
-  createMatching() {
-    this.similarityCreationComponent.open();
+  onNavShown() {
+    const element = this.scrollContainer.nativeElement;
+    element.scrollTop = this.scrollTop.get(this.active) || 0;
   }
 
   onScroll() {
     const element = this.scrollContainer.nativeElement;
     const closeToBottom = element.scrollHeight - element.scrollTop <= element.clientHeight + this.scrollThreshold;
-    if (closeToBottom && !this.isLoading && !this.isCompleted) {
-      this.getThumbnails(this.currentPage + 1, false);
-    }
-  }
-
-
-  getThumbnails(page = 0, reset = true) {
-    const thumbnailRequest: ThumbnailRequest = {
-      projectPath: this.projectDto!.path,
-      categoryId: this.category.value!,
-      filter: this.filter.value!,
-      page: page,
-      perPage: 50
-    }
-    this.isLoading = true;
-    this.eIpc.send<ThumbnailRequest, ThumbnailResponse>('image:get-thumbnails', thumbnailRequest).then((result) => {
-      console.log(result);
-      if (reset) {
-        this.thumbnails.length = 0;
-        this.isCompleted = false;
+    if (closeToBottom) {
+      if (this.active === 1) {
+        this.thumbnailsPanel.loadData();
+      } else if (this.active === 2) {
+        this.matchingPanel.loadData();
       }
-      if (result.thumbnails.length === 0) {
-        this.isCompleted = true;
-      }
-      this.thumbnails.push(...result.thumbnails);
-      this.currentPage = page;
-      this.isLoading = false;
-    });
+    }
   }
 }

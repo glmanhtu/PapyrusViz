@@ -30,7 +30,6 @@ export class MainComponent implements OnInit {
     this.projectDto = projectDto;
     this.eIpc.send<string, AssemblingDTO[]>('assembling:get-assemblings', projectDto.path).then((assemblings) => {
       this.assemblings = assemblings;
-      console.log(assemblings)
     });
 
     this.eIpc.send<string, number>('assembling:get-activated-assembling-id', projectDto.path).then((assemblingId) => {
@@ -53,7 +52,6 @@ export class MainComponent implements OnInit {
   add(event: MouseEvent) {
     event.preventDefault();
     this.eIpc.send<string, AssemblingDTO>('assembling:create-assembling', this.projectDto!.path).then((assemblingDto) => {
-      console.log(assemblingDto);
       this.assemblings.push(assemblingDto);
       this.active = assemblingDto.id;
     });

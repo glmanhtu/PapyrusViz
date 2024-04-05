@@ -15,3 +15,16 @@ export type MatchingDto = {
 	matchingType: MatchingType,
 	matchingMethod: MatchingMethod
 }
+
+export type MatchingResponse = {
+	id: number,
+	name: string,
+	matrixPath: string,
+	matchingType: string,
+	matchingMethod: string
+}
+
+export type MatchingRequest = {
+	projectPath: string,
+	matchingId: number
+}

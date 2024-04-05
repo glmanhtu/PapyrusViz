@@ -1,0 +1,14 @@
+
+
+.thumbnail-tabs {
+    display: flex;
+    flex-direction: row;
+}
+
+.thumbnail-tabs .nav-item {
+    flex: 1 1 auto;
+}
+
+#matching-query {
+    border: 1px solid green;
+}
