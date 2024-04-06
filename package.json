@@ -1,11 +1,11 @@
 {
 	"name": "papyviz",
-	"productName": "Electron Angular App",
+	"productName": "Papyrus Visualisation",
 	"version": "5.0.0",
-	"description": "An Electron and Angular Quick-starter",
-	"repository": "https://github.com/sourcygen/electron-angular-quick-start.git",
+	"description": "Visualize papyrus fragments and allow user to reassemble them",
+	"repository": "https://github.com/glmanhtu/PapyrusViz",
 	"author": "Manh Tu VU",
-	"license": "MIT",
+	"license": "GPL",
 	"main": ".webpack/main",
 	"keywords": [
 		"angular",
@@ -27,7 +27,7 @@
 	],
 	"scripts": {
 		"db:generate": "drizzle-kit generate:sqlite",
-		"start": "npm-run-all -p start:shared-lib start:angular-app start:electron-app",
+		"start": "npm-run-all -p start:shared-lib start:angular-app start:electron-app:once",
 		"start:shared-lib": "tsc -b workspaces/shared-lib -w",
 		"start:angular-app": "wait-on workspaces/shared-lib/.dist/index.d.ts && cd workspaces/angular-app && npm run start",
 		"start:electron-app": "node scripts/electron-forge-start-watch.js",

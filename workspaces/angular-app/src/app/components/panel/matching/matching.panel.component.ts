@@ -70,12 +70,12 @@ export class MatchingPanelComponent implements OnInit {
   }
 
   getThumbnails(page = 0, reset = true) {
-    if (this.isLoading || (this.isCompleted && !reset)) {
+    if (!this.imgDto || this.isLoading || (this.isCompleted && !reset)) {
       return;
     }
     this.isLoading = true;
     const thumbnailRequest: MatchingImgRequest = {
-      projectPath: this.projectDto!.path,
+      projectPath: this.projectDto.path,
       categoryId: this.category.value!,
       matchingId: this.activatedMatching.id,
       imgId: this.imgDto.id,

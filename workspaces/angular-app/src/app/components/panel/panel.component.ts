@@ -1,7 +1,7 @@
 import { Component, ElementRef, Inject, Input, OnInit, ViewChild } from '@angular/core';
 import { BroadcastService, PROJECT_BROADCAST_SERVICE_TOKEN } from '../../services/broadcast.service';
 import { CategoryDTO, ImgDto, ProjectDTO } from 'shared-lib';
-import { NgbDropdown, NgbNav, NgbNavChangeEvent } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDropdown, NgbNav } from '@ng-bootstrap/ng-bootstrap';
 import { ElectronIpcService } from '../../services/electron-ipc.service';
 import { SimilarityCreationComponent } from '../similarity/creation/similarity.creation.component';
 import { ImagesPanelComponent } from './images/images.panel.component';
@@ -42,16 +42,6 @@ export class PanelComponent implements OnInit {
         this.categories = categories;
       });
     });
-  }
-
-  onNavChange(changeEvent: NgbNavChangeEvent) {
-    const element = this.scrollContainer.nativeElement;
-    this.scrollTop.set(changeEvent.activeId, element.scrollTop);
-  }
-
-  onNavShown() {
-    const element = this.scrollContainer.nativeElement;
-    element.scrollTop = this.scrollTop.get(this.active) || 0;
   }
 
   onScroll() {
