@@ -61,10 +61,17 @@
 	"config": {
 		"forge": {
 			"packagerConfig": {
-				"name": "Electron Angular App",
-				"executableName": "electron-angular-app",
+				"name": "Papyrus Visualization",
+				"executableName": "papyviz",
+				"asar": {
+					"unpack": [
+						"**/node_modules/sharp/**/*",
+						"**/node_modules/@img/**/*"
+					]
+				},
 				"icon": "./workspaces/electron-app/main/assets/icons/icon"
 			},
+			"rebuildConfig": {},
 			"makers": [
 				{
 					"name": "@electron-forge/maker-dmg",
@@ -98,6 +105,17 @@
 							]
 						}
 					}
+				},
+				{
+					"name": "@electron-forge/plugin-auto-unpack-natives",
+					"config": {}
+				},
+				{
+					"name": "@timfish/forge-externals-plugin",
+					"config": {
+						"externals": ["sharp"],
+						"includeDeps": true
+					}
 				}
 			]
 		}
@@ -107,13 +125,16 @@
 		"@angular-eslint/template-parser": "^17.3.0",
 		"@commitlint/cli": "^18.4.2",
 		"@commitlint/config-conventional": "^18.4.2",
-		"@electron-forge/cli": "^7.1.0",
-		"@electron-forge/maker-deb": "^7.1.0",
-		"@electron-forge/maker-dmg": "^7.1.0",
-		"@electron-forge/maker-rpm": "^7.1.0",
-		"@electron-forge/maker-squirrel": "^7.1.0",
-		"@electron-forge/maker-zip": "^7.1.0",
-		"@electron-forge/plugin-webpack": "^7.1.0",
+		"@electron-forge/cli": "^7.2.0",
+		"@electron-forge/maker-deb": "^7.2.0",
+		"@electron-forge/maker-dmg": "^7.2.0",
+		"@electron-forge/maker-rpm": "^7.2.0",
+		"@electron-forge/maker-squirrel": "^7.2.0",
+		"@electron-forge/maker-zip": "^7.2.0",
+		"@electron-forge/plugin-auto-unpack-natives": "^7.2.0",
+		"@electron-forge/plugin-webpack": "^7.2.0",
+		"@timfish/forge-externals-plugin": "^0.2.1",
+		"@types/better-sqlite3": "^7.6.9",
 		"@types/jasmine": "^5.1.2",
 		"@types/lodash": "^4.14.201",
 		"@types/node": "^20.9.2",
@@ -162,16 +183,15 @@
 	},
 	"dependencies": {
 		"@electron/remote": "^2.1.0",
-		"@types/better-sqlite3": "^7.6.9",
+		"@fast-csv/parse": "^5.0.0",
 		"better-sqlite3": "^9.4.3",
 		"drizzle-orm": "^0.30.7",
 		"electron-squirrel-startup": "^1.0.0",
 		"fs-extra": "^11.1.1",
 		"pretty-quick": "^2.0.2",
-		"sharp": "0.33.3",
+		"sharp": "^0.33.3",
 		"uuid": "^9.0.1",
-		"winston": "^3.11.0",
-		"@fast-csv/parse": "^5.0.0"
+		"winston": "^3.11.0"
 	},
 	"lint-staged": {
 		"*.ts": "npm run lint"
