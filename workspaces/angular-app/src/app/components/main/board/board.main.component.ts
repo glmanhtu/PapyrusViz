@@ -65,9 +65,20 @@ export class BoardMainComponent implements OnInit {
   }
 
   addImage(thumbnail: Thumbnail) {
-    if (this.assemblingImages.some((x) => x.img.id === thumbnail.imgId)) {
-      return;
+    const imgHeights = []
+    for (let i = 0; i < this.assemblingImages.length; i++) {
+      const img = this.assemblingImages[i];
+      if (img.img.id === thumbnail.imgId) {
+        return;
+      }
+      imgHeights.push(img.img.height * img.transforms.scale);
     }
+    const avgHeight = imgHeights.reduce((p, c) => p + c, 0) / imgHeights.length;
+    let imgScale = (avgHeight / thumbnail.orgImgHeight);
+    if (imgScale === 0) {
+      imgScale = 1;
+    }
+
     this.eIpc.send<AssemblingImageChangeRequest, AssemblingImage>('assembling:create-assembling-img', {
       projectPath: this.projectDto.path,
       assemblingId: this.assembling.id,
@@ -76,7 +87,7 @@ export class BoardMainComponent implements OnInit {
         zIndex: 1 + this.assemblingImages.reduce((acc, x) => Math.max(acc, x.transforms.zIndex), 0),
         top: 10,
         left: 10,
-        scale: 1,
+        scale: imgScale,
         rotation: 0
       }
     }).then((x) => {

@@ -52,7 +52,8 @@ export class ImageHandler extends BaseHandler {
 
 		return images.then(items => ({
 			thumbnails: items.map(x => ({
-				imgId: x.id, path: "atom://" + path.join(request.projectPath, x.thumbnail), imgName: x.name
+				imgId: x.id, path: "atom://" + path.join(request.projectPath, x.thumbnail), imgName: x.name,
+				orgImgWidth: x.width, orgImgHeight: x.height
 			}))
 		}));
 	}

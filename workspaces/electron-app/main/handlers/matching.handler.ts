@@ -77,7 +77,9 @@ export class MatchingHandler extends BaseHandler {
 			thumbnails: items.map(x => ({
 				imgId: x.img.id, path: "atom://" + path.join(request.projectPath, x.img.thumbnail),
 				imgName: x.img.name,
-				score: x['matching-img'].score
+				score: x['matching-img'].score,
+				orgImgWidth: x.img.width,
+				orgImgHeight: x.img.height
 			}))
 		}));
 	}

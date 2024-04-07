@@ -27,7 +27,9 @@ export type Thumbnail = {
 	imgId: number,
 	path: string,
 	imgName: string,
-	score?: number
+	score?: number,
+	orgImgWidth: number,
+	orgImgHeight: number
 }
 
 export type ThumbnailResponse = {
