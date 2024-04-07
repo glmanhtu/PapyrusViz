@@ -54,7 +54,7 @@
 		</div>
 	</div>
 
-	<select class="form-control form-control-sm mb-1" [formControl]="category">
+	<select class="form-control form-control-sm mb-1" [formControl]="category" (change)="getThumbnails()">
 		<option *ngFor="let category of categories" [selected]="category.isActivated" value="{{category.id}}">{{category.name}}</option>
 	</select>
 </form>

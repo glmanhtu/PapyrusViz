@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /*
  * Copyright (C) 2024  Manh Tu VU
  *
@@ -15,7 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#!/usr/bin/env node
 const spawn = require('child_process').spawn;
 const chokidar = require('chokidar');
 const kill = require('tree-kill');
