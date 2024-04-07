@@ -15,12 +15,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Component, Inject, Input, OnInit } from '@angular/core';
-import { BroadcastService, PROJECT_BROADCAST_SERVICE_TOKEN } from '../../services/broadcast.service';
-import { AssemblingDTO, GetAssemblingRequest, ImgDto, ProjectDTO } from 'shared-lib';
+import { Component, Inject, Input, OnInit, QueryList, ViewChildren } from '@angular/core';
+import {
+  BroadcastService,
+  IMG_BROADCAST_SERVICE_TOKEN,
+  PROJECT_BROADCAST_SERVICE_TOKEN,
+} from '../../services/broadcast.service';
+import {
+  AssemblingDTO,
+  GetAssemblingRequest,
+  ImgDto,
+  ProjectDTO, Thumbnail,
+} from 'shared-lib';
 import { ElectronIpcService } from '../../services/electron-ipc.service';
 import { NgbNav, NgbNavChangeEvent } from '@ng-bootstrap/ng-bootstrap';
 import { PanelComponent } from '../panel/panel.component';
+import { BoardMainComponent } from './board/board.main.component';
 
 @Component({
   selector: 'app-main',
@@ -30,6 +40,7 @@ import { PanelComponent } from '../panel/panel.component';
 })
 export class MainComponent implements OnInit {
 
+  @ViewChildren(BoardMainComponent) boardComponents: QueryList<BoardMainComponent>;
   projectDto: ProjectDTO | null = null;
   assemblings: AssemblingDTO[] = [];
   active: number;
@@ -39,12 +50,26 @@ export class MainComponent implements OnInit {
 
   constructor(
     @Inject(PROJECT_BROADCAST_SERVICE_TOKEN) private projectBroadcastService: BroadcastService<ProjectDTO>,
+    @Inject(IMG_BROADCAST_SERVICE_TOKEN) private imgBroadcastService: BroadcastService<Thumbnail>,
     private eIpc: ElectronIpcService) {
+  }
+
+  getActivatedBoard(): BoardMainComponent {
+    for (let i = 0; i < this.boardComponents.length; i++) {
+      if (this.boardComponents!.get(i)!.assembling.id === this.active) {
+        return this.boardComponents.get(i)!;
+      }
+    }
+    throw new Error('Board component not found!')
   }
   ngOnInit(): void {
     this.projectBroadcastService.observe().subscribe((projectDto) => {
       this.initProject(projectDto);
     });
+
+    this.imgBroadcastService.observe().subscribe((thumbnail) => {
+      this.getActivatedBoard().addImage(thumbnail)
+    })
   }
 
   initProject(projectDto: ProjectDTO) {

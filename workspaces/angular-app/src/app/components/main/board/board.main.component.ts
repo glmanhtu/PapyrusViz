@@ -19,7 +19,6 @@ import {
   Component,
   EventEmitter,
   HostListener,
-  Inject,
   Input,
   OnInit,
   Output,
@@ -35,7 +34,6 @@ import {
   Transforms,
 } from 'shared-lib';
 import { ElectronIpcService } from '../../../services/electron-ipc.service';
-import { BroadcastService, IMG_BROADCAST_SERVICE_TOKEN } from '../../../services/broadcast.service';
 import { FrameComponent } from '../../../shared/components/frame/frame.component';
 
 @Component({
@@ -56,7 +54,6 @@ export class BoardMainComponent implements OnInit {
 
 
   constructor(
-    @Inject(IMG_BROADCAST_SERVICE_TOKEN) private imgBroadcastService: BroadcastService<Thumbnail>,
     private eIpc: ElectronIpcService) {
   }
   ngOnInit(): void {
@@ -64,24 +61,26 @@ export class BoardMainComponent implements OnInit {
       {projectPath: this.projectDto!.path, assemblingId: this.assembling.id}).then((items) => {
         this.assemblingImages = items;
     });
-    this.imgBroadcastService.observe().subscribe((thumbnail) => {
-      if (this.assemblingImages.some((x) => x.img.id === thumbnail.imgId)) {
-        return;
+
+  }
+
+  addImage(thumbnail: Thumbnail) {
+    if (this.assemblingImages.some((x) => x.img.id === thumbnail.imgId)) {
+      return;
+    }
+    this.eIpc.send<AssemblingImageChangeRequest, AssemblingImage>('assembling:create-assembling-img', {
+      projectPath: this.projectDto.path,
+      assemblingId: this.assembling.id,
+      imageId: thumbnail.imgId,
+      transforms: {
+        zIndex: 1 + this.assemblingImages.reduce((acc, x) => Math.max(acc, x.transforms.zIndex), 0),
+        top: 10,
+        left: 10,
+        scale: 1,
+        rotation: 0
       }
-      this.eIpc.send<AssemblingImageChangeRequest, AssemblingImage>('assembling:create-assembling-img', {
-        projectPath: this.projectDto.path,
-        assemblingId: this.assembling.id,
-        imageId: thumbnail.imgId,
-        transforms: {
-          zIndex: 1 + this.assemblingImages.reduce((acc, x) => Math.max(acc, x.transforms.zIndex), 0),
-          top: 10,
-          left: 10,
-          scale: 1,
-          rotation: 0
-        }
-      }).then((x) => {
-        this.assemblingImages.push(x);
-      })
+    }).then((x) => {
+      this.assemblingImages.push(x);
     })
   }
 
