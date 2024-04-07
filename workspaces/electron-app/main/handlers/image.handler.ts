@@ -17,7 +17,7 @@
 
 import { BaseHandler } from "./base.handler";
 import { imgTbl } from '../entities/img';
-import { and, eq, like, SQLWrapper } from 'drizzle-orm';
+import { and, eq, like } from 'drizzle-orm';
 import { categoryTbl } from '../entities/category';
 import { takeUniqueOrThrow } from '../utils/data.utils';
 import path from 'node:path';
@@ -36,16 +36,15 @@ export class ImageHandler extends BaseHandler {
 		const category = await database.select().from(categoryTbl)
 			.where(eq(categoryTbl.id, request.categoryId)).then(takeUniqueOrThrow);
 
-		const filters: SQLWrapper[] = [];
-		if (request.filter.length > 0) {
-			filters.push(like(imgTbl.path, `%${request.filter}%`))
-		}
-		if (category.path !== '') {
-			filters.push(eq(imgTbl.categoryId, request.categoryId))
-		}
-
 		const images = database.select().from(imgTbl)
-			.where(and(...filters))
+			.where(and(
+				request.filter.length > 0
+					? like(imgTbl.path, `%${request.filter}%`)
+					: undefined,
+				category.path !== ''
+					? eq(imgTbl.categoryId, request.categoryId)
+					: undefined
+			))
 			.orderBy(imgTbl.name)
 			.limit(request.perPage)
 			.offset(request.page * request.perPage);
