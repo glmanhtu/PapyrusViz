@@ -18,21 +18,22 @@
 import { BetterSQLite3Database, drizzle } from 'drizzle-orm/better-sqlite3';
 import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
 import Database from 'better-sqlite3';
+import * as schema from '../entities/entities';
 
 
 class DatabaseService {
-    private databases = new Map<string, BetterSQLite3Database>();
+    private databases = new Map<string, BetterSQLite3Database<typeof schema>>();
 
-    public createConnection(databasePath: string) : BetterSQLite3Database {
+    public createConnection(databasePath: string): BetterSQLite3Database<typeof schema> {
         const sqlite = new Database(databasePath);
-        return drizzle(sqlite);
+        return drizzle(sqlite, { schema });
     }
 
-    public migrateDatabase(database: BetterSQLite3Database, schemaPath: string) {
+    public migrateDatabase(database: BetterSQLite3Database<typeof schema>, schemaPath: string) {
         migrate(database, { migrationsFolder: schemaPath });
     }
 
-    public addConnection(key: string, connection: BetterSQLite3Database) {
+    public addConnection(key: string, connection: BetterSQLite3Database<typeof schema>) {
         this.databases.set(key, connection);
     }
 

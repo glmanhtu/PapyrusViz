@@ -39,8 +39,8 @@
 						<td class="ps-2 pe-5">{{matching.name}}</td>
 						<td>
 							<div class="text-right d-flex justify-content-end">
-								<button type="button" class="btn btn-outline-success btn-sm me-1">Select</button>
-								<button type="button" class="btn btn-outline-danger btn-sm">X</button>
+								<button type="button" class="btn btn-outline-success btn-sm me-1" (click)="setActivatedMatching(matching)">Select</button>
+								<button type="button" class="btn btn-outline-danger btn-sm" (click)="deleteMatching(matching)">X</button>
 							</div>
 						</td>
 					</tr>

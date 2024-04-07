@@ -17,7 +17,7 @@
 
 import { sqliteTable, integer, real, index, text } from 'drizzle-orm/sqlite-core';
 import { imgTbl } from './img';
-import { sql } from 'drizzle-orm';
+import { relations, sql } from 'drizzle-orm';
 import { projectTbl } from './project';
 
 
@@ -38,8 +38,8 @@ export const matchingTbl = sqliteTable('matching', {
 
 export const matchingImgTbl = sqliteTable('matching-img', {
     id: integer('id').primaryKey({autoIncrement: true}),
-    sourceImgId: integer('source_img_id').references(() => imgTbl.id),
-    targetImgId: integer('target_img_id').references(() => imgTbl.id),
+    sourceImgId: integer('source_img_id').notNull().references(() => imgTbl.id),
+    targetImgId: integer('target_img_id').notNull().references(() => imgTbl.id),
     score: real('score'),
     matchingId: integer('matching_id').references(() => matchingTbl.id)
 }, (table) => {
@@ -48,6 +48,29 @@ export const matchingImgTbl = sqliteTable('matching-img', {
         targetIdx: index('matching_target_index').on(table.targetImgId),
     }
 });
+
+export const matchingTblRelations = relations(matchingTbl, ({ many }) => ({
+    matchingImgTbl: many(matchingImgTbl)
+}));
+
+export const matchingImgRelations = relations(imgTbl, ({ many }) => ({
+    matchingImgTbl: many(matchingImgTbl)
+}));
+
+export const imgToMatchingRelations = relations(matchingImgTbl, ({ one }) => ({
+    matching: one(matchingTbl, {
+        fields: [matchingImgTbl.matchingId],
+        references: [matchingTbl.id],
+    }),
+    sourceImg: one(imgTbl, {
+        fields: [matchingImgTbl.sourceImgId],
+        references: [imgTbl.id],
+    }),
+    targetImg: one(imgTbl, {
+        fields: [matchingImgTbl.targetImgId],
+        references: [imgTbl.id],
+    }),
+}));
 
 
 export type MatchingImg = typeof matchingImgTbl.$inferSelect

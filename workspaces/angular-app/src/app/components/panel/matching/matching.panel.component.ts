@@ -19,7 +19,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import {
   CategoryDTO,
   ImgDto,
-  MatchingImgRequest,
+  MatchingImgRequest, MatchingRequest,
   MatchingResponse,
   ProjectDTO, Thumbnail,
   ThumbnailResponse,
@@ -49,7 +49,7 @@ export class MatchingPanelComponent implements OnInit {
 
   matchings: MatchingResponse[] = [];
   thumbnails: Thumbnail[] = [];
-  activatedMatching: MatchingResponse;
+  activatedMatching: MatchingResponse | null;
 
   imgDto: ImgDto;
 
@@ -63,13 +63,19 @@ export class MatchingPanelComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.initMatchings()
+  }
+
+  initMatchings() {
     this.eIpc.send<string, MatchingResponse[]>('matching:get-matchings', this.projectDto!.path).then((matchings) => {
       this.matchings = matchings;
     });
 
     this.eIpc.send<string, MatchingResponse>('matching:get-activated-matching', this.projectDto!.path).then((matching) => {
       this.activatedMatching = matching;
-    });
+    }).catch((_) => {
+      this.activatedMatching = null;
+    })
 
   }
 
@@ -79,15 +85,46 @@ export class MatchingPanelComponent implements OnInit {
   }
 
   createMatching() {
-    this.similarityCreationComponent.open();
+    this.similarityCreationComponent.open().then((result) => {
+      if (result) {
+        this.initMatchings();
+      }
+    });
   }
 
   loadData() {
     this.getThumbnails(this.currentPage + 1, false);
   }
 
+  setActivatedMatching(matching: MatchingResponse) {
+    this.eIpc.send<MatchingRequest, void>('matching:set-activated-matching', {
+      projectPath: this.projectDto.path,
+      matchingId: matching.id
+    }).then(() => {
+      this.activatedMatching = matching;
+      this.thumbnails = [];
+    })
+  }
+
+  deleteMatching(matching: MatchingResponse) {
+    this.eIpc.send<MatchingRequest, void>('matching:delete-matching', {
+      projectPath: this.projectDto.path,
+      matchingId: matching.id
+    }).then(() => {
+      this.matchings = this.matchings.filter(x => x.id !== matching.id);
+      if (this.matchings.length > 0) {
+        if (this.activatedMatching === null || this.activatedMatching.id === matching.id) {
+          this.setActivatedMatching(this.matchings[0]);
+        }
+      } else {
+        this.activatedMatching = null;
+      }
+      this.thumbnails = [];
+    })
+  }
+
   getThumbnails(page = 0, reset = true) {
-    if (!this.imgDto || this.isLoading || (this.isCompleted && !reset)) {
+    if (!this.activatedMatching || !this.imgDto || this.isLoading || (this.isCompleted && !reset)) {
       return;
     }
     this.isLoading = true;

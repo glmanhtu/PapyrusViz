@@ -68,8 +68,9 @@ export class SimilarityCreationComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  open(): void {
+  open(): Promise<unknown> {
     this.modelRef = this.modalService.open(this.content, { size: 'lg', centered: true });
+    return this.modelRef.result;
   }
 
   onSubmit() {
@@ -94,8 +95,18 @@ export class SimilarityCreationComponent implements OnInit {
     });
   }
 
+  reset() {
+    this.isFinished = false;
+    this.showProgress = false;
+  }
+
+  finished() {
+    this.modelRef!.close(true);
+    this.reset();
+  }
+
   cancel() {
-    this.modelRef!.close();
+    this.modelRef!.close(false);
   }
 
   folderSelection(event: MouseEvent): void {

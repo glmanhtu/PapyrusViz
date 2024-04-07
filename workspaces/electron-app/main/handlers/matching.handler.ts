@@ -35,7 +35,7 @@ import { imageService } from '../services/image.service';
 import { Message } from 'shared-lib/.dist/models/common';
 import { projectService } from '../services/project.service';
 import { takeUniqueOrThrow } from '../utils/data.utils';
-import { and, eq, SQLWrapper } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { configService } from '../services/config.service';
 import { Config } from '../entities/user-config-tbl';
 import { categoryTbl } from '../entities/category';
@@ -50,6 +50,7 @@ export class MatchingHandler extends BaseHandler {
 		this.addRoute('matching:get-matchings', this.getMatchings.bind(this))
 		this.addRoute('matching:get-activated-matching', this.getActivatedMatching.bind(this))
 		this.addRoute('matching:set-activated-matching', this.setActivatedMatching.bind(this))
+		this.addRoute('matching:delete-matching', this.deleteMatching.bind(this))
 		this.addRoute('matching:find-matching-imgs', this.findMatchingImages.bind(this))
 	}
 
@@ -58,20 +59,35 @@ export class MatchingHandler extends BaseHandler {
 		const category = await database.select().from(categoryTbl)
 			.where(eq(categoryTbl.id, request.categoryId)).then(takeUniqueOrThrow);
 
-		const filters: SQLWrapper[] = [
-			eq(matchingImgTbl.matchingId, request.matchingId),
-			eq(matchingImgTbl.sourceImgId, request.imgId)
-		];
-		if (category.path !== '') {
-			filters.push(eq(imgTbl.categoryId, request.categoryId))
-		}
-
 		const images = database.select().from(matchingImgTbl)
-			.leftJoin(imgTbl, eq(matchingImgTbl.targetImgId, imgTbl.id))
-			.where((and(...filters)))
+			.where(and(
+				eq(matchingImgTbl.matchingId, request.matchingId),
+				eq(matchingImgTbl.sourceImgId, request.imgId),
+				category.path !== ''
+					? eq(imgTbl.categoryId, request.categoryId)
+					: undefined
+			))
+
+			.innerJoin(imgTbl, eq(matchingImgTbl.targetImgId, imgTbl.id))
 			.orderBy(matchingImgTbl.score)
 			.limit(request.perPage)
 			.offset(request.page * request.perPage);
+
+		// const images = database.query.matchingImgTbl.findMany({
+		// 	limit: request.perPage,
+		// 	offset: request.page * request.perPage,
+		// 	orderBy: [asc(matchingImgTbl.score)],
+		// 	where: (matchingImgTbl, { eq, and }) => (
+		// 		and(
+		// 			eq(matchingImgTbl.matchingId, request.matchingId),
+		// 			eq(matchingImgTbl.sourceImgId, request.imgId),
+		// 		)
+		// 	),
+		// 	with: {
+		// 		targetImg: true
+		// 	}
+		// })
+
 
 		return images.then(items => ({
 			thumbnails: items.map(x => ({
@@ -88,6 +104,12 @@ export class MatchingHandler extends BaseHandler {
 		const database = dbService.getConnection(projectPath);
 		const project = await projectService.getProjectByPath(projectPath);
 		return database.select().from(matchingTbl).where(eq(matchingTbl.projectId, project.id));
+	}
+
+	private async deleteMatching(matchingRequest: MatchingRequest): Promise<void> {
+		const database = dbService.getConnection(matchingRequest.projectPath);
+		await database.delete(matchingImgTbl).where(eq(matchingImgTbl.matchingId, matchingRequest.matchingId));
+		await database.delete(matchingTbl).where(eq(matchingTbl.id, matchingRequest.matchingId));
 	}
 
 	private async getActivatedMatching(projectPath: string): Promise<MatchingResponse> {
