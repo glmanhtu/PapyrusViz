@@ -29,6 +29,9 @@ module.exports = {
 	module: {
 		rules: require('./webpack.rules'),
 	},
+	externals: {
+		'sharp': 'commonjs sharp'
+	},
 	resolve: {
 		extensions: ['.js', '.ts', '.jsx', '.tsx', '.css', '.json'],
 		modules: [path.resolve(__dirname, 'node_modules'), 'node_modules'],
