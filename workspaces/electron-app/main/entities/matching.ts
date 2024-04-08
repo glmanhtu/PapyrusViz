@@ -41,6 +41,7 @@ export const matchingImgTbl = sqliteTable('matching-img', {
     sourceImgId: integer('source_img_id').notNull().references(() => imgTbl.id),
     targetImgId: integer('target_img_id').notNull().references(() => imgTbl.id),
     score: real('score'),
+    rank: integer('rank'),
     matchingId: integer('matching_id').references(() => matchingTbl.id)
 }, (table) => {
     return {
@@ -74,3 +75,4 @@ export const imgToMatchingRelations = relations(matchingImgTbl, ({ one }) => ({
 
 
 export type MatchingImg = typeof matchingImgTbl.$inferSelect
+export type Matching = typeof matchingTbl.$inferSelect

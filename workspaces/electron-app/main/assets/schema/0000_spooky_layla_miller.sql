@@ -16,15 +16,6 @@ CREATE TABLE `category` (
 	FOREIGN KEY (`project_id`) REFERENCES `project`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
-CREATE TABLE `img_assembling` (
-	`img_id` integer,
-	`assembling_id` integer,
-	`transforms` text,
-	PRIMARY KEY(`assembling_id`, `img_id`),
-	FOREIGN KEY (`img_id`) REFERENCES `img`(`id`) ON UPDATE no action ON DELETE no action,
-	FOREIGN KEY (`assembling_id`) REFERENCES `assembling`(`id`) ON UPDATE no action ON DELETE no action
-);
---> statement-breakpoint
 CREATE TABLE `img` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`name` text,
@@ -37,11 +28,21 @@ CREATE TABLE `img` (
 	FOREIGN KEY (`dir_id`) REFERENCES `category`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
+CREATE TABLE `img_assembling` (
+	`img_id` integer,
+	`assembling_id` integer,
+	`transforms` text,
+	PRIMARY KEY(`assembling_id`, `img_id`),
+	FOREIGN KEY (`img_id`) REFERENCES `img`(`id`) ON UPDATE no action ON DELETE no action,
+	FOREIGN KEY (`assembling_id`) REFERENCES `assembling`(`id`) ON UPDATE no action ON DELETE no action
+);
+--> statement-breakpoint
 CREATE TABLE `matching-img` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-	`source_img_id` integer,
-	`target_img_id` integer,
+	`source_img_id` integer NOT NULL,
+	`target_img_id` integer NOT NULL,
 	`score` real,
+	`rank` integer,
 	`matching_id` integer,
 	FOREIGN KEY (`source_img_id`) REFERENCES `img`(`id`) ON UPDATE no action ON DELETE no action,
 	FOREIGN KEY (`target_img_id`) REFERENCES `img`(`id`) ON UPDATE no action ON DELETE no action,

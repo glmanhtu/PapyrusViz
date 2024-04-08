@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "sqlite",
-  "id": "ea63b2f1-cb49-45f4-8b82-7f973ad332c7",
+  "id": "8926d2df-b8a6-46e0-8914-2c12f1e71599",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "assembling": {
@@ -129,71 +129,6 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "img_assembling": {
-      "name": "img_assembling",
-      "columns": {
-        "img_id": {
-          "name": "img_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "assembling_id": {
-          "name": "assembling_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "transforms": {
-          "name": "transforms",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "img_assembling_img_id_img_id_fk": {
-          "name": "img_assembling_img_id_img_id_fk",
-          "tableFrom": "img_assembling",
-          "tableTo": "img",
-          "columnsFrom": [
-            "img_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "img_assembling_assembling_id_assembling_id_fk": {
-          "name": "img_assembling_assembling_id_assembling_id_fk",
-          "tableFrom": "img_assembling",
-          "tableTo": "assembling",
-          "columnsFrom": [
-            "assembling_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {
-        "img_assembling_img_id_assembling_id_pk": {
-          "columns": [
-            "assembling_id",
-            "img_id"
-          ],
-          "name": "img_assembling_img_id_assembling_id_pk"
-        }
-      },
-      "uniqueConstraints": {}
-    },
     "img": {
       "name": "img",
       "columns": {
@@ -288,6 +223,71 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
+    "img_assembling": {
+      "name": "img_assembling",
+      "columns": {
+        "img_id": {
+          "name": "img_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "assembling_id": {
+          "name": "assembling_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "transforms": {
+          "name": "transforms",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "img_assembling_img_id_img_id_fk": {
+          "name": "img_assembling_img_id_img_id_fk",
+          "tableFrom": "img_assembling",
+          "tableTo": "img",
+          "columnsFrom": [
+            "img_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "img_assembling_assembling_id_assembling_id_fk": {
+          "name": "img_assembling_assembling_id_assembling_id_fk",
+          "tableFrom": "img_assembling",
+          "tableTo": "assembling",
+          "columnsFrom": [
+            "assembling_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "img_assembling_img_id_assembling_id_pk": {
+          "columns": [
+            "assembling_id",
+            "img_id"
+          ],
+          "name": "img_assembling_img_id_assembling_id_pk"
+        }
+      },
+      "uniqueConstraints": {}
+    },
     "matching-img": {
       "name": "matching-img",
       "columns": {
@@ -302,19 +302,26 @@
           "name": "source_img_id",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "target_img_id": {
           "name": "target_img_id",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "score": {
           "name": "score",
           "type": "real",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "rank": {
+          "name": "rank",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false

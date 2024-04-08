@@ -23,16 +23,11 @@ import {
 	MatchingImgRequest,
 	MatchingRequest,
 	MatchingResponse,
-	MatchingType,
 	Progress,
 	ThumbnailResponse,
 } from 'shared-lib';
 import { dbService } from '../services/database.service';
-import * as csv from '@fast-csv/parse';
-import { createReadStream } from 'fs';
 import { matchingImgTbl, matchingTbl } from '../entities/matching';
-import { imageService } from '../services/image.service';
-import { Message } from 'shared-lib/.dist/models/common';
 import { projectService } from '../services/project.service';
 import { takeUniqueOrThrow } from '../utils/data.utils';
 import { and, eq } from 'drizzle-orm';
@@ -41,6 +36,7 @@ import { Config } from '../entities/user-config-tbl';
 import { categoryTbl } from '../entities/category';
 import { imgTbl } from '../entities/img';
 import path from 'node:path';
+import { matchingService } from '../services/matching.service';
 
 
 export class MatchingHandler extends BaseHandler {
@@ -94,6 +90,7 @@ export class MatchingHandler extends BaseHandler {
 				imgId: x.img.id, path: "atom://" + path.join(request.projectPath, x.img.thumbnail),
 				imgName: x.img.name,
 				score: x['matching-img'].score,
+				rank: x['matching-img'].rank,
 				orgImgWidth: x.img.width,
 				orgImgHeight: x.img.height
 			}))
@@ -120,58 +117,12 @@ export class MatchingHandler extends BaseHandler {
 	}
 
 	private async setActivatedMatching(payload: MatchingRequest): Promise<void> {
-		return configService.updateConfig(payload.projectPath, Config.ACTIVATED_MATCHING_ID, payload.matchingId.toString());
+		return matchingService.setActivatedMatching(payload.projectPath, payload.matchingId);
 	}
 
 	private async createMatching(payload: MatchingDto, reply: (message: IMessage<string | Progress>) => Promise<void>): Promise<void> {
-		const database = dbService.getConnection(payload.projectPath);
-		const project = await projectService.getProjectByPath(payload.projectPath);
-		const matching = await database.insert(matchingTbl).values({
-			name: payload.matchingName,
-			matrixPath: payload.projectPath,
-			matchingMethod: payload.matchingMethod,
-			matchingType: payload.matchingType,
-			projectId: project.id
-		}).returning({ insertedId: matchingTbl.id }).then(takeUniqueOrThrow);
-
-		const stream = createReadStream(payload.matchingFile)
-			.pipe(csv.parse({ headers: true }));
-
-		const idMap = new Map<string, number>();
-
-		const findImgId = async (imName: string) => {
-			if (idMap.has(imName)) {
-				return new Promise<number>((resolve, _) => resolve(idMap.get(imName)));
-			}
-			const img = await imageService.findBestMatch(payload.projectPath, imName);
-			idMap.set(imName, img.id);
-			return img.id;
-		};
-
-		let count = 0;
-		for await (const  row of stream) {
-			const srcImgId = await findImgId(row['']);
-			const values = [];
-			for (const [targetIm, distance] of Object.entries(row)) {
-				if (targetIm === '') {
-					continue;
-				}
-				let score = parseFloat(distance as string);
-				if (payload.matchingType === MatchingType.SIMILARITY) {
-					score = 1 - score;
-				}
-				const targetImgId = await findImgId(targetIm);
-				values.push({
-					sourceImgId: srcImgId,
-					targetImgId: targetImgId,
-					score: score,
-					matchingId: matching.insertedId
-				});
-			}
-			await database.insert(matchingImgTbl).values(values);
-			count += 1;
-			await reply(Message.success({ percentage: 100 * count / values.length, title: '', description: ''}))
-		}
-		await this.setActivatedMatching({projectPath: payload.projectPath, matchingId: matching.insertedId});
+		const matching = await matchingService.createMatching(payload)
+		await matchingService.processSimilarity(payload.projectPath, matching, reply)
+		await this.setActivatedMatching({projectPath: payload.projectPath, matchingId: matching.id});
 	}
 }

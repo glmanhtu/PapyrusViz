@@ -22,6 +22,8 @@ import * as winston from 'winston';
 import { GlobalConfig } from 'shared-lib';
 
 declare const global: GlobalConfig;
+const { timestamp, prettyPrint, colorize, errors } = winston.format;
+
 
 export class Logger {
 	private static singleton: Logger;
@@ -93,7 +95,10 @@ export class Logger {
 					stderrLevels: ['error', 'warn'],
 					format: winston.format.combine(
 						winston.format.timestamp(),
-						this.consoleFormat
+						errors({ stack: true }), // <-- use errors format
+						colorize(),
+						timestamp(),
+						prettyPrint()
 					),
 				})
 			);
@@ -127,21 +132,6 @@ export class Logger {
 	private fileFormat = winston.format.printf(
 		(data: winston.Logform.TransformableInfo) => {
 			return JSON.stringify(this.prepareLogData(data));
-		}
-	);
-
-	/**
-	 * Custom winston console format
-	 * Write logs with given format :
-	 * `${timestamp} ${level} : ${info.message} : JSON.stringify({ ...meta }) `
-	 */
-	private consoleFormat = winston.format.printf(
-		(data: winston.Logform.TransformableInfo) => {
-			const preparedData = this.prepareLogData(data);
-			return (
-				`${preparedData.timestamp} ${preparedData.level} : ` +
-				`${preparedData.message} : ${JSON.stringify(preparedData.meta)}`
-			);
 		}
 	);
 

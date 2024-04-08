@@ -118,6 +118,17 @@ export class ProjectHandler extends BaseHandler {
 
 			}))
 		}));
+
+		// const matching = await matchingService.createMatching({
+		// 	projectPath: projectPath,
+		// 	matchingName: data.matching.matchingName,
+		// 	matchingType: data.matching.matrixType,
+		// 	matchingMethod: data.matching.matchingMethod,
+		// 	matchingFile: data.matching.matchingFile
+		// })
+		// await matchingService.processSimilarity(projectPath, matching, reply)
+		// await this.setActivatedMatching({projectPath: payload.projectPath, matchingId: matching.id});
+
 	}
 
 	private async loadProject(projectPath: string): Promise<ProjectDTO> {

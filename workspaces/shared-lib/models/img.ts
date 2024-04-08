@@ -28,6 +28,7 @@ export type Thumbnail = {
 	path: string,
 	imgName: string,
 	score?: number,
+	rank?: number,
 	orgImgWidth: number,
 	orgImgHeight: number
 }

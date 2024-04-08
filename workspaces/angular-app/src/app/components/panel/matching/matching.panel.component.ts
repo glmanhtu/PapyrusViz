@@ -77,6 +77,7 @@ export class MatchingPanelComponent implements OnInit {
       this.activatedMatching = null;
     })
 
+    this.thumbnails.length = 0;
   }
 
   findMatching(img: ImgDto) {
