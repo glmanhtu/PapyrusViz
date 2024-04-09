@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { AfterViewInit, Component, Input, OnInit } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CategoryDTO, ProjectDTO, Thumbnail, ThumbnailRequest, ThumbnailResponse } from 'shared-lib';
 import { NgbDropdown, NgbNav } from '@ng-bootstrap/ng-bootstrap';
 import { ElectronIpcService } from '../../../services/electron-ipc.service';
@@ -34,6 +34,9 @@ export class ImagesPanelComponent implements OnInit, AfterViewInit {
 
   @Input()
   categories: CategoryDTO[] = [];
+
+  @Output()
+  openImage = new EventEmitter<Thumbnail>();
 
   category = new FormControl(1);
   filter = new FormControl('');

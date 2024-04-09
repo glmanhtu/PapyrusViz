@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import {
   CategoryDTO,
   ImgDto,
@@ -42,6 +42,9 @@ export class MatchingPanelComponent implements OnInit {
 
   @Input()
   similarityCreationComponent: SimilarityCreationComponent;
+
+  @Output()
+  openImage = new EventEmitter<Thumbnail>();
 
   @Input()
   categories: CategoryDTO[] = [];

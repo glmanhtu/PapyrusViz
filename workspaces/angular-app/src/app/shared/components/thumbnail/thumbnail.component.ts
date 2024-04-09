@@ -15,9 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Component, Inject, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Thumbnail } from 'shared-lib';
-import { BroadcastService, IMG_BROADCAST_SERVICE_TOKEN } from '../../../services/broadcast.service';
 
 @Component({
   selector: 'app-thumbnail',
@@ -27,15 +26,12 @@ import { BroadcastService, IMG_BROADCAST_SERVICE_TOKEN } from '../../../services
 export class ThumbnailComponent implements OnInit {
 
   @Input() thumbnail: Thumbnail;
-
-  constructor(
-    @Inject(IMG_BROADCAST_SERVICE_TOKEN) private imgBroadcastService: BroadcastService<Thumbnail>,
-  ) {}
+  @Output() openImage = new EventEmitter<Thumbnail>();
 
   ngOnInit(): void {
   }
 
   addImage() {
-    this.imgBroadcastService.publish(this.thumbnail)
+    this.openImage.emit(this.thumbnail)
   }
 }

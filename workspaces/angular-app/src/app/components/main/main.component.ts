@@ -18,7 +18,6 @@
 import { Component, Inject, Input, OnInit, QueryList, ViewChildren } from '@angular/core';
 import {
   BroadcastService,
-  IMG_BROADCAST_SERVICE_TOKEN,
   PROJECT_BROADCAST_SERVICE_TOKEN,
 } from '../../services/broadcast.service';
 import {
@@ -50,7 +49,6 @@ export class MainComponent implements OnInit {
 
   constructor(
     @Inject(PROJECT_BROADCAST_SERVICE_TOKEN) private projectBroadcastService: BroadcastService<ProjectDTO>,
-    @Inject(IMG_BROADCAST_SERVICE_TOKEN) private imgBroadcastService: BroadcastService<Thumbnail>,
     private eIpc: ElectronIpcService) {
   }
 
@@ -66,10 +64,10 @@ export class MainComponent implements OnInit {
     this.projectBroadcastService.observe().subscribe((projectDto) => {
       this.initProject(projectDto);
     });
+  }
 
-    this.imgBroadcastService.observe().subscribe((thumbnail) => {
-      this.getActivatedBoard().addImage(thumbnail)
-    })
+  addImage(thumbnail: Thumbnail) {
+    this.getActivatedBoard().addImage(thumbnail)
   }
 
   initProject(projectDto: ProjectDTO) {

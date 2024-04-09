@@ -22,13 +22,15 @@
 				<li [ngbNavItem]="1" class="nav-item">
 					<a ngbNavLink>Images</a>
 					<ng-template ngbNavContent>
-						<app-images-panel #thumbnails [projectDto]="projectDto" [categories]="categories"></app-images-panel>
+						<app-images-panel #thumbnails (openImage)="openImage($event)" [projectDto]="projectDto"
+															[categories]="categories"></app-images-panel>
 					</ng-template>
 				</li>
 				<li [ngbNavItem]="2" class="nav-item">
 					<a ngbNavLink>Similarity</a>
 					<ng-template ngbNavContent>
-						<app-matching-panel #matching [projectDto]="projectDto" [categories]="categories" [similarityCreationComponent]="similarityCreationComponent"></app-matching-panel>
+						<app-matching-panel #matching (openImage)="openImage($event)" [projectDto]="projectDto"
+																[categories]="categories" [similarityCreationComponent]="similarityCreationComponent"></app-matching-panel>
 					</ng-template>
 				</li>
 			</ul>

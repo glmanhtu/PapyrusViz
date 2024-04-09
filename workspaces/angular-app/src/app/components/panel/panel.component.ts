@@ -17,12 +17,13 @@
 
 import { Component, ElementRef, Inject, Input, OnInit, ViewChild } from '@angular/core';
 import { BroadcastService, PROJECT_BROADCAST_SERVICE_TOKEN } from '../../services/broadcast.service';
-import { CategoryDTO, ImgDto, ProjectDTO } from 'shared-lib';
+import { CategoryDTO, ImgDto, ProjectDTO, Thumbnail } from 'shared-lib';
 import { NgbDropdown, NgbNav } from '@ng-bootstrap/ng-bootstrap';
 import { ElectronIpcService } from '../../services/electron-ipc.service';
 import { SimilarityCreationComponent } from '../similarity/creation/similarity.creation.component';
 import { ImagesPanelComponent } from './images/images.panel.component';
 import { MatchingPanelComponent } from './matching/matching.panel.component';
+import { MainComponent } from '../main/main.component';
 
 @Component({
   selector: 'app-panel',
@@ -41,6 +42,10 @@ export class PanelComponent implements OnInit {
 
   @Input()
   similarityCreationComponent: SimilarityCreationComponent;
+
+  @Input()
+  mainComponent: MainComponent;
+
   scrollTop = new Map<number, number>;
 
   active = 1;
@@ -59,6 +64,10 @@ export class PanelComponent implements OnInit {
         this.categories = categories;
       });
     });
+  }
+
+  openImage(thumbnail: Thumbnail) {
+    this.mainComponent.addImage(thumbnail)
   }
 
   onScroll() {
