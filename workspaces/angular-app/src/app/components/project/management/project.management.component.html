@@ -15,7 +15,10 @@
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
+<app-progress [title]="'Migrate project'" #progress ></app-progress>
+
 <ng-template #content let-modal>
+<!--	<app-progress [title]="'Project migration'" #progress (onComplete)="openProject($event)"></app-progress>-->
 	<div>
 		<div class="modal-header text-center">
 			<h4 class="modal-title w-100">Papyrus Projects</h4>

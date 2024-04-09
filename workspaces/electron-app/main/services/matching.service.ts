@@ -17,7 +17,7 @@
 
 import { dbService } from './database.service';
 import { takeUniqueOrThrow } from '../utils/data.utils';
-import { IMessage, MatchingDto, MatchingType, Message, Progress } from 'shared-lib';
+import { MatchingDto, MatchingType } from 'shared-lib';
 import { projectService } from './project.service';
 import { Matching, matchingImgTbl, matchingTbl } from '../entities/matching';
 import { createReadStream } from 'fs';
@@ -43,7 +43,7 @@ class MatchingService {
 				eq(matchingTbl.id, matching.insertedId)
 		)});
 	}
-	public async processSimilarity(projectPath: string, matching: Matching, reply: (message: IMessage<string | Progress>) => Promise<void>): Promise<void> {
+	public async processSimilarity(projectPath: string, matching: Matching, reply: (current: number, total: number) => Promise<void>): Promise<void> {
 		const stream = createReadStream(matching.matrixPath)
 			.pipe(csv.parse({ headers: true }));
 
@@ -90,7 +90,7 @@ class MatchingService {
 			}
 			await database.insert(matchingImgTbl).values(sortedValues);
 			count += 1;
-			await reply(Message.success({ percentage: 100 * count / values.length, title: '', description: ''}))
+			await reply( count, values.length)
 		}
 	}
 

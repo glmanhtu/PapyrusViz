@@ -15,8 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { BaseHandler } from "./base.handler";
-import { GlobalConfig, IMessage, Message, Progress, ProjectDTO } from 'shared-lib';
+import { BaseHandler } from './base.handler';
+import { GlobalConfig, IMessage, MatchingMethod, MatchingType, Message, Progress, ProjectDTO } from 'shared-lib';
 import { promises as fs } from 'fs';
 
 import { projectTbl } from '../entities/project';
@@ -25,6 +25,7 @@ import { categoryTbl } from '../entities/category';
 import { eq } from 'drizzle-orm';
 import { imgTbl } from '../entities/img';
 import * as dataUtils from '../utils/data.utils';
+import { takeUniqueOrThrow } from '../utils/data.utils';
 import * as pathUtils from '../utils/path.utils';
 import { ProjectInfo } from '../models/app-data';
 import { dbService } from '../services/database.service';
@@ -33,8 +34,8 @@ import { assemblingTbl } from '../entities/assembling';
 import { imgAssemblingTbl } from '../entities/img-assembling';
 import { projectService } from '../services/project.service';
 import { assemblingService } from '../services/assembling.service';
-import { takeUniqueOrThrow } from '../utils/data.utils';
 import { imageService } from '../services/image.service';
+import { matchingService } from '../services/matching.service';
 
 
 declare const global: GlobalConfig;
@@ -43,6 +44,7 @@ export class ProjectHandler extends BaseHandler {
 	constructor() {
 		super();
 		this.addContinuousRoute('project::create-project', this.creteProject.bind(this));
+		this.addContinuousRoute('project::migrate-project', this.migrateOldProject.bind(this));
 		this.addRoute('project:get-projects', this.getProjects.bind(this));
 		this.addRoute('project:load-project', this.loadProject.bind(this))
 	}
@@ -52,8 +54,15 @@ export class ProjectHandler extends BaseHandler {
 		return projects.reverse();
 	}
 
-	private async migrateOldProject(projectPath: string): Promise<void> {
+	private async migrateOldProject(projectPath: string, reply: (message: IMessage<string | Progress>) => Promise<void>): Promise<void> {
 		const projectFile = path.join(projectPath, 'project.json');
+		if (!await pathUtils.isFile(projectFile)) {
+			throw new Error('Project does not exists!');
+		}
+		await reply(Message.success({
+			percentage: 1, title: 'Step 1/4 - Migrate project...',
+			description: `Converting project files...`
+		}));
 		const data: OldProjectModel = JSON.parse(await fs.readFile(projectFile, 'utf-8'));
 
 		const databaseFile = pathUtils.projectFile(projectPath)
@@ -80,7 +89,7 @@ export class ProjectHandler extends BaseHandler {
 			categoryMap.set(rootDir.path, category.insertedId);
 		}));
 
-		await Promise.all(Object.entries(data.images).map(async ([key, oldImg]) => {
+		await Promise.all(Object.entries(data.images).map(async ([key, oldImg], idx) => {
 			await Promise.all([...categoryMap].map(async ([rootDir, rootDirID]) => {
 				if (oldImg.path.includes(rootDir) && rootDir !== '') {
 					await database.insert(imgTbl).values({
@@ -95,9 +104,14 @@ export class ProjectHandler extends BaseHandler {
 					});
 				}
 			}))
+			await reply(Message.success({
+				percentage: (idx + 1) * 50 / data.images.size, title: 'Step 2/4 - Migrate project...',
+				description: `Updating image files...`
+			}));
+
 		}));
 
-		await Promise.all(Object.entries(data.assembled).map(async ([_, assembled]) => {
+		await Promise.all(Object.entries(data.assembled).map(async ([_, assembled], idx) => {
 			const assembling = await database.insert(assemblingTbl).values({
 				name: assembled.name,
 				group: assembled.parent,
@@ -116,28 +130,41 @@ export class ProjectHandler extends BaseHandler {
 					transforms: imgTransform
 				})
 
-			}))
+			}));
+
+			await reply(Message.success({
+				percentage: 50 + (idx + 1) * 30 / data.assembled.size, title: 'Step 3/4 - Migrate project...',
+				description: `Updating assembled files...`
+			}));
 		}));
 
-		// const matching = await matchingService.createMatching({
-		// 	projectPath: projectPath,
-		// 	matchingName: data.matching.matchingName,
-		// 	matchingType: data.matching.matrixType,
-		// 	matchingMethod: data.matching.matchingMethod,
-		// 	matchingFile: data.matching.matchingFile
-		// })
-		// await matchingService.processSimilarity(projectPath, matching, reply)
-		// await this.setActivatedMatching({projectPath: payload.projectPath, matchingId: matching.id});
+		if (data.matching) {
+			const matching = await matchingService.createMatching({
+				projectPath: projectPath,
+				matchingName: data.matching.matchingName,
+				matchingType: data.matching.matrixType as MatchingType,
+				matchingMethod: data.matching.matchingMethod === 'file' ? MatchingMethod.NAME : MatchingMethod.PATH,
+				matchingFile: data.matching.matchingFile
+			})
+			await matchingService.processSimilarity(projectPath, matching, async (current, total) => {
+				await reply(Message.success({
+					percentage: 80 + (current) * 20 / total, title: 'Step 3/4 - Migrate project...',
+					description: `Updating assembled files...`
+				}));
 
+			})
+			await matchingService.setActivatedMatching(projectPath, matching.id);
+		} else {
+			await reply(Message.success({
+				percentage: 100, title: 'Step 4/4 - Migrate project...',
+				description: `Update similarity matrix...`
+			}));
+		}
 	}
 
 	private async loadProject(projectPath: string): Promise<ProjectDTO> {
 		if (!await projectService.projectExists(projectPath)) {
-			if (await pathUtils.isFile(path.join(projectPath, 'project.json'))) {
-				await this.migrateOldProject(projectPath);
-			} else {
-				throw new Error('Project does not exists!');
-			}
+			throw new Error('Project does not exists!');
 		}
 		const projectFile = pathUtils.projectFile(projectPath);
 		const database = dbService.createConnection(projectFile);

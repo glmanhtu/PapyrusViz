@@ -1,0 +1,47 @@
+<!--
+  ~ Copyright (C) 2024  Manh Tu VU
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<ng-template #content let-modal>
+	<div class="container">
+
+		<div class="modal-header text-center">
+			<h4 class="modal-title w-100">{{title}}</h4>
+		</div>
+		<div class="modal-body">
+			<div class="row mb-3">
+				<h5 id="progressTitle">{{progress.title}}</h5>
+			</div>
+			<div class="row mb-3">
+				<p id="progressDesc">{{progress.description}}</p>
+			</div>
+			<div class="progress row mb-5 ms-1 me-1" style="height: 20px;">
+				<div class="progress-bar" id="progressBar" role="progressbar" [ngStyle]="{'width.%': progress.percentage}"
+						 aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="progress.percentage"></div>
+			</div>
+			<div class="row">
+					<pre>
+						<code id="project-error" *ngIf="errorMessage !== ''">
+							{{errorMessage}}
+						</code>
+					</pre>
+			</div>
+		</div>
+		<div class="modal-footer">
+			<button type="submit" class="btn btn-success btn-sm" (click)="finish()" *ngIf="showComplete">Finish</button>
+		</div>
+	</div>
+</ng-template>

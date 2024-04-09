@@ -49,7 +49,7 @@ export class MatchingPanelComponent implements OnInit {
 
   matchings: MatchingResponse[] = [];
   thumbnails: Thumbnail[] = [];
-  activatedMatching: MatchingResponse | null;
+  activatedMatching: MatchingResponse | undefined;
 
   imgDto: ImgDto;
 
@@ -73,9 +73,7 @@ export class MatchingPanelComponent implements OnInit {
 
     this.eIpc.send<string, MatchingResponse>('matching:get-activated-matching', this.projectDto!.path).then((matching) => {
       this.activatedMatching = matching;
-    }).catch((_) => {
-      this.activatedMatching = null;
-    })
+    });
 
     this.thumbnails.length = 0;
   }
@@ -114,11 +112,11 @@ export class MatchingPanelComponent implements OnInit {
     }).then(() => {
       this.matchings = this.matchings.filter(x => x.id !== matching.id);
       if (this.matchings.length > 0) {
-        if (this.activatedMatching === null || this.activatedMatching.id === matching.id) {
+        if (this.activatedMatching === undefined || this.activatedMatching.id === matching.id) {
           this.setActivatedMatching(this.matchings[0]);
         }
       } else {
-        this.activatedMatching = null;
+        this.activatedMatching = undefined;
       }
       this.thumbnails = [];
     })

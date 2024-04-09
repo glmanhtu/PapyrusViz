@@ -35,14 +35,25 @@ export async function writeAppData(appData: AppData): Promise<void> {
 	await fs.writeFile(dataFile, JSON.stringify(appData));
 }
 
+class UniqueConstraintError extends Error {
+	constructor(message: string) {
+		super(message);
+		this.name = "UniqueConstraintError";
+		if (Error.captureStackTrace) {
+			Error.captureStackTrace(this, UniqueConstraintError);
+		}
+	}
+}
+
+
 export const takeUniqueOrThrow = <T>(values: T[]): T => {
 	if (values.length !== 1)
-		throw new Error("Found non unique or inexistent value");
+		throw new UniqueConstraintError("Found non unique or inexistent value");
 	return values[0]!;
 };
 
 export const takeFirstOrThrow = <T>(values: T[]): T => {
 	if (values.length < 1)
-		throw new Error("No item found");
+		throw new UniqueConstraintError("No item found");
 	return values[0]!;
 };

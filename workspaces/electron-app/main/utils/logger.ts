@@ -22,7 +22,6 @@ import * as winston from 'winston';
 import { GlobalConfig } from 'shared-lib';
 
 declare const global: GlobalConfig;
-const { timestamp, prettyPrint, colorize, errors } = winston.format;
 
 
 export class Logger {
@@ -73,16 +72,19 @@ export class Logger {
 	private constructor() {
 		this._logger = winston.createLogger({
 			level: 'debug',
-			format: winston.format.json(),
+			format: winston.format.combine(
+				winston.format.errors({stack: true}),
+				winston.format.timestamp({format: "YYYY-MM-DD HH:mm:ss.SSS"}),
+				winston.format.printf(({timestamp, level, message, stack}) => {
+					const text = `${timestamp} ${level.toUpperCase()} ${message}`;
+					return stack ? text + '\n' + stack : text;
+				}),
+			),
 			defaultMeta: { service: 'user-service' },
 			transports: [
 				new winston.transports.File({
 					filename: this.getLogFilename(),
 					level: global.appConfig.mainLogLevel,
-					format: winston.format.combine(
-						winston.format.timestamp(),
-						this.fileFormat
-					),
 				}),
 			],
 		});
@@ -93,13 +95,6 @@ export class Logger {
 			this._logger.add(
 				new winston.transports.Console({
 					stderrLevels: ['error', 'warn'],
-					format: winston.format.combine(
-						winston.format.timestamp(),
-						errors({ stack: true }), // <-- use errors format
-						colorize(),
-						timestamp(),
-						prettyPrint()
-					),
 				})
 			);
 		}
@@ -124,28 +119,4 @@ export class Logger {
 		return path.join(os.homedir(), filename);
 	}
 
-	/**
-	 * Custom winston file format
-	 * Write JSON logs with given format :
-	 * `${timestamp} ${level} : ${info.message} : ${meta})`
-	 */
-	private fileFormat = winston.format.printf(
-		(data: winston.Logform.TransformableInfo) => {
-			return JSON.stringify(this.prepareLogData(data));
-		}
-	);
-
-	private prepareLogData = (data: winston.Logform.TransformableInfo) => {
-		const additionalData = { ...data };
-		delete additionalData.timestamp;
-		delete additionalData.level;
-		delete additionalData.message;
-		delete additionalData.service;
-		return {
-			timestamp: data.timestamp,
-			level: data.level,
-			message: data.message,
-			meta: additionalData,
-		};
-	};
 }

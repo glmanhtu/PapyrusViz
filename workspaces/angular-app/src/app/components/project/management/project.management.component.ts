@@ -21,8 +21,10 @@ import { ProjectCreationComponent } from '../creation/project.creation.component
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap/modal/modal-ref';
 import { ElectronIpcService } from '../../../services/electron-ipc.service';
 import { ProjectInfo } from '../../../../../../electron-app/main/models/app-data';
-import { ProjectDTO } from 'shared-lib';
+import { Progress, ProjectDTO } from 'shared-lib';
 import { BroadcastService, PROJECT_BROADCAST_SERVICE_TOKEN } from '../../../services/broadcast.service';
+import { ProgressComponent } from '../../../shared/components/progress/progress.component';
+import { ModalService } from '../../../services/modal.service';
 
 @Component({
   selector: 'app-project-management',
@@ -33,6 +35,7 @@ import { BroadcastService, PROJECT_BROADCAST_SERVICE_TOKEN } from '../../../serv
 export class ProjectManagementComponent implements OnInit, AfterViewInit {
   @ViewChild('content') content : ElementRef;
   @Input() projectCreation: ProjectCreationComponent;
+  @ViewChild(ProgressComponent) progressComponent: ProgressComponent;
   private modelRef: NgbModalRef | null = null;
 
   projects: ProjectInfo[] = [];
@@ -42,6 +45,7 @@ export class ProjectManagementComponent implements OnInit, AfterViewInit {
     @Inject(PROJECT_BROADCAST_SERVICE_TOKEN) private projectBroadcastService: BroadcastService<ProjectDTO>,
     private electronIpc: ElectronIpcService,
     private modalService: NgbModal,
+    private notificationService: ModalService
   ) {
     // customize default values of modals used by this component tree
     config.backdrop = 'static';
@@ -70,10 +74,33 @@ export class ProjectManagementComponent implements OnInit, AfterViewInit {
     this.projectCreation.open();
   }
 
-  openProject(projectPath: string) {
+  migrateProject(projectPath: string) {
+    this.progressComponent.onComplete.subscribe(() => {
+      this.openProject(projectPath, false);
+    })
+    this.electronIpc.sendAndListen<string, Progress>('project::migrate-project', projectPath, (message) => {
+      if (!this.progressComponent.showProgress) {
+        if (message.status === 'success') {
+          this.modelRef!.close();
+          this.progressComponent.show();
+        } else {
+          this.notificationService.info(message.payload as string)
+        }
+      }
+      if (this.progressComponent.showProgress) {
+        this.progressComponent.onMessage(message);
+      }
+    });
+  }
+
+  openProject(projectPath: string, retryWithMigrate = true) {
     this.electronIpc.send<string, ProjectDTO>('project:load-project', projectPath).then((project) => {
       this.projectBroadcastService.publish(project);
       this.modelRef!.close();
-    });
+    }).catch((err) => {
+      if (err.message === 'Project does not exists!' && retryWithMigrate) {
+        this.migrateProject(projectPath);
+      }
+    })
   }
 }

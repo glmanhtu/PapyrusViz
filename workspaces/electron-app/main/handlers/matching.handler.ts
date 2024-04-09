@@ -22,7 +22,7 @@ import {
 	MatchingDto,
 	MatchingImgRequest,
 	MatchingRequest,
-	MatchingResponse,
+	MatchingResponse, Message,
 	Progress,
 	ThumbnailResponse,
 } from 'shared-lib';
@@ -113,7 +113,7 @@ export class MatchingHandler extends BaseHandler {
 		const matchingId = await configService.getConfig(projectPath, Config.ACTIVATED_MATCHING_ID, "1")
 			.then(x => parseInt(x));
 		const database = dbService.getConnection(projectPath);
-		return database.select().from(matchingTbl).where(eq(matchingTbl.id, matchingId)).then(takeUniqueOrThrow);
+		return database.query.matchingTbl.findFirst({ where: (matchingTbl, { eq }) => (eq(matchingTbl.id, matchingId))})
 	}
 
 	private async setActivatedMatching(payload: MatchingRequest): Promise<void> {
@@ -122,7 +122,12 @@ export class MatchingHandler extends BaseHandler {
 
 	private async createMatching(payload: MatchingDto, reply: (message: IMessage<string | Progress>) => Promise<void>): Promise<void> {
 		const matching = await matchingService.createMatching(payload)
-		await matchingService.processSimilarity(payload.projectPath, matching, reply)
+		await matchingService.processSimilarity(payload.projectPath, matching, async (current, total) => {
+			await reply(Message.success({
+				percentage: 100 * current / total, title: 'Create matching...',
+				description: `Created ${current} / ${total} similarity matching...`
+			}));
+		})
 		await this.setActivatedMatching({projectPath: payload.projectPath, matchingId: matching.id});
 	}
 }

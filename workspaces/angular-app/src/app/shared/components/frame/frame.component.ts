@@ -19,7 +19,6 @@ import { Component, ElementRef, Inject, Input, ViewChild, Output, EventEmitter }
 import { DOCUMENT } from '@angular/common';
 import { ImgDto } from 'shared-lib/.dist/models/img';
 import { Transforms } from 'shared-lib';
-import { ElectronIpcService } from '../../../services/electron-ipc.service';
 
 
 @Component({
@@ -51,9 +50,7 @@ export class FrameComponent {
   isResizing = false;
   isRotating = false;
 
-  constructor(@Inject(DOCUMENT) private _document: Document,
-              private eIpc: ElectronIpcService,
-              private _el: ElementRef) {
+  constructor(@Inject(DOCUMENT) private _document: Document) {
   }
 
   isMouseSelected(event: MouseEvent): boolean {
@@ -128,8 +125,8 @@ export class FrameComponent {
 
     const targetElement = $event.target as Element;
     const rect = targetElement.getBoundingClientRect();
-    const targetXs = this.generateEvenlyDistribution(rect.left, rect.right, 100);
-    const targetYs = this.generateEvenlyDistribution(rect.top, rect.bottom, 100);
+    const targetXs = this.generateEvenlyDistribution(rect.left, rect.right, 10);
+    const targetYs = this.generateEvenlyDistribution(rect.top, rect.bottom, 10);
     const diffX = targetXs.reduce((acc, x) => acc + x - centerX, 0);
     const diffY = targetYs.reduce((acc, y) => acc + y - centerY, 0)
     const sumX = targetXs.reduce((acc, x) => acc + x - rect.left, 0);

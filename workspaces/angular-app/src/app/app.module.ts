@@ -40,6 +40,8 @@ import { FrameComponent } from './shared/components/frame/frame.component';
 import { SimilarityCreationComponent } from './components/similarity/creation/similarity.creation.component';
 import { MatchingPanelComponent } from './components/panel/matching/matching.panel.component';
 import { ImagesPanelComponent } from './components/panel/images/images.panel.component';
+import { ProgressComponent } from './shared/components/progress/progress.component';
+import { InfoModalComponent } from './shared/components/info-modal/info-modal.component';
 
 
 // AoT requires an exported function for factories
@@ -60,7 +62,9 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
 		FrameComponent,
 		SimilarityCreationComponent,
 		MatchingPanelComponent,
-		ImagesPanelComponent
+		ImagesPanelComponent,
+		ProgressComponent,
+		InfoModalComponent
   ],
 	imports: [
 		BrowserModule,

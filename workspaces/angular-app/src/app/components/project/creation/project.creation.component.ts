@@ -22,6 +22,7 @@ import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap/modal/modal-ref';
 import { ElectronIpcService } from '../../../services/electron-ipc.service';
 import { FormControl, FormGroup } from '@angular/forms';
 import { FileDialogRequest, FileDialogResponse, Progress, ProjectDTO } from 'shared-lib';
+import { ProgressComponent } from '../../../shared/components/progress/progress.component';
 
 @Component({
   selector: 'app-project-creation',
@@ -30,24 +31,18 @@ import { FileDialogRequest, FileDialogResponse, Progress, ProjectDTO } from 'sha
   providers: [NgbModalConfig, NgbModal]
 })
 export class ProjectCreationComponent implements OnInit {
+  title = 'Create Project'
   @ViewChild('content') content : ElementRef;
+  @ViewChild(ProgressComponent) progressComponent: ProgressComponent;
+
   @Input() projectManagement: ProjectManagementComponent;
   private modelRef: NgbModalRef | null = null;
 
   projectForm = new FormGroup({
-    projectName: new FormControl(''),
-    datasetPath: new FormControl(''),
-    projectPath: new FormControl(''),
+    name: new FormControl(''),
+    path: new FormControl(''),
+    dataPath: new FormControl(''),
   });
-
-  progress: Progress = {
-    title: 'Creating Project',
-    description: '',
-    percentage: 0
-  }
-  showProgress = false;
-  showComplete = false;
-  errorMessage = '';
 
   constructor(
     config: NgbModalConfig,
@@ -69,20 +64,14 @@ export class ProjectCreationComponent implements OnInit {
   onSubmit() {
     const formValue = this.projectForm.value;
     const projectRequest: ProjectDTO = {
-      name: formValue.projectName!,
-      path: formValue.projectPath!,
-      dataPath: formValue.datasetPath!
+      name: formValue.name!,
+      path: formValue.path!,
+      dataPath: formValue.dataPath!
     }
-    this.showProgress = true;
+    this.modelRef!.close();
+    this.progressComponent.show();
     this.electronIpc.sendAndListen<ProjectDTO, Progress>('project::create-project', projectRequest, (message) => {
-      if (message.status === 'success') {
-        this.progress = message.payload as Progress;
-        console.log(message)
-      } else if (message.status === 'complete') {
-        this.showComplete = true;
-      } else {
-        this.errorMessage += message.payload + '\n';
-      }
+      this.progressComponent.onMessage(message);
     });
   }
 

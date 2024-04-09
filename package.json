@@ -113,7 +113,9 @@
 				{
 					"name": "@timfish/forge-externals-plugin",
 					"config": {
-						"externals": ["sharp"],
+						"externals": [
+							"sharp"
+						],
 						"includeDeps": true
 					}
 				}
