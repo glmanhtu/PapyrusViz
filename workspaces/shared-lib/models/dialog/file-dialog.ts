@@ -26,3 +26,8 @@ export type FileDialogResponse = {
 	canceled: boolean,
 	filePaths: string[]
 }
+
+export type FileSaveResponse = {
+	canceled: boolean,
+	filePath?: string
+}

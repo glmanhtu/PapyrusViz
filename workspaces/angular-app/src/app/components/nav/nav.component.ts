@@ -15,9 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, Input, OnInit } from '@angular/core';
 import { BroadcastService, PROJECT_BROADCAST_SERVICE_TOKEN } from '../../services/broadcast.service';
-import { ProjectDTO } from 'shared-lib';
+import {
+  AssemblingExportRequest,
+  FileSaveResponse,
+  Progress,
+  ProjectDTO,
+} from 'shared-lib';
+import { MainComponent } from '../main/main.component';
+import { ElectronIpcService } from '../../services/electron-ipc.service';
+import { ModalService } from '../../services/modal.service';
 
 @Component({
   selector: 'app-nav',
@@ -28,9 +36,13 @@ export class NavComponent implements OnInit {
 
   projectDto: ProjectDTO;
 
+  @Input()
+  mainComponent: MainComponent;
+
   constructor(
     @Inject(PROJECT_BROADCAST_SERVICE_TOKEN) private projectBroadcastService: BroadcastService<ProjectDTO>,
-  ) {
+    private modalService: ModalService,
+    private eIpc: ElectronIpcService) {
     this.projectBroadcastService.observe().subscribe((projectDto) => {
       this.projectDto = projectDto;
     });
@@ -38,6 +50,25 @@ export class NavComponent implements OnInit {
 
   ngOnInit(): void {
     console.log('NavComponent INIT');
-   }
+  }
+
+  exportImg() {
+    const currentBoard = this.mainComponent.getActivatedBoard();
+    const assembling = currentBoard.assembling;
+    const fileNameSuggestion = assembling.name + '.png';
+    this.eIpc.send<string, FileSaveResponse>('dialogs:open-file-save', fileNameSuggestion).then((res) => {
+      if (!res.canceled) {
+        const progress = this.modalService.progress('Image Export')
+        const request: AssemblingExportRequest = {
+          projectPath: this.projectDto.path,
+          assemblingId: assembling.id,
+          outputFile: res.filePath!
+        }
+        this.eIpc.sendAndListen<AssemblingExportRequest, Progress>('assembling::export-img', request, (message) => {
+          progress.onMessage(message);
+        });
+      }
+    })
+  }
 
 }

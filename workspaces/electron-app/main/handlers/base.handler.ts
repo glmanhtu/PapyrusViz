@@ -32,6 +32,9 @@ export abstract class BaseHandler {
 	}
 
 	protected addContinuousRoute(action: string, method: (payload: unknown, reply: (message: IMessage<unknown>) => void) => Promise<void>): void {
+		if (!action.includes('::')) {
+			throw new Error('Continuous Route must use :: to separate controller and action')
+		}
 		this.continuousHandlers.set(action, method);
 	}
 

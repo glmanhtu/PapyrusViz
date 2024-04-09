@@ -14,12 +14,11 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
-
 <nav class="navbar navbar-dark bg-dark flex-shrink-1 p-1" id="proj-nav" *ngIf="projectDto">
   <div class="container-fluid">
     <span class="navbar-brand mb-0 h1" id="proj-name">Project: {{projectDto.name}}</span>
     <div class="d-flex">
-      <button class="btn btn-light btn-sm me-2" onclick="exportImg()"><i class="fas fa-file-export"></i>
+      <button class="btn btn-light btn-sm me-2" (click)="exportImg()"><i class="fas fa-file-export"></i>
         Export</button>
     </div>
   </div>

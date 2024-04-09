@@ -17,13 +17,20 @@
 
 import { BaseHandler } from "./base.handler";
 import { BrowserWindow, dialog, OpenDialogOptions } from 'electron';
-import { FileDialogRequest, FileDialogResponse } from 'shared-lib';
+import { FileDialogRequest, FileDialogResponse, FileSaveResponse } from 'shared-lib';
 
 export class DialogHandler extends BaseHandler {
 	constructor(private readonly mainWin: BrowserWindow) {
 		super();
 		this.addRoute('dialogs:open-file-folder', this.openFileFolder.bind(this));
+		this.addRoute('dialogs:open-file-save', this.openSaveFile.bind(this));
 		this.mainWin = mainWin;
+	}
+
+	private async openSaveFile(fileName: string): Promise<FileSaveResponse> {
+		return dialog.showSaveDialog({
+			defaultPath: fileName
+		})
 	}
 
 	private async openFileFolder(payload: FileDialogRequest): Promise<FileDialogResponse> {

@@ -57,3 +57,11 @@ export const takeFirstOrThrow = <T>(values: T[]): T => {
 		throw new UniqueConstraintError("No item found");
 	return values[0]!;
 };
+
+export function getItemList<T>(data: T[], callback: (x: T) => number): number[] {
+	const result: number[] = [];
+	data.forEach(element => {
+		result.push(callback(element))
+	});
+	return result;
+}

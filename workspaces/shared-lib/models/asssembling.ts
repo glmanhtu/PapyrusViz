@@ -57,3 +57,8 @@ export type AssemblingImageChangeRequest = {
 	transforms: Transforms
 }
 
+export type AssemblingExportRequest = {
+	projectPath: string,
+	assemblingId: number,
+	outputFile: string
+}

@@ -17,10 +17,10 @@
 
 import { BaseHandler } from './base.handler';
 import {
-	AssemblingDTO,
+	AssemblingDTO, AssemblingExportRequest,
 	AssemblingImage,
 	AssemblingImageChangeRequest,
-	GetAssemblingRequest,
+	GetAssemblingRequest, IMessage, Progress,
 	Transforms,
 } from 'shared-lib';
 import { dbService } from '../services/database.service';
@@ -33,6 +33,11 @@ import { assemblingService } from '../services/assembling.service';
 import { takeUniqueOrThrow } from '../utils/data.utils';
 import { projectService } from '../services/project.service';
 import { imageService } from '../services/image.service';
+import sharp from 'sharp';
+import * as dataUtils from '../utils/data.utils';
+import { Message } from 'shared-lib/.dist/models/common';
+
+
 
 export class AssemblingHandler extends BaseHandler {
 	constructor() {
@@ -44,6 +49,7 @@ export class AssemblingHandler extends BaseHandler {
 		this.addRoute('assembling:create-assembling-img', this.createAssemblingImage.bind(this));
 		this.addRoute('assembling:set-activated-assembling-id', this.setActivatedAssemblingId.bind(this));
 		this.addRoute('assembling:get-images', this.getAssemblingImages.bind(this));
+		this.addContinuousRoute('assembling::export-img', this.exportImg.bind(this));
 	}
 
 	private async getAssemblings(projectPath: string): Promise<AssemblingDTO[]> {
@@ -57,6 +63,102 @@ export class AssemblingHandler extends BaseHandler {
 
 	private async setActivatedAssemblingId(request: GetAssemblingRequest): Promise<void> {
 		await assemblingService.updateActivatedAssembling(request.projectPath, request.assemblingId);
+	}
+
+	private async exportImg(payload: AssemblingExportRequest,  reply: (message: IMessage<string | Progress>) => Promise<void>) {
+		const assemblingImages = await this.getAssemblingImages({
+			projectPath: payload.projectPath,
+			assemblingId: payload.assemblingId
+		});
+
+		const images = [];
+		for (const assemblingImg of assemblingImages) {
+			const image = assemblingImg.img
+			const transforms = assemblingImg.transforms
+			const zIndex = transforms.zIndex;
+			const rotation = transforms.rotation || 0;
+			const scale = transforms.scale || 1;
+			const width = Math.round(scale * image.width);
+			const height = Math.round(scale * image.height);
+			const top = transforms.top;
+			const left = transforms.left;
+			let processedImage = await sharp(image.path.replace('atom://', ''), {
+				raw: {
+					width: image.width,
+					height: image.height,
+					channels: 4
+				},
+			})
+				.resize({ width: width, height: height })
+				.toBuffer();
+
+			const metaData1 = await sharp(processedImage).metadata();
+			const widthBeforeRotate = metaData1.width;
+			const heightBeforeRotate = metaData1.height;
+
+			processedImage = await sharp(processedImage)
+				.rotate(rotation, { background: { r: 0, g: 0, b: 0, alpha: 0 } })
+				.toBuffer();
+
+			const metaData = await sharp(processedImage).metadata();
+
+			const wChange = (metaData.width - widthBeforeRotate) / 2;
+			const hChange = (metaData.height - heightBeforeRotate) / 2;
+
+			images.push({
+				img: processedImage,
+				zIndex: zIndex,
+				top: Math.round(top - hChange),
+				left: Math.round(left - wChange),
+				width: metaData.width,
+				height: metaData.height
+			});
+
+			await reply(Message.success({
+				percentage: 80 * images.length / assemblingImages.length,
+				title: 'Processing image fragments...',
+				description: `Processed ${images.length} / ${assemblingImages.length} fragments`
+			}))
+		}
+
+		const minX = Math.min(...dataUtils.getItemList(images, (x) => x.left));
+		const maxX = Math.max(...dataUtils.getItemList(images, (x) => x.left + x.width - minX));
+
+		const minY = Math.min(...dataUtils.getItemList(images, (x) => x.top));
+		const maxY = Math.max(...dataUtils.getItemList(images, (x) => x.top + x.height - minY));
+
+		const fragments = images.sort((a, b) => a.zIndex - b.zIndex);
+		const composites = [];
+		for (let i = 0; i < fragments.length; i++) {
+			composites.push({
+				input: fragments[i].img,
+				top: fragments[i].top - minY,
+				left: fragments[i].left - minX
+			});
+		}
+
+		await reply(Message.success({
+			percentage: 90,
+			title: 'Generating image...',
+			description: `Combining final output...`
+		}))
+
+		await sharp({
+			create: {
+				width: maxX,
+				height: maxY,
+				channels: 4,
+				background: { r: 255, g: 255, b: 255, alpha: 1 }
+			}})
+			.composite(composites)
+			.toFile(payload.outputFile);
+
+		await reply(Message.success({
+			percentage: 100,
+			title: 'Completed!',
+			description: `Final output image is generated!`
+		}))
+
 	}
 
 	private async createAssembling(projectPath: string): Promise<AssemblingDTO> {
