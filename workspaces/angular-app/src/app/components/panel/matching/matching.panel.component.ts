@@ -28,6 +28,7 @@ import { NgbDropdown, NgbNav } from '@ng-bootstrap/ng-bootstrap';
 import { ElectronIpcService } from '../../../services/electron-ipc.service';
 import { SimilarityCreationComponent } from '../../similarity/creation/similarity.creation.component';
 import { FormControl } from '@angular/forms';
+import { ModalService } from '../../../services/modal.service';
 
 @Component({
   selector: 'app-matching-panel',
@@ -63,6 +64,7 @@ export class MatchingPanelComponent implements OnInit {
 
   constructor(
     private eIpc: ElectronIpcService,
+    private modalService: ModalService
   ) {}
 
   ngOnInit(): void {
@@ -87,11 +89,11 @@ export class MatchingPanelComponent implements OnInit {
   }
 
   createMatching() {
-    this.similarityCreationComponent.open().then((result) => {
-      if (result) {
+    this.modalService.similarityCreation(this.projectDto).result.then((x) => {
+      if (x) {
         this.initMatchings();
       }
-    });
+    })
   }
 
   loadData() {

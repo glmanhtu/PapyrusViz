@@ -4,6 +4,8 @@ import { InfoModalComponent } from '../shared/components/info-modal/info-modal.c
 import { ProjectManagementComponent } from '../components/project/management/project.management.component';
 import { ProjectCreationComponent } from '../components/project/creation/project.creation.component';
 import { ProgressComponent } from '../shared/components/progress/progress.component';
+import { SimilarityCreationComponent } from '../components/similarity/creation/similarity.creation.component';
+import { ProjectDTO } from 'shared-lib';
 
 @Injectable({
 	providedIn: 'root'
@@ -29,6 +31,16 @@ export class ModalService {
 			size: 'lg', centered: true, backdrop: 'static', keyboard: false
 		});
 		modalRef.componentInstance.modalRef = modalRef;
+	}
+
+
+	similarityCreation(projectDto: ProjectDTO) {
+		const modalRef = this.modalService.open(SimilarityCreationComponent, {
+			size: 'lg', centered: true, backdrop: 'static', keyboard: false
+		});
+		modalRef.componentInstance.projectDto = projectDto;
+		modalRef.componentInstance.modalRef = modalRef;
+		return modalRef;
 	}
 
 	progress(title: string) {

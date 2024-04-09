@@ -15,8 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap/modal/modal-ref';
 import { ElectronIpcService } from '../../../services/electron-ipc.service';
 import { FormControl, FormGroup } from '@angular/forms';
@@ -28,25 +27,19 @@ import {
   MatchingType, Progress,
   ProjectDTO,
 } from 'shared-lib';
-import { BroadcastService, PROJECT_BROADCAST_SERVICE_TOKEN } from '../../../services/broadcast.service';
+import { ProgressComponent } from '../../../shared/components/progress/progress.component';
 
 @Component({
   selector: 'app-similarity-creation',
   templateUrl: './similarity.creation.component.html',
   styleUrls: ['./similarity.creation.component.scss'],
-  providers: [NgbModal]
 })
 export class SimilarityCreationComponent implements OnInit {
   @ViewChild('content') content : ElementRef;
-  private modelRef: NgbModalRef | null = null;
+  private modalRef: NgbModalRef | null = null;
   private projectDto: ProjectDTO;
-  showProgress = false;
-  isFinished = false;
-  progress: Progress = {
-    title: 'Creating Project',
-    description: '',
-    percentage: 0
-  }
+
+  @ViewChild(ProgressComponent) progressComponent: ProgressComponent;
 
   matchingForm = new FormGroup({
     matchingName: new FormControl(''),
@@ -56,27 +49,16 @@ export class SimilarityCreationComponent implements OnInit {
   });
 
   constructor(
-    private modalService: NgbModal,
-    @Inject(PROJECT_BROADCAST_SERVICE_TOKEN) private projectBroadcastService: BroadcastService<ProjectDTO>,
     private electronIpc: ElectronIpcService,
   ) {
-    projectBroadcastService.observe().subscribe((project) => {
-      this.projectDto = project;
-    })
   }
 
   ngOnInit(): void {
   }
 
-  open(): Promise<unknown> {
-    this.modelRef = this.modalService.open(this.content, { size: 'lg', centered: true });
-    return this.modelRef.result;
-  }
-
   onSubmit() {
     const formValue = this.matchingForm.value;
 
-    this.showProgress = true;
     const request = {
       projectPath: this.projectDto.path,
       matchingName: formValue.matchingName!,
@@ -85,28 +67,17 @@ export class SimilarityCreationComponent implements OnInit {
       matchingType: formValue.matchingType!
     }
     this.electronIpc.sendAndListen<MatchingDto, Progress>('matching::create-matching', request, (message) => {
-      if (message.status === 'success') {
-        this.progress = message.payload as Progress;
-      } else if (message.status === 'complete') {
-        this.isFinished = true;
-      } else {
-        console.log(message);
-      }
+      this.progressComponent.show();
+      this.progressComponent.onMessage(message);
     });
   }
 
-  reset() {
-    this.isFinished = false;
-    this.showProgress = false;
-  }
-
   finished() {
-    this.modelRef!.close(true);
-    this.reset();
+    this.modalRef!.close(true);
   }
 
   cancel() {
-    this.modelRef!.close(false);
+    this.modalRef!.close(false);
   }
 
   folderSelection(event: MouseEvent): void {
