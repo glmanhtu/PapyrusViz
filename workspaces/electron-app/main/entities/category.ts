@@ -17,6 +17,8 @@
 
 import { sqliteTable, text, integer, index } from 'drizzle-orm/sqlite-core';
 import { projectTbl } from './project';
+import { relations } from 'drizzle-orm';
+import { imgTbl } from './img';
 
 
 export const categoryTbl = sqliteTable('category', {
@@ -29,5 +31,9 @@ export const categoryTbl = sqliteTable('category', {
     pathIdx: index('dir_path_index').on(categories.path),
   })
 );
+
+export const categoryRelations = relations(categoryTbl, ({ many }) => ({
+    imgs: many(imgTbl),
+}));
 
 export type Category = typeof categoryTbl.$inferSelect

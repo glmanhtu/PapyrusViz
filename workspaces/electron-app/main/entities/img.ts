@@ -17,6 +17,7 @@
 
 import { sqliteTable, text, integer, index } from 'drizzle-orm/sqlite-core';
 import { categoryTbl } from './category';
+import { relations } from 'drizzle-orm';
 
 
 export const imgTbl = sqliteTable('img', {
@@ -35,5 +36,11 @@ export const imgTbl = sqliteTable('img', {
   };
 });
 
+export const imgRelations = relations(imgTbl, ({ one }) => ({
+  category: one(categoryTbl, {
+    fields: [imgTbl.categoryId],
+    references: [categoryTbl.id],
+  }),
+}));
 
 export type Img = typeof imgTbl.$inferSelect

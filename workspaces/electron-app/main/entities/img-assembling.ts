@@ -18,6 +18,7 @@
 import { sqliteTable, text, integer, primaryKey } from 'drizzle-orm/sqlite-core';
 import { assemblingTbl } from './assembling';
 import { imgTbl } from './img';
+import { relations } from 'drizzle-orm';
 
 
 export const imgAssemblingTbl = sqliteTable('img_assembling', {
@@ -29,5 +30,24 @@ export const imgAssemblingTbl = sqliteTable('img_assembling', {
         pk: primaryKey({columns: [table.imgId, table.assemblingId]})
     }
 })
+
+export const assemblingTblRelations = relations(assemblingTbl, ({ many }) => ({
+    imgAssemblingTbl: many(imgAssemblingTbl)
+}));
+
+export const assemblingImgRelations = relations(imgTbl, ({ many }) => ({
+    imgAssemblingTbl: many(imgAssemblingTbl)
+}));
+
+export const imgToAssemblingRelations = relations(imgAssemblingTbl, ({ one }) => ({
+    assembling: one(assemblingTbl, {
+        fields: [imgAssemblingTbl.assemblingId],
+        references: [assemblingTbl.id],
+    }),
+    img: one(imgTbl, {
+        fields: [imgAssemblingTbl.imgId],
+        references: [imgTbl.id],
+    })
+}));
 
 export type ImgAssembling = typeof imgAssemblingTbl.$inferSelect
