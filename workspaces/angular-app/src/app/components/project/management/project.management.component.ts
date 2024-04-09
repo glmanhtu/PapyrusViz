@@ -15,9 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { AfterViewInit, Component, ElementRef, Inject, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
 import { NgbModal, NgbModalConfig } from '@ng-bootstrap/ng-bootstrap';
-import { ProjectCreationComponent } from '../creation/project.creation.component';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap/modal/modal-ref';
 import { ElectronIpcService } from '../../../services/electron-ipc.service';
 import { ProjectInfo } from '../../../../../../electron-app/main/models/app-data';
@@ -32,46 +31,29 @@ import { ModalService } from '../../../services/modal.service';
   styleUrls: ['./project.management.component.scss'],
   providers: [NgbModalConfig, NgbModal]
 })
-export class ProjectManagementComponent implements OnInit, AfterViewInit {
+export class ProjectManagementComponent implements OnInit {
   @ViewChild('content') content : ElementRef;
-  @Input() projectCreation: ProjectCreationComponent;
   @ViewChild(ProgressComponent) progressComponent: ProgressComponent;
-  private modelRef: NgbModalRef | null = null;
+  private modalRef: NgbModalRef | null = null;
 
   projects: ProjectInfo[] = [];
 
   constructor(
-    config: NgbModalConfig,
     @Inject(PROJECT_BROADCAST_SERVICE_TOKEN) private projectBroadcastService: BroadcastService<ProjectDTO>,
     private electronIpc: ElectronIpcService,
-    private modalService: NgbModal,
-    private notificationService: ModalService
+    private modalService: ModalService
   ) {
-    // customize default values of modals used by this component tree
-    config.backdrop = 'static';
-    config.keyboard = false;
   }
 
   ngOnInit(): void {
-  }
-
-  ngAfterViewInit(): void {
-    this.open();
-  }
-
-  open(): void {
-    if (this.modelRef !== null) {
-      this.modelRef.close();
-    }
     this.electronIpc.send<void, ProjectInfo[]>('project:get-projects', undefined).then((projects) => {
       this.projects = projects;
     });
-    this.modelRef = this.modalService.open(this.content, { size: 'lg', centered: true });
   }
 
   createProject(): void {
-    this.modelRef!.close();
-    this.projectCreation.open();
+    this.modalRef!.close();
+    this.modalService.projectCreation();
   }
 
   migrateProject(projectPath: string) {
@@ -81,10 +63,9 @@ export class ProjectManagementComponent implements OnInit, AfterViewInit {
     this.electronIpc.sendAndListen<string, Progress>('project::migrate-project', projectPath, (message) => {
       if (!this.progressComponent.showProgress) {
         if (message.status === 'success') {
-          this.modelRef!.close();
-          this.progressComponent.show();
+          this.progressComponent.showProgress = true;
         } else {
-          this.notificationService.info(message.payload as string)
+          this.modalService.info(message.payload as string)
         }
       }
       if (this.progressComponent.showProgress) {
@@ -96,7 +77,7 @@ export class ProjectManagementComponent implements OnInit, AfterViewInit {
   openProject(projectPath: string, retryWithMigrate = true) {
     this.electronIpc.send<string, ProjectDTO>('project:load-project', projectPath).then((project) => {
       this.projectBroadcastService.publish(project);
-      this.modelRef!.close();
+      this.modalRef!.close();
     }).catch((err) => {
       if (err.message === 'Project does not exists!' && retryWithMigrate) {
         this.migrateProject(projectPath);

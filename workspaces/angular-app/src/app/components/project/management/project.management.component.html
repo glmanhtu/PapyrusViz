@@ -15,52 +15,50 @@
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<app-progress [title]="'Migrate project'" #progress ></app-progress>
+<!--<app-progress [title]="'Migrate project'" #progress ></app-progress>-->
 
-<ng-template #content let-modal>
-<!--	<app-progress [title]="'Project migration'" #progress (onComplete)="openProject($event)"></app-progress>-->
-	<div>
-		<div class="modal-header text-center">
-			<h4 class="modal-title w-100">Papyrus Projects</h4>
-		</div>
-		<div class="modal-body">
-			<div class="container mt-4">
-				<div class="d-flex justify-content-center">
-					<button type="button" class="btn btn-success btn-sm btn-create me-2" (click)="createProject()"><i
-						class="fas fa-plus-circle mr-2"></i> Create a New
-						Project</button>
-					<button type="button" class="btn btn-primary btn-sm btn-open me-2"><i class="fas fa-folder-open mr-2"></i>
-						Open an Existing
-						Project</button>
-					<button type="button" class="btn btn-danger btn-sm btn-open me-2" onclick="quit()"><i
-						class="fas fa-close mr-2"></i> Quit</button>
-				</div>
+<app-progress [title]="'Project migration'" #progress></app-progress>
+<div *ngIf="!progress.showProgress">
+	<div class="modal-header text-center">
+		<h4 class="modal-title w-100">Papyrus Projects</h4>
+	</div>
+	<div class="modal-body">
+		<div class="container mt-4">
+			<div class="d-flex justify-content-center">
+				<button type="button" class="btn btn-success btn-sm btn-create me-2" (click)="createProject()"><i
+					class="fas fa-plus-circle mr-2"></i> Create a New
+					Project</button>
+				<button type="button" class="btn btn-primary btn-sm btn-open me-2"><i class="fas fa-folder-open mr-2"></i>
+					Open an Existing
+					Project</button>
+				<button type="button" class="btn btn-danger btn-sm btn-open me-2" onclick="quit()"><i
+					class="fas fa-close mr-2"></i> Quit</button>
+			</div>
 
-				<div class="recent-projects mt-5 overflow-auto" style="height: 300px">
-					<h5>Recent Projects</h5>
-					<table class="table mt-3 table-sm overflow-auto">
-						<tbody id="proj-list">
-						<tr *ngFor="let project of projects" >
-							<th scope="row" class="proj-name">{{project.projName}}</th>
-							<td colspan="2" class="proj-path">{{project.projPath}}</td>
-							<td>
-								<div class="text-right d-flex justify-content-end">
-									<button type="button" class="btn btn-outline-success btn-sm me-1 proj-open"
-													(click)="openProject(project.projPath)">Open</button>
-									<button type="button" class="btn btn-outline-danger btn-sm proj-del">X</button>
-								</div>
-							</td>
-						</tr>
+			<div class="recent-projects mt-5 overflow-auto" style="height: 300px">
+				<h5>Recent Projects</h5>
+				<table class="table mt-3 table-sm overflow-auto">
+					<tbody id="proj-list">
+					<tr *ngFor="let project of projects" >
+						<th scope="row" class="proj-name">{{project.projName}}</th>
+						<td colspan="2" class="proj-path">{{project.projPath}}</td>
+						<td>
+							<div class="text-right d-flex justify-content-end">
+								<button type="button" class="btn btn-outline-success btn-sm me-1 proj-open"
+												(click)="openProject(project.projPath)">Open</button>
+								<button type="button" class="btn btn-outline-danger btn-sm proj-del">X</button>
+							</div>
+						</td>
+					</tr>
 
-						<tr id="no-proj" *ngIf="projects.length === 0">
-							<td colspan="4">No project was found!</td>
-						</tr>
-						</tbody>
-					</table>
-				</div>
+					<tr id="no-proj" *ngIf="projects.length === 0">
+						<td colspan="4">No project was found!</td>
+					</tr>
+					</tbody>
+				</table>
 			</div>
 		</div>
-		<div class="modal-footer border-0">
-		</div>
 	</div>
-</ng-template>
+	<div class="modal-footer border-0">
+	</div>
+</div>

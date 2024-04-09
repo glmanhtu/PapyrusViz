@@ -89,7 +89,9 @@ export class ProjectHandler extends BaseHandler {
 			categoryMap.set(rootDir.path, category.insertedId);
 		}));
 
-		await Promise.all(Object.entries(data.images).map(async ([key, oldImg], idx) => {
+		let count = 0;
+		const images = Object.entries(data.images);
+		for (const [key, oldImg] of images) {
 			await Promise.all([...categoryMap].map(async ([rootDir, rootDirID]) => {
 				if (oldImg.path.includes(rootDir) && rootDir !== '') {
 					await database.insert(imgTbl).values({
@@ -103,15 +105,17 @@ export class ProjectHandler extends BaseHandler {
 						categoryId: rootDirID
 					});
 				}
-			}))
+			}));
 			await reply(Message.success({
-				percentage: (idx + 1) * 50 / data.images.size, title: 'Step 2/4 - Migrate project...',
+				percentage: (count + 1) * 50 / images.length, title: 'Step 2/4 - Migrate project...',
 				description: `Updating image files...`
 			}));
+			count += 1;
+		}
 
-		}));
-
-		await Promise.all(Object.entries(data.assembled).map(async ([_, assembled], idx) => {
+		count = 0;
+		const assemblings = Object.entries(data.assembled);
+		for (const [_, assembled] of assemblings) {
 			const assembling = await database.insert(assemblingTbl).values({
 				name: assembled.name,
 				group: assembled.parent,
@@ -133,10 +137,11 @@ export class ProjectHandler extends BaseHandler {
 			}));
 
 			await reply(Message.success({
-				percentage: 50 + (idx + 1) * 30 / data.assembled.size, title: 'Step 3/4 - Migrate project...',
+				percentage: 50 + (count + 1) * 30 / assemblings.length, title: 'Step 3/4 - Migrate project...',
 				description: `Updating assembled files...`
 			}));
-		}));
+			count += 1;
+		}
 
 		if (data.matching) {
 			const matching = await matchingService.createMatching({
@@ -148,8 +153,8 @@ export class ProjectHandler extends BaseHandler {
 			})
 			await matchingService.processSimilarity(projectPath, matching, async (current, total) => {
 				await reply(Message.success({
-					percentage: 80 + (current) * 20 / total, title: 'Step 3/4 - Migrate project...',
-					description: `Updating assembled files...`
+					percentage: 80 + (current) * 20 / total, title: 'Step 4/4 - Migrate project...',
+					description: `Updating similarity matrix...`
 				}));
 
 			})

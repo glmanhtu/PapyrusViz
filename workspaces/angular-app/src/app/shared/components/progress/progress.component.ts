@@ -17,16 +17,12 @@
 
 import { Component, Input, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
 import { IMessage, Progress } from 'shared-lib';
-import { ElectronIpcService } from '../../../services/electron-ipc.service';
-import { NgbModal, NgbModalConfig } from '@ng-bootstrap/ng-bootstrap';
-import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap/modal/modal-ref';
 
 
 @Component({
   selector: 'app-progress',
   templateUrl: './progress.component.html',
   styleUrls: [ './progress.component.scss' ],
-  providers: [NgbModalConfig, NgbModal]
 })
 export class ProgressComponent {
 
@@ -34,8 +30,6 @@ export class ProgressComponent {
   title: string;
 
   @ViewChild('content') content : ElementRef;
-
-  private modelRef: NgbModalRef | null = null;
 
   progress: Progress = {
     percentage: 0,
@@ -52,11 +46,7 @@ export class ProgressComponent {
   @Output()
   onComplete = new EventEmitter<void>();
 
-  constructor(private eIpc: ElectronIpcService,
-              private modalService: NgbModal,
-              config: NgbModalConfig) {
-    config.backdrop = 'static';
-    config.keyboard = false;
+  constructor() {
   }
 
   onMessage(message: IMessage<Progress>) {
@@ -70,12 +60,10 @@ export class ProgressComponent {
   }
 
   show() {
-    this.modelRef = this.modalService.open(this.content, { size: 'lg', centered: true });
     this.showProgress = true;
   }
 
   finish() {
     this.onComplete.emit();
-    this.modelRef!.close();
   }
 }

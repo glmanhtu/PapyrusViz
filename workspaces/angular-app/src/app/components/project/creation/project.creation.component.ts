@@ -15,14 +15,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
 import { NgbModal, NgbModalConfig } from '@ng-bootstrap/ng-bootstrap';
-import { ProjectManagementComponent } from '../management/project.management.component';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap/modal/modal-ref';
 import { ElectronIpcService } from '../../../services/electron-ipc.service';
 import { FormControl, FormGroup } from '@angular/forms';
 import { FileDialogRequest, FileDialogResponse, Progress, ProjectDTO } from 'shared-lib';
 import { ProgressComponent } from '../../../shared/components/progress/progress.component';
+import { ModalService } from '../../../services/modal.service';
+import { BroadcastService, PROJECT_BROADCAST_SERVICE_TOKEN } from '../../../services/broadcast.service';
 
 @Component({
   selector: 'app-project-creation',
@@ -35,8 +36,7 @@ export class ProjectCreationComponent implements OnInit {
   @ViewChild('content') content : ElementRef;
   @ViewChild(ProgressComponent) progressComponent: ProgressComponent;
 
-  @Input() projectManagement: ProjectManagementComponent;
-  private modelRef: NgbModalRef | null = null;
+  private modalRef: NgbModalRef | null = null;
 
   projectForm = new FormGroup({
     name: new FormControl(''),
@@ -45,20 +45,12 @@ export class ProjectCreationComponent implements OnInit {
   });
 
   constructor(
-    config: NgbModalConfig,
-    private modalService: NgbModal,
+    @Inject(PROJECT_BROADCAST_SERVICE_TOKEN) private projectBroadcastService: BroadcastService<ProjectDTO>,
+    private modalService: ModalService,
     private electronIpc: ElectronIpcService,
-  ) {
-    // customize default values of modals used by this component tree
-    config.backdrop = 'static';
-    config.keyboard = false;
-  }
+  ) {}
 
   ngOnInit(): void {
-  }
-
-  open(): void {
-    this.modelRef = this.modalService.open(this.content, { size: 'lg', centered: true });
   }
 
   onSubmit() {
@@ -68,7 +60,6 @@ export class ProjectCreationComponent implements OnInit {
       path: formValue.path!,
       dataPath: formValue.dataPath!
     }
-    this.modelRef!.close();
     this.progressComponent.show();
     this.electronIpc.sendAndListen<ProjectDTO, Progress>('project::create-project', projectRequest, (message) => {
       this.progressComponent.onMessage(message);
@@ -76,8 +67,8 @@ export class ProjectCreationComponent implements OnInit {
   }
 
   cancel() {
-    this.modelRef!.close();
-    this.projectManagement.open();
+    this.modalRef!.close();
+    this.modalService.projectManagement();
   }
 
   folderSelection(event: MouseEvent, allowCreation=false): void {
@@ -94,7 +85,9 @@ export class ProjectCreationComponent implements OnInit {
   }
 
   openProject(projectPath: string) {
-    this.projectManagement.openProject(projectPath);
-    this.modelRef!.close();
+    this.electronIpc.send<string, ProjectDTO>('project:load-project', projectPath).then((project) => {
+      this.projectBroadcastService.publish(project);
+      this.modalRef!.close();
+    });
   }
 }

@@ -15,12 +15,9 @@
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<app-project-management #projectManagement [projectCreation]="projectCreation"></app-project-management>
-<app-project-creation #projectCreation [projectManagement]="projectManagement"></app-project-creation>
-<app-similarity-creation #similarityCreation></app-similarity-creation>
 <app-nav></app-nav>
 <div class="flex-fill d-flex flex-row overflow-auto">
-    <app-panel #panel id="thumbnail-column" [similarityCreationComponent]="similarityCreation" class="sidebar d-flex p-1 flex-column"></app-panel>
+    <app-panel #panel id="thumbnail-column" class="sidebar d-flex p-1 flex-column"></app-panel>
     <app-main id="board-column" [panel]="panel" class="main flex-fill p-1" style="width: 75%;"></app-main>
     <!-- <div class="flex-shrink-1 bg-primary text-white p-1">
       <span>Bottom Bar</span>

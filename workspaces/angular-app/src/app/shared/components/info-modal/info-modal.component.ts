@@ -16,24 +16,17 @@
  */
 
 import { Component, Input } from '@angular/core';
-import { NgbModal, NgbModalConfig } from '@ng-bootstrap/ng-bootstrap';
-
 
 @Component({
   selector: 'app-info-modal',
   templateUrl: './info-modal.component.html',
   styleUrls: [ './info-modal.component.scss' ],
-  providers: [NgbModalConfig, NgbModal]
 })
 export class InfoModalComponent {
 
   @Input()
   message: string;
 
-  constructor(private modalService: NgbModal) { }
-
-  dismiss() {
-    this.modalService.dismissAll();
-  }
+  constructor() { }
 
 }
