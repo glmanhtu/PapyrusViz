@@ -20,8 +20,9 @@
 
 import { contextBridge, ipcRenderer } from 'electron';
 import { v4 as uuidv4 } from 'uuid';
-import { Message } from 'shared-lib';
+import { IMessage, Message, ChannelMessage, ExtrasChannels } from 'shared-lib';
 
+const channelMapping = new Map<string, ((message: IMessage<unknown>) => void)[]>();
 
 // So we expose protected methods that allow the renderer process
 // to use the ipcRenderer without exposing the entire object
@@ -58,7 +59,31 @@ contextBridge.exposeInMainWorld('api', {
 			});
 
 			ipcRenderer.send('ipc-continuous-request', { type, payload, requestId });
+	},
+	listen: <R>(channel: ExtrasChannels, listener: (message: IMessage<R>) => void): void => {
+		if (!Object.values(ExtrasChannels).includes(channel)) {
+			console.log('Reject the request to listen on ' + channel + ' channel!');
+			return;
+		}
+		if (!channelMapping.has(channel)) {
+			channelMapping.set(channel, []);
+		}
+		channelMapping.get(channel).push(listener);
+		channelMapping.forEach((value, key) => {
+			console.log(`Channel ${key} has ${value.length} listener...`)
+		});
 	}
+
+});
+
+ipcRenderer.on('ipc-extras', (_, response: ChannelMessage<unknown>) => {
+	channelMapping.forEach((callbacks, key) => {
+		if (key === response.channel) {
+			callbacks.forEach((callback) => {
+				callback(response.message)
+			})
+		}
+	})
 });
 
 console.log('The preload script has been injected successfully.');

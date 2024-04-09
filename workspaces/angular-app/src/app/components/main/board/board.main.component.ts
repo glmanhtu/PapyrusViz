@@ -35,6 +35,7 @@ import {
 } from 'shared-lib';
 import { ElectronIpcService } from '../../../services/electron-ipc.service';
 import { FrameComponent } from '../../../shared/components/frame/frame.component';
+import { ModalService } from '../../../services/modal.service';
 
 @Component({
   selector: 'app-board-main',
@@ -54,6 +55,7 @@ export class BoardMainComponent implements OnInit {
 
 
   constructor(
+    private modalService: ModalService,
     private eIpc: ElectronIpcService) {
   }
   ngOnInit(): void {
@@ -61,7 +63,35 @@ export class BoardMainComponent implements OnInit {
       {projectPath: this.projectDto!.path, assemblingId: this.assembling.id}).then((items) => {
         this.assemblingImages = items;
     });
+  }
 
+  commandListener(command: string) {
+    switch (command) {
+      case "main:menu:img-delete":
+        this.selectedFrames.forEach((frame, key) => {
+          this.deleteAssemblingImg(frame.image.id).then(() => {
+            frame.showController = false;
+            this.assemblingImages = this.assemblingImages.filter((x) => x.img.id != frame.image.id)
+            this.selectedFrames.delete(key);
+          })
+        });
+        break;
+      case "main:menu:img-find-similarity":
+        if (this.selectedFrames.size > 1) {
+          this.modalService.info("Only one image can be selected to find similarity!");
+        } else if (this.selectedFrames.size === 1) {
+          this.selectedFrames.forEach((frame) => {
+            this.queryImage.emit(frame.image);
+          });
+        }
+        break;
+
+      case "main:menu:select-all":
+        this.frameComponents.forEach((item) => {
+          item.showController = true;
+          this.selectedFrames.set(item.image.id, item);
+        });
+    }
   }
 
   addImage(thumbnail: Thumbnail) {
@@ -100,7 +130,6 @@ export class BoardMainComponent implements OnInit {
     let hasSelected = false;
     this.frameComponents.forEach((item) => {
       if (item.isMouseSelected(event)) {
-        item.showController = true;
         if (event.button === 2) {
           item.contextMenuEvent.emit();
         }
@@ -115,6 +144,7 @@ export class BoardMainComponent implements OnInit {
             this.selectedFrames.delete(key);
           })
         }
+        item.showController = true;
         this.selectedFrames.set(item.image.id, item);
         hasSelected = true;
       }
@@ -143,18 +173,46 @@ export class BoardMainComponent implements OnInit {
           this.assemblingImages[imgIdx] = x.data;
           break
         case 'delete':
-          delete this.assemblingImages[imgIdx];
-          this.assemblingImages = this.assemblingImages.filter((x) => x.img.id != assemblingImage.img.id)
+          this.deleteAssemblingImg(assemblingImage.img.id).then(() => {
+            this.assemblingImages = this.assemblingImages.filter((x) => x.img.id != assemblingImage.img.id)
+          })
           break
         case 'similarity':
           this.queryImage.emit(assemblingImage.img);
           break;
+
+        case 'to_front':
+          this.toFront(assemblingImage);
+          break
+
+        case 'to_back':
+          this.toBack(assemblingImage);
       }
     })
   }
 
+  toFront(assemblingImg: AssemblingImage) {
+    const maxZIndex = this.assemblingImages.reduce((acc, x) => Math.max(acc, x.transforms.zIndex), -9999999);
+    assemblingImg.transforms.zIndex = maxZIndex + 1;
+    return this.onTransform(assemblingImg, assemblingImg.transforms);
+  }
+
+  toBack(assemblingImg: AssemblingImage) {
+    const minZIndex = this.assemblingImages.reduce((acc, x) => Math.min(acc, x.transforms.zIndex), 9999999);
+    assemblingImg.transforms.zIndex = minZIndex - 1;
+    return this.onTransform(assemblingImg, assemblingImg.transforms);
+  }
+
+  deleteAssemblingImg(assemblingImgId: number) {
+    return this.eIpc.send<AssemblingImageRequest, void>('assembling:delete-assembling-img', {
+      projectPath: this.projectDto.path,
+      assemblingId: this.assembling.id,
+      imageId: assemblingImgId
+    })
+  }
+
   onTransform(assemblingImage: AssemblingImage, transforms: Transforms) {
-    this.eIpc.send<AssemblingImageChangeRequest, void>('assembling:update-assembling-img', {
+    return this.eIpc.send<AssemblingImageChangeRequest, void>('assembling:update-assembling-img', {
       projectPath: this.projectDto.path,
       assemblingId: this.assembling.id,
       imageId: assemblingImage.img.id,

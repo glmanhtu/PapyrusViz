@@ -19,7 +19,7 @@ import { BaseHandler } from './base.handler';
 import {
 	AssemblingDTO, AssemblingExportRequest,
 	AssemblingImage,
-	AssemblingImageChangeRequest,
+	AssemblingImageChangeRequest, AssemblingImageRequest,
 	GetAssemblingRequest, IMessage, Progress,
 	Transforms,
 } from 'shared-lib';
@@ -47,9 +47,14 @@ export class AssemblingHandler extends BaseHandler {
 		this.addRoute('assembling:get-activated-assembling-id', this.getActivatedAssemblingId.bind(this));
 		this.addRoute('assembling:update-assembling-img', this.updateAssemblingImage.bind(this));
 		this.addRoute('assembling:create-assembling-img', this.createAssemblingImage.bind(this));
+		this.addRoute('assembling:delete-assembling-img', this.deleteAssemblingImage.bind(this));
 		this.addRoute('assembling:set-activated-assembling-id', this.setActivatedAssemblingId.bind(this));
 		this.addRoute('assembling:get-images', this.getAssemblingImages.bind(this));
 		this.addContinuousRoute('assembling::export-img', this.exportImg.bind(this));
+	}
+
+	public async deleteAssemblingImage(payload: AssemblingImageRequest): Promise<void> {
+		return assemblingService.deleteAssembledImage(payload.projectPath, payload.assemblingId, payload.imageId)
 	}
 
 	private async getAssemblings(projectPath: string): Promise<AssemblingDTO[]> {

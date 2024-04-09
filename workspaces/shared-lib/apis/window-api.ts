@@ -27,4 +27,6 @@ export interface WindowApi {
 	send<P, R>(type: string, payload: P): Promise<R>;
 
 	sendAndListen<P, R>(type: string, payload: P,  listener: (message: IMessage<R>) => void): void;
+
+	listen<R>(channel: string, listener: (message: IMessage<R>) => void): void;
 }

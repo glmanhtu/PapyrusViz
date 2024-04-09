@@ -35,10 +35,10 @@ class AssemblingService {
 			.then(x => parseInt(x))
 	}
 
-	public async deleteAssembledImage(projectPath: string, assemblingId: number, img: Img): Promise<void> {
+	public async deleteAssembledImage(projectPath: string, assemblingId: number, imgId: number): Promise<void> {
 		const database = dbService.getConnection(projectPath);
 		await database.delete(imgAssemblingTbl)
-				.where(and(eq(imgAssemblingTbl.assemblingId, assemblingId), eq(imgAssemblingTbl.imgId, img.id)));
+				.where(and(eq(imgAssemblingTbl.assemblingId, assemblingId), eq(imgAssemblingTbl.imgId, imgId)));
   }
 
 	public async swapAssembledImage(projectPath: string, assemblingId: number, fromImg: Img, toImg: Img) : Promise<AssemblingImage> {

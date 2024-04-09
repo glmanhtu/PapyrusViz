@@ -16,8 +16,8 @@
  */
 
 import { BaseHandler } from "./base.handler";
-import { BrowserWindow, Menu } from 'electron';
-import { AssemblingImage, AssemblingImageRequest, ContextAction } from 'shared-lib';
+import { app, BrowserWindow, globalShortcut, Menu } from 'electron';
+import { AssemblingImage, AssemblingImageRequest, ChannelMessage, ContextAction, ExtrasChannels } from 'shared-lib';
 import { dbService } from '../services/database.service';
 import { categoryTbl } from '../entities/category';
 import { imgTbl } from '../entities/img';
@@ -31,6 +31,73 @@ export class MenuHandler extends BaseHandler {
 		super();
 		this.addRoute('menu:context:get-image-context', this.getImageContext.bind(this));
 		this.mainWin = mainWin;
+		this.registerMenu();
+	}
+
+	private sendHotKeyCommandToRenderer(command: string) {
+		const message: ChannelMessage<ChannelMessage<string>> = {
+			channel: ExtrasChannels.HOTKEY,
+			message: {
+				status: 'success',
+				payload: command
+			}
+		}
+		this.mainWin.webContents.send('ipc-extras', message)
+	}
+
+	private registerMenu() {
+		const isMac = process.platform === 'darwin';
+		app.on('browser-window-focus', (function() {
+			globalShortcut.register('CommandOrControl+A', () =>
+				this.sendHotKeyCommandToRenderer('main:menu:select-all')
+			)
+		}).bind(this));
+		app.on('browser-window-blur', function() {
+			globalShortcut.unregister('CommandOrControl+A');
+		});
+		const menu = Menu.buildFromTemplate([
+			{
+				label: 'File',
+				submenu: [
+					isMac ? { role: 'close' } : { role: 'quit' }
+				]
+			},
+			{
+				label: 'Edit',
+				submenu: [
+					{ role: 'cut' },
+					{ role: 'copy' },
+					{ type: 'separator' },
+					{
+						label: 'Delete',
+						accelerator: 'Backspace',
+						click: () => { this.sendHotKeyCommandToRenderer('main:menu:img-delete') }
+					},
+					{ type: 'separator' },
+					{
+						label: 'Select All',
+						accelerator: 'CmdOrCtrl+A',
+						click: () => { this.sendHotKeyCommandToRenderer('main:menu:select-all') }
+					},
+					{
+						label: 'Find similarities',
+						accelerator: 'CmdOrCtrl+F',
+						click: () => { this.sendHotKeyCommandToRenderer('main:menu:img-find-similarity') }
+					},
+				]
+			},
+			{
+				label: 'View',
+				submenu: [
+					{ role: 'resetZoom' },
+					{ role: 'zoomIn' },
+					{ role: 'zoomOut' },
+					{ type: 'separator' },
+					{ role: 'togglefullscreen' }
+				]
+			},
+		]);
+		Menu.setApplicationMenu(menu);
 	}
 
 	private async getImageContext(payload: AssemblingImageRequest): Promise<ContextAction<AssemblingImage>> {
@@ -57,13 +124,13 @@ export class MenuHandler extends BaseHandler {
 				{
 					label: 'To Front',
 					click: () => {
-
+						resolve({ name: 'to_front', data: null })
 					}
 				},
 				{
 					label: 'To Back',
 					click: () => {
-
+						resolve({ name: 'to_back', data: null })
 					}
 				},
 				{ type: 'separator' },
@@ -71,9 +138,7 @@ export class MenuHandler extends BaseHandler {
 					label: 'Delete',
 					accelerator: 'Backspace',
 					click: () => {
-						assemblingService.deleteAssembledImage(payload.projectPath, payload.assemblingId, img)
-							.then(() => resolve({ name: 'delete', data: null }))
-							.catch(reject)
+						 resolve({ name: 'delete', data: null })
 					}
 				},
 				{ type: 'separator' },

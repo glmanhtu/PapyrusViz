@@ -16,7 +16,7 @@
  */
 
 import { Injectable, NgZone } from '@angular/core';
-import { IMessage, WindowApi } from 'shared-lib';
+import { ExtrasChannels, IMessage, WindowApi } from 'shared-lib';
 
 @Injectable({
 	providedIn: 'root',
@@ -45,5 +45,12 @@ export class ElectronIpcService {
 		});
 	};
 
+	public listen<R>(channel: ExtrasChannels, listener: (message: IMessage<R>) => void): void {
+		this._api.listen<R>(channel, (message) => {
+			this.ngZone.run(() => {
+				listener(message);
+			});
+		});
+	}
 }
 

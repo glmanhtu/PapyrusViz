@@ -28,6 +28,12 @@ export interface IMessage<R> {
 }
 
 
+export interface ChannelMessage<R> {
+	channel: string,
+	message: IMessage<R>
+}
+
+
 export class Message<R> implements IMessage<R> {
 
 	status: string;

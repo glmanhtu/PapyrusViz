@@ -26,6 +26,7 @@ export * from './models/asssembling';
 export * from './models/context';
 export * from './models/img';
 export * from './models/matching';
+export * from './extras-channels';
 
 declare global {
 	// Global augmentation of the `Window` interface

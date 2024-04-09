@@ -16,15 +16,15 @@
  */
 
 import { Component, Inject, Input, OnInit, QueryList, ViewChildren } from '@angular/core';
-import {
-  BroadcastService,
-  PROJECT_BROADCAST_SERVICE_TOKEN,
-} from '../../services/broadcast.service';
+import { BroadcastService, PROJECT_BROADCAST_SERVICE_TOKEN } from '../../services/broadcast.service';
 import {
   AssemblingDTO,
+  ExtrasChannels,
   GetAssemblingRequest,
+  IMessage,
   ImgDto,
-  ProjectDTO, Thumbnail,
+  ProjectDTO,
+  Thumbnail,
 } from 'shared-lib';
 import { ElectronIpcService } from '../../services/electron-ipc.service';
 import { NgbNav, NgbNavChangeEvent } from '@ng-bootstrap/ng-bootstrap';
@@ -52,6 +52,17 @@ export class MainComponent implements OnInit {
     private eIpc: ElectronIpcService) {
   }
 
+  ngOnInit(): void {
+    this.projectBroadcastService.observe().subscribe((projectDto) => {
+      this.initProject(projectDto);
+    });
+    this.eIpc.listen<string>(ExtrasChannels.HOTKEY, this.hotKeyListener.bind(this));
+  }
+
+  hotKeyListener(message: IMessage<string>) {
+    this.getActivatedBoard().commandListener(message.payload);
+  }
+
   getActivatedBoard(): BoardMainComponent {
     for (let i = 0; i < this.boardComponents.length; i++) {
       if (this.boardComponents!.get(i)!.assembling.id === this.active) {
@@ -59,11 +70,6 @@ export class MainComponent implements OnInit {
       }
     }
     throw new Error('Board component not found!')
-  }
-  ngOnInit(): void {
-    this.projectBroadcastService.observe().subscribe((projectDto) => {
-      this.initProject(projectDto);
-    });
   }
 
   addImage(thumbnail: Thumbnail) {
