@@ -15,13 +15,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { ModalService } from './services/modal.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'Papyrus Visualization';
+
+  constructor(
+    private modalService: ModalService,
+  ) {}
+
+  ngOnInit(): void {
+    this.modalService.projectManagement();
+  }
+
 }

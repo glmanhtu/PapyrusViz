@@ -31,7 +31,6 @@ import { ElectronIpcService } from '../../services/electron-ipc.service';
 import { NgbNav, NgbNavChangeEvent } from '@ng-bootstrap/ng-bootstrap';
 import { PanelComponent } from '../panel/panel.component';
 import { BoardMainComponent } from './board/board.main.component';
-import { ModalService } from '../../services/modal.service';
 
 @Component({
   selector: 'app-main',
@@ -52,7 +51,6 @@ export class MainComponent implements OnInit {
   constructor(
     @Inject(PROJECT_BROADCAST_SERVICE_TOKEN) private projectBroadcastService: BroadcastService<ProjectDTO>,
     @Inject(IMG_BROADCAST_SERVICE_TOKEN) private imgBroadcastService: BroadcastService<Thumbnail>,
-    private modalService: ModalService,
     private eIpc: ElectronIpcService) {
   }
 
@@ -65,7 +63,6 @@ export class MainComponent implements OnInit {
     throw new Error('Board component not found!')
   }
   ngOnInit(): void {
-    this.modalService.projectManagement();
     this.projectBroadcastService.observe().subscribe((projectDto) => {
       this.initProject(projectDto);
     });
