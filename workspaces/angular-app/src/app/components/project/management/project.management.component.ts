@@ -20,7 +20,7 @@ import { NgbModal, NgbModalConfig } from '@ng-bootstrap/ng-bootstrap';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap/modal/modal-ref';
 import { ElectronIpcService } from '../../../services/electron-ipc.service';
 import { ProjectInfo } from '../../../../../../electron-app/main/models/app-data';
-import { Progress, ProjectDTO } from 'shared-lib';
+import { FileDialogRequest, FileDialogResponse, Progress, ProjectDTO } from 'shared-lib';
 import { BroadcastService, PROJECT_BROADCAST_SERVICE_TOKEN } from '../../../services/broadcast.service';
 import { ProgressComponent } from '../../../shared/components/progress/progress.component';
 import { ModalService } from '../../../services/modal.service';
@@ -74,6 +74,11 @@ export class ProjectManagementComponent implements OnInit {
     });
   }
 
+  quit() {
+    this.electronIpc.send<void, void>('app:quit', undefined).then(() => {
+    });
+  }
+
   openProject(projectPath: string, retryWithMigrate = true) {
     this.electronIpc.send<string, ProjectDTO>('project:load-project', projectPath).then((project) => {
       this.projectBroadcastService.publish(project);
@@ -81,6 +86,16 @@ export class ProjectManagementComponent implements OnInit {
     }).catch((err) => {
       if (err.message === 'Project does not exists!' && retryWithMigrate) {
         this.migrateProject(projectPath);
+      }
+    })
+  }
+
+  selectProject() {
+    this.electronIpc.send<FileDialogRequest, FileDialogResponse>(
+      'dialogs:open-file-folder',
+      { isFolder: true, allowFolderCreation: false, isMultiSelect: false, extensions: [] }).then((res) => {
+      if (!res.canceled) {
+        this.openProject(res.filePaths[0]);
       }
     })
   }

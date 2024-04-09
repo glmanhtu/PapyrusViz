@@ -191,6 +191,9 @@ export class ProjectHandler extends BaseHandler {
 				})
 				.where(eq(projectTbl.id, project.id));
 		}
+		if (!await this.getProjects().then((ps) => ps.some(x => x.projPath === projectPath))) {
+			await this.addProjectToAppData({projName: project.name, projPath: project.path, datasetPath: project.dataPath});
+		}
 		return project as ProjectDTO
 	}
 
@@ -267,9 +270,12 @@ export class ProjectHandler extends BaseHandler {
 				}
 			}
 		}
+		await this.addProjectToAppData({projName: payload.name, projPath: payload.path, datasetPath: payload.dataPath});
+	}
 
+	private async addProjectToAppData(project: ProjectInfo) {
 		const appData = await dataUtils.readAppData();
-		appData.projects.push({projName: payload.name, projPath: payload.path, datasetPath: payload.dataPath});
+		appData.projects.push(project);
 		await dataUtils.writeAppData(appData);
 	}
 }

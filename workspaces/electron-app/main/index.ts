@@ -27,6 +27,7 @@ import { ImageHandler } from './handlers/image.handler';
 import { AssemblingHandler } from './handlers/assembling.handler';
 import { MenuHandler } from './handlers/menu.handler';
 import { MatchingHandler } from './handlers/matching.handler';
+import { AppHandler } from './handlers/app.handler';
 
 declare const global: GlobalConfig;
 
@@ -46,6 +47,7 @@ App.launch((mainWin) => {
 	const handlers = [
 		new DialogHandler(mainWin),
 		new MenuHandler(mainWin),
+		new AppHandler(mainWin),
 		new ProjectHandler(),
 		new CategoryHandler(),
 		new ImageHandler(),
