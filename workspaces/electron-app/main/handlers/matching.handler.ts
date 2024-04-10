@@ -33,8 +33,8 @@ import { takeUniqueOrThrow } from '../utils/data.utils';
 import { and, eq } from 'drizzle-orm';
 import { configService } from '../services/config.service';
 import { Config } from '../entities/user-config-tbl';
-import { categoryTbl } from '../entities/category';
-import { imgTbl } from '../entities/img';
+import { categoryTbl, DefaultCategory } from '../entities/category';
+import { ImgStatus, imgTbl } from '../entities/img';
 import path from 'node:path';
 import { matchingService } from '../services/matching.service';
 
@@ -61,11 +61,13 @@ export class MatchingHandler extends BaseHandler {
 				eq(matchingImgTbl.sourceImgId, request.imgId),
 				category.path !== ''
 					? eq(imgTbl.categoryId, request.categoryId)
-					: undefined
+					: undefined,
+				category.name === DefaultCategory.ACHIEVED
+					? eq(imgTbl.status, ImgStatus.ACHIEVED)
+					: eq(imgTbl.status, ImgStatus.ONLINE)
 			))
-
 			.innerJoin(imgTbl, eq(matchingImgTbl.targetImgId, imgTbl.id))
-			.orderBy(matchingImgTbl.score)
+			.orderBy(matchingImgTbl.rank)
 			.limit(request.perPage)
 			.offset(request.page * request.perPage);
 
@@ -122,12 +124,15 @@ export class MatchingHandler extends BaseHandler {
 
 	private async createMatching(payload: MatchingDto, reply: (message: IMessage<string | Progress>) => Promise<void>): Promise<void> {
 		const matching = await matchingService.createMatching(payload)
-		await matchingService.processSimilarity(payload.projectPath, matching, async (current, total) => {
+		const nonMappingCols = await matchingService.processSimilarity(payload.projectPath, matching, async (current, total) => {
 			await reply(Message.success({
 				percentage: 100 * current / total, title: 'Create matching...',
 				description: `Created ${current} / ${total} similarity matching...`
 			}));
 		})
+		for (const colName of nonMappingCols) {
+			await reply(Message.warning(`Unable to find any image that match with column: '${colName}'`))
+		}
 		await this.setActivatedMatching({projectPath: payload.projectPath, matchingId: matching.id});
 	}
 }

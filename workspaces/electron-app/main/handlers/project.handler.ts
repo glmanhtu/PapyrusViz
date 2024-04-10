@@ -21,7 +21,7 @@ import { promises as fs } from 'fs';
 
 import { projectTbl } from '../entities/project';
 import path from 'node:path';
-import { categoryTbl } from '../entities/category';
+import { categoryTbl, DefaultCategory } from '../entities/category';
 import { eq } from 'drizzle-orm';
 import { imgTbl } from '../entities/img';
 import * as dataUtils from '../utils/data.utils';
@@ -79,7 +79,8 @@ export class ProjectHandler extends BaseHandler {
 
 
 		const categoryMap = new Map<string, number>;
-		await Promise.all(data.rootDirs.available.map(async (rootDir) => {
+		const rootDirs = [...data.rootDirs.available, { name: DefaultCategory.ACHIEVED, path: ''}];
+		await Promise.all(rootDirs.map(async (rootDir) => {
 			const category = await database.insert(categoryTbl).values({
 				name: rootDir.name,
 				path: rootDir.path,
@@ -151,13 +152,17 @@ export class ProjectHandler extends BaseHandler {
 				matchingMethod: data.matching.matchingMethod === 'file' ? MatchingMethod.NAME : MatchingMethod.PATH,
 				matchingFile: data.matching.matchingFile
 			})
-			await matchingService.processSimilarity(projectPath, matching, async (current, total) => {
+			const nonMappingCols = await matchingService.processSimilarity(projectPath, matching, async (current, total) => {
 				await reply(Message.success({
 					percentage: 80 + (current) * 20 / total, title: 'Step 4/4 - Migrate project...',
 					description: `Updating similarity matrix...`
 				}));
 
 			})
+
+			for (const colName of nonMappingCols) {
+				await reply(Message.warning(`Unable to find any image that match with column: '${colName}'`))
+			}
 			await matchingService.setActivatedMatching(projectPath, matching.id);
 		} else {
 			await reply(Message.success({
@@ -229,7 +234,9 @@ export class ProjectHandler extends BaseHandler {
 			percentage: 5, title: 'Step 1/3 - Creating project', description: 'Writing project information...'
 		}));
 
-		const imageMap = await pathUtils.getFilesRecursively(payload.dataPath);
+		const imageMap = await pathUtils.getFilesRecursively(payload.dataPath, DefaultCategory.ALL_IMAGES);
+		// We add an 'Achieved' to the list of image map to store the achieved images in the future
+		imageMap.set(DefaultCategory.ACHIEVED, []);
 		const nImages: number = [...imageMap.values()].reduce((acc, x) => acc + x.length, 0);
 		await reply(Message.success({
 			percentage: 10, title: 'Step 2/3 - Collecting images', description: `Collected ${nImages} images...`
@@ -240,7 +247,7 @@ export class ProjectHandler extends BaseHandler {
 		let count = 0;
 		for (const [rootDir, images] of imageMap) {
 			const category = await database.insert(categoryTbl).values({
-				name: path.basename(rootDir) || 'All images',
+				name: path.basename(rootDir),
 				path: rootDir,
 				projectId: projectId
 			}).returning({insertedId: categoryTbl.id}).then(takeUniqueOrThrow)

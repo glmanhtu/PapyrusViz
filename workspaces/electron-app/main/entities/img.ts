@@ -19,6 +19,10 @@ import { sqliteTable, text, integer, index } from 'drizzle-orm/sqlite-core';
 import { categoryTbl } from './category';
 import { relations } from 'drizzle-orm';
 
+export enum ImgStatus {
+  ONLINE = 1,
+  ACHIEVED = 2
+}
 
 export const imgTbl = sqliteTable('img', {
     id: integer('id').primaryKey({autoIncrement: true}),
@@ -27,11 +31,13 @@ export const imgTbl = sqliteTable('img', {
     thumbnail: text('thumbnail'),
     width: integer('width'),
     height: integer('height'),
+    status: integer('status').default(ImgStatus.ONLINE),
     format: text('format'),
     categoryId: integer('dir_id').references(() => categoryTbl.id),
 }, (table) => {
   return {
     pathIdx: index("img_path_idx").on(table.path),
+    statusIdx: index("img_status_idx").on(table.status),
     nameIdx: index("img_name_idx").on(table.name),
   };
 });

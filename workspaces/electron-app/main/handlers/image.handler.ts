@@ -16,9 +16,9 @@
  */
 
 import { BaseHandler } from "./base.handler";
-import { imgTbl } from '../entities/img';
+import { ImgStatus, imgTbl } from '../entities/img';
 import { and, eq, like } from 'drizzle-orm';
-import { categoryTbl } from '../entities/category';
+import { categoryTbl, DefaultCategory } from '../entities/category';
 import { takeUniqueOrThrow } from '../utils/data.utils';
 import path from 'node:path';
 import { dbService } from '../services/database.service';
@@ -43,7 +43,10 @@ export class ImageHandler extends BaseHandler {
 					: undefined,
 				category.path !== ''
 					? eq(imgTbl.categoryId, request.categoryId)
-					: undefined
+					: undefined,
+				category.name === DefaultCategory.ACHIEVED
+					? eq(imgTbl.status, ImgStatus.ACHIEVED)
+					: eq(imgTbl.status, ImgStatus.ONLINE)
 			))
 			.orderBy(imgTbl.name)
 			.limit(request.perPage)

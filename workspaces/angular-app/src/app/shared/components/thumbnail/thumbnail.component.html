@@ -21,7 +21,10 @@
 				 [alt]="thumbnail.imgName"
 				 [title]="thumbnail.imgName"
 		>
-<!--		<span *ngIf="thumbnail.rank">{{thumbnail.rank}}</span>-->
-		<figcaption class="figure-caption">{{thumbnail.imgName}}</figcaption>
+
+		<figcaption class="figure-caption">
+			<span *ngIf="thumbnail.rank" class="px-2" [style.background-color]="getSimilarityColor(thumbnail.score!)">#{{thumbnail.rank}}</span>
+			{{thumbnail.imgName}}
+		</figcaption>
 	</figure>
 </div>

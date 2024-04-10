@@ -22,7 +22,6 @@ import { ImgDto } from 'shared-lib/.dist/models/img';
 import sharp from 'sharp';
 import { like } from 'drizzle-orm';
 import { dbService } from './database.service';
-import { takeFirstOrThrow } from '../utils/data.utils';
 
 class ImageService {
 
@@ -33,12 +32,20 @@ class ImageService {
 		}
 	}
 
-	public async findBestMatch(projectPath: string, name: string): Promise<Img> {
+	public async findBestMatchByName(projectPath: string, name: string): Promise<Img[]> {
 		const database = dbService.getConnection(projectPath);
 		return database.select()
 			.from(imgTbl).where(like(imgTbl.name, '%' + name + '%'))
 			.orderBy(imgTbl.name)
-			.then(takeFirstOrThrow);
+			.limit(3);
+	}
+
+	public async findBestMatchByPath(projectPath: string, name: string): Promise<Img[]> {
+		const database = dbService.getConnection(projectPath);
+		return database.select()
+			.from(imgTbl).where(like(imgTbl.path, '%' + name + '%'))
+			.orderBy(imgTbl.name)
+			.limit(3);
 	}
 
 	public async resize(inputFile: string, outputFile: string, width: number, height: number) {

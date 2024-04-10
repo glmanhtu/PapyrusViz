@@ -20,6 +20,10 @@ import { projectTbl } from './project';
 import { relations } from 'drizzle-orm';
 import { imgTbl } from './img';
 
+export enum DefaultCategory {
+    ALL_IMAGES = 'All images',
+    ACHIEVED = 'Achieved'
+}
 
 export const categoryTbl = sqliteTable('category', {
     id: integer('id').primaryKey({autoIncrement: true}),

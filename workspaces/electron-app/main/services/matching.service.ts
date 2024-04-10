@@ -25,6 +25,7 @@ import * as csv from '@fast-csv/parse';
 import { imageService } from './image.service';
 import { configService } from './config.service';
 import { Config } from '../entities/user-config-tbl';
+import { MatchingMethod } from 'shared-lib/.dist/models/matching';
 
 class MatchingService {
 
@@ -43,7 +44,7 @@ class MatchingService {
 				eq(matchingTbl.id, matching.insertedId)
 		)});
 	}
-	public async processSimilarity(projectPath: string, matching: Matching, reply: (current: number, total: number) => Promise<void>): Promise<void> {
+	public async processSimilarity(projectPath: string, matching: Matching, reply: (current: number, total: number) => Promise<void>): Promise<string[]> {
 		const stream = createReadStream(matching.matrixPath)
 			.pipe(csv.parse({ headers: true }));
 
@@ -53,13 +54,25 @@ class MatchingService {
 			if (idMap.has(imName)) {
 				return new Promise<number>((resolve, _) => resolve(idMap.get(imName)));
 			}
-			const img = await imageService.findBestMatch(projectPath, imName);
-			idMap.set(imName, img.id);
-			return img.id;
+			let img;
+			if (matching.matchingMethod === MatchingMethod.NAME) {
+				img = await imageService.findBestMatchByName(projectPath, imName);
+			} else if (matching.matchingMethod === MatchingMethod.PATH) {
+				img = await imageService.findBestMatchByPath(projectPath, imName);
+			} else {
+				throw new Error(`Matching Method ${matching.matchingMethod} is not implemented!`)
+			}
+			if (img.length > 0) {
+				idMap.set(imName, img[0].id);
+				return img[0].id;
+			}
+			idMap.set(imName, undefined);
+			return undefined;
 		};
 
 		const database = dbService.getConnection(projectPath);
 		let count = 0;
+		const nonMappingCategories = [];
 		for await (const  row of stream) {
 			const srcImgId = await findImgId(row['']);
 			const values = [];
@@ -68,22 +81,28 @@ class MatchingService {
 					continue;
 				}
 				let score = parseFloat(distance as string);
-				if (matching.matchingType === MatchingType.SIMILARITY) {
-					score = 1 - score;
+				if (matching.matchingType === MatchingType.DISTANCE) {
+					score = 1 / (1 + score);
 				}
 				const targetImgId = await findImgId(targetIm);
-				values.push({
-					sourceImgId: srcImgId,
-					targetImgId: targetImgId,
-					score: score,
-					matchingId: matching.id,
-					rank: 0
-				});
+				if (targetImgId !== undefined) {
+					values.push({
+						sourceImgId: srcImgId,
+						targetImgId: targetImgId,
+						score: score,
+						matchingId: matching.id,
+						rank: 0
+					});
+				} else {
+					nonMappingCategories.push(targetIm)
+				}
 			}
-			const sortedValues = values.sort((a, b) => (a.score - b.score))
+
+			// Sort the records based on score
+			const sortedValues = values.sort((a, b) => (b.score - a.score))
 			let rank = 1;
 			for (let i = 0; i < values.length; i++) {
-				if (i > 0 && sortedValues[i].score > sortedValues[i - 1].score) {
+				if (i > 0 && sortedValues[i].score < sortedValues[i - 1].score) {
 					rank += 1
 				}
 				sortedValues[i].rank = rank
@@ -92,6 +111,7 @@ class MatchingService {
 			count += 1;
 			await reply( count, values.length)
 		}
+		return nonMappingCategories;
 	}
 
 	public async setActivatedMatching(projectPath: string, matchingId: number): Promise<void> {

@@ -19,6 +19,7 @@ import { sqliteTable, integer, real, index, text } from 'drizzle-orm/sqlite-core
 import { imgTbl } from './img';
 import { relations, sql } from 'drizzle-orm';
 import { projectTbl } from './project';
+import { MatchingMethod } from 'shared-lib';
 
 
 export const matchingTbl = sqliteTable('matching', {
@@ -26,7 +27,7 @@ export const matchingTbl = sqliteTable('matching', {
     name: text('name'),
     matrixPath: text('matrix_path'),
     matchingType: text('matching_type'),
-    matchingMethod: text('matching_method'),
+    matchingMethod: text('matching_method', {enum: [MatchingMethod.NAME, MatchingMethod.PATH]}),
     createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
     projectId: integer('project_id').references(() => projectTbl.id),
 }, (table) => {

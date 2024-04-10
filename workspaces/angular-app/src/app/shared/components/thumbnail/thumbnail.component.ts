@@ -34,4 +34,17 @@ export class ThumbnailComponent implements OnInit {
   addImage() {
     this.openImage.emit(this.thumbnail)
   }
+
+  getSimilarityColor(score: number): string {
+    // Ensure the score is between 0 and 1
+    const clampedScore = Math.max(0, Math.min(score, 1));
+
+    // Calculate hue from red (0) to green (120) based on the score
+    // A higher score should be more green, directly proportional
+    const hue = clampedScore * 120;
+
+    // Return the CSS HSL color string
+    // Saturation is set to 100% and lightness to 50% for vibrant colors
+    return `hsl(${hue}, 100%, 50%)`;
+  }
 }
