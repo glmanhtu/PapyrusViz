@@ -27,6 +27,7 @@ import {
 } from 'shared-lib';
 import { ElectronIpcService } from '../../../services/electron-ipc.service';
 import { FormControl } from '@angular/forms';
+import { ModalService } from '../../../services/modal.service';
 
 @Component({
   selector: 'app-nav-main',
@@ -43,7 +44,7 @@ export class NavMainComponent implements OnInit, AfterViewInit {
   isEditModel = false;
   assemblingName = new FormControl('');
 
-  constructor(private eIpc: ElectronIpcService) {
+  constructor(private eIpc: ElectronIpcService, private modalService: ModalService) {
   }
 
   ngAfterViewInit(): void {
@@ -74,12 +75,20 @@ export class NavMainComponent implements OnInit, AfterViewInit {
   }
 
   close() {
-    this.eIpc.send<PRequest<number>, void>('assembling:close-assembling', {
-      projectPath: this.projectDto.path,
-      payload: this.assembling.id
-    }).then(() => {
-      this.closeAssembling.emit(this.assembling);
-    });
+    this.modalService.warning(
+      `Assembling deletion`,
+      `Are you sure you want to delete ${this.assembling.name} assembling?`,
+      `All information associated to this assembling will be permanently deleted. This operation can not be undone !`
+    ).then((res) => {
+      if (res) {
+        this.eIpc.send<PRequest<number>, void>('assembling:close-assembling', {
+          projectPath: this.projectDto.path,
+          payload: this.assembling.id
+        }).then(() => {
+          this.closeAssembling.emit(this.assembling);
+        });
+      }
+    })
   }
 
   tabContextMenu() {

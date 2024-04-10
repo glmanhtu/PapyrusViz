@@ -42,6 +42,7 @@ import { ImagesPanelComponent } from './components/panel/images/images.panel.com
 import { ProgressComponent } from './shared/components/progress/progress.component';
 import { InfoModalComponent } from './shared/components/info-modal/info-modal.component';
 import { NavMainComponent } from './components/main/nav/nav.main.component';
+import { ConfirmModalComponent } from './shared/components/confirm-modal/confirm-modal.component';
 
 
 // AoT requires an exported function for factories
@@ -65,7 +66,8 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
 		ImagesPanelComponent,
 		ProgressComponent,
 		InfoModalComponent,
-		NavMainComponent
+		NavMainComponent,
+		ConfirmModalComponent
   ],
 	imports: [
 		BrowserModule,

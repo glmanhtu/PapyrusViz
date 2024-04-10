@@ -55,7 +55,7 @@ export class MatchingPanelComponent implements OnInit {
   thumbnails: Thumbnail[] = [];
   activatedMatching: MatchingResponse | undefined;
 
-  queryImgId: number;
+  queryImgId: number | undefined = undefined;
 
   currentPage = 0;
   isLoading: boolean = false; // is a boolean flag to track whether new items are being loaded.
@@ -157,7 +157,7 @@ export class MatchingPanelComponent implements OnInit {
   }
 
   getThumbnails(page = 0, reset = true) {
-    if (!this.activatedMatching || !this.queryImgId || this.isLoading || (this.isCompleted && !reset)) {
+    if (!this.activatedMatching || this.queryImgId === undefined || this.isLoading || (this.isCompleted && !reset)) {
       return;
     }
     this.isLoading = true;

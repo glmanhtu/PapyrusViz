@@ -6,6 +6,7 @@ import { ProjectCreationComponent } from '../components/project/creation/project
 import { ProgressComponent } from '../shared/components/progress/progress.component';
 import { SimilarityCreationComponent } from '../components/similarity/creation/similarity.creation.component';
 import { ProjectDTO } from 'shared-lib';
+import { ConfirmModalComponent } from '../shared/components/confirm-modal/confirm-modal.component';
 
 @Injectable({
 	providedIn: 'root'
@@ -17,6 +18,15 @@ export class ModalService {
 	info(message: string) {
 		const modalRef = this.modalService.open(InfoModalComponent);
 		modalRef.componentInstance.message = message; // Assuming your InfoModalComponent has a 'message' property
+	}
+
+	warning(title: string, headline: string, description: string) {
+		const modalRef = this.modalService.open(ConfirmModalComponent);
+		modalRef.componentInstance.title = title;
+		modalRef.componentInstance.headline = headline;
+		modalRef.componentInstance.description = description;
+		modalRef.componentInstance.modalRef = modalRef;
+		return modalRef.result;
 	}
 
 	projectManagement() {

@@ -46,12 +46,20 @@ export class ProjectHandler extends BaseHandler {
 		this.addContinuousRoute('project::create-project', this.creteProject.bind(this));
 		this.addContinuousRoute('project::migrate-project', this.migrateOldProject.bind(this));
 		this.addRoute('project:get-projects', this.getProjects.bind(this));
+		this.addRoute('project:delete-project', this.deleteProject.bind(this));
 		this.addRoute('project:load-project', this.loadProject.bind(this))
 	}
 
 	private async getProjects(): Promise<ProjectInfo[]> {
 		const {projects} = await dataUtils.readAppData();
 		return projects.reverse();
+	}
+
+	private async deleteProject(projectPath: string): Promise<void> {
+		const appData = await dataUtils.readAppData();
+		appData.projects = appData.projects.filter((x) => x.projPath !== projectPath);
+		await dataUtils.writeAppData(appData);
+		await fs.rm(projectPath, { recursive: true, force: true });
 	}
 
 	private async migrateOldProject(projectPath: string, reply: (message: IMessage<string | Progress>) => Promise<void>): Promise<void> {
@@ -96,7 +104,7 @@ export class ProjectHandler extends BaseHandler {
 			await Promise.all([...categoryMap].map(async ([rootDir, rootDirID]) => {
 				if (oldImg.path.includes(rootDir) && rootDir !== '') {
 					await database.insert(imgTbl).values({
-						id: parseInt(key),
+						id: parseInt(key) + 1,
 						path: path.relative(rootDir, oldImg.path),
 						name: oldImg.name,
 						thumbnail: path.relative(data.projPath, oldImg.thumbnails),
@@ -130,7 +138,7 @@ export class ProjectHandler extends BaseHandler {
 
 			await Promise.all(Object.entries(assembled.images).map(async ([imgId, imgTransform]) => {
 				await database.insert(imgAssemblingTbl).values({
-					imgId: parseInt(imgId),
+					imgId: parseInt(imgId) + 1,
 					assemblingId: assemblingId,
 					transforms: imgTransform
 				})

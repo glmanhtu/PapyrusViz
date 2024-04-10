@@ -163,7 +163,9 @@ export class MenuHandler extends BaseHandler {
 				},
 				{ type: 'separator' },
 				{
-					label: 'Close',
+					label: 'Delete',
+					// We use delete instead of close because we haven't implemented the feature to recover a closed assembling
+					// Todo: implement closed assembling feature
 					click: () => {
 						resolve({ name: 'close', data: null })
 					}

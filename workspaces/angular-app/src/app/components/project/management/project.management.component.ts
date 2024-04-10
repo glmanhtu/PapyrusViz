@@ -79,6 +79,21 @@ export class ProjectManagementComponent implements OnInit {
     });
   }
 
+
+  deleteProject(project: ProjectInfo) {
+    this.modalService.warning(
+      `Project deletion`,
+      `Are you sure you want to delete ${project.projName} project?`,
+      `All information associated to this project will be permanently deleted. This operation can not be undone !`
+    ).then((res) => {
+      if (res) {
+        this.electronIpc.send<string, void>('project:delete-project', project.projPath).then(() => {
+          this.projects = this.projects.filter((x) => x.projPath !== project.projPath)
+        })
+      }
+    })
+  }
+
   openProject(projectPath: string, retryWithMigrate = true) {
     this.electronIpc.send<string, ProjectDTO>('project:load-project', projectPath).then((project) => {
       this.projectBroadcastService.publish(project);
