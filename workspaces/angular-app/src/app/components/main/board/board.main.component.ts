@@ -96,12 +96,18 @@ export class BoardMainComponent implements OnInit {
 
   addImage(thumbnail: Thumbnail) {
     const imgHeights = []
-    for (let i = 0; i < this.assemblingImages.length; i++) {
-      const img = this.assemblingImages[i];
-      if (img.img.id === thumbnail.imgId) {
+    for (const frame of this.frameComponents) {
+      if (frame.image.id === thumbnail.imgId) {
+        this.selectedFrames.forEach((x, key) => {
+          x.showController = false;
+          this.selectedFrames.delete(key);
+        })
+        frame.showController = true;
+        this.selectedFrames.set(frame.image.id, frame);
+
         return;
       }
-      imgHeights.push(img.img.height * img.transforms.scale);
+      imgHeights.push(frame.image.height * frame.transforms.scale)
     }
     const avgHeight = imgHeights.reduce((p, c) => p + c, 0) / imgHeights.length;
     let imgScale = (avgHeight / thumbnail.orgImgHeight);
