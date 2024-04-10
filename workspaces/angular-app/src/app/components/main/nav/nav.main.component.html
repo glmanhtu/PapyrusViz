@@ -15,7 +15,7 @@
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<button ngbNavLink class="nav-link" role="tab" (contextmenu)="tabContextMenu()" *ngIf="!isEditModel">
+<button ngbNavLink class="nav-link unselectable" role="tab" (contextmenu)="tabContextMenu()" *ngIf="!isEditModel">
 	{{ assembling.name }}
 	<span class="btn-close ms-3 fw-light" (click)="close()"></span>
 </button>
