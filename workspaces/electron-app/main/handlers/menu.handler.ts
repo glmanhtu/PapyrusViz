@@ -17,10 +17,17 @@
 
 import { BaseHandler } from "./base.handler";
 import { app, BrowserWindow, globalShortcut, Menu } from 'electron';
-import { AssemblingImage, AssemblingImageRequest, ChannelMessage, ContextAction, ExtrasChannels } from 'shared-lib';
+import {
+	AssemblingImage,
+	AssemblingImageRequest,
+	ChannelMessage,
+	ContextAction,
+	ExtrasChannels,
+	ImageRequest,
+} from 'shared-lib';
 import { dbService } from '../services/database.service';
 import { categoryTbl } from '../entities/category';
-import { imgTbl } from '../entities/img';
+import { ImgStatus, imgTbl } from '../entities/img';
 import { eq } from 'drizzle-orm';
 import { takeUniqueOrThrow } from '../utils/data.utils';
 import { assemblingService } from '../services/assembling.service';
@@ -30,6 +37,7 @@ export class MenuHandler extends BaseHandler {
 	constructor(private readonly mainWin: BrowserWindow) {
 		super();
 		this.addRoute('menu:context:get-image-context', this.getImageContext.bind(this));
+		this.addRoute('menu:context:get-thumbnail-context', this.getThumbnailContext.bind(this));
 		this.mainWin = mainWin;
 		this.registerMenu();
 	}
@@ -99,6 +107,48 @@ export class MenuHandler extends BaseHandler {
 		]);
 		Menu.setApplicationMenu(menu);
 	}
+
+	private async getThumbnailContext(payload: ImageRequest): Promise<ContextAction<AssemblingImage>> {
+		const database = dbService.getConnection(payload.projectPath);
+		const img = await database.select().from(imgTbl)
+			.where(eq(imgTbl.id, payload.imgId)).then(takeUniqueOrThrow);
+
+		return new Promise<ContextAction<AssemblingImage>>((resolve, _) => {
+			const template: Electron.MenuItemConstructorOptions[] = [
+				{
+					label: 'Open',
+					click: () => {
+						resolve({ name: 'open', data: null })
+					}
+				},
+				{ type: 'separator' },
+				{
+					label: 'Archive',
+					enabled: img.status === ImgStatus.ONLINE,
+					click: () => {
+						resolve({ name: 'archive', data: null })
+					}
+				},
+				{
+					label: 'Unarchive',
+					enabled: img.status === ImgStatus.ARCHIVED,
+					click: () => {
+						resolve({ name: 'unarchive', data: null })
+					}
+				},
+				{ type: 'separator' },
+				{
+					label: 'Find similarities',
+					click: () => {
+						resolve({ name: 'similarity', data: null })
+					}
+				}
+			]
+			const menu = Menu.buildFromTemplate(template)
+			menu.popup({ window: this.mainWin })
+		});
+	}
+
 
 	private async getImageContext(payload: AssemblingImageRequest): Promise<ContextAction<AssemblingImage>> {
 		const database = dbService.getConnection(payload.projectPath);

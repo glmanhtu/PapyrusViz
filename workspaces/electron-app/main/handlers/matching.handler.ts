@@ -63,7 +63,7 @@ export class MatchingHandler extends BaseHandler {
 					? eq(imgTbl.categoryId, request.categoryId)
 					: undefined,
 				category.name === DefaultCategory.ACHIEVED
-					? eq(imgTbl.status, ImgStatus.ACHIEVED)
+					? eq(imgTbl.status, ImgStatus.ARCHIVED)
 					: eq(imgTbl.status, ImgStatus.ONLINE)
 			))
 			.innerJoin(imgTbl, eq(matchingImgTbl.targetImgId, imgTbl.id))

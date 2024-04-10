@@ -21,7 +21,7 @@ import { relations } from 'drizzle-orm';
 
 export enum ImgStatus {
   ONLINE = 1,
-  ACHIEVED = 2
+  ARCHIVED = 2
 }
 
 export const imgTbl = sqliteTable('img', {

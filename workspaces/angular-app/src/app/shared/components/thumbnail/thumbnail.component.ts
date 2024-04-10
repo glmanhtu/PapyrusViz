@@ -47,4 +47,5 @@ export class ThumbnailComponent implements OnInit {
     // Saturation is set to 100% and lightness to 50% for vibrant colors
     return `hsl(${hue}, 100%, 50%)`;
   }
+
 }

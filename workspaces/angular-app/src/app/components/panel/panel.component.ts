@@ -17,7 +17,7 @@
 
 import { Component, ElementRef, Inject, Input, OnInit, ViewChild } from '@angular/core';
 import { BroadcastService, PROJECT_BROADCAST_SERVICE_TOKEN } from '../../services/broadcast.service';
-import { CategoryDTO, ImgDto, ProjectDTO, Thumbnail } from 'shared-lib';
+import { CategoryDTO, ProjectDTO, Thumbnail } from 'shared-lib';
 import { NgbDropdown, NgbNav } from '@ng-bootstrap/ng-bootstrap';
 import { ElectronIpcService } from '../../services/electron-ipc.service';
 import { SimilarityCreationComponent } from '../similarity/creation/similarity.creation.component';
@@ -82,7 +82,7 @@ export class PanelComponent implements OnInit {
     }
   }
 
-  findMatching(img: ImgDto) {
+  findMatching(img: {id: number}) {
     this.active = 2;
     this.matchingPanel.findMatching(img);
   }

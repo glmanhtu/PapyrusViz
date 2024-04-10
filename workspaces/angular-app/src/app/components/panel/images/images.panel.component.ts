@@ -16,7 +16,14 @@
  */
 
 import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { CategoryDTO, ProjectDTO, Thumbnail, ThumbnailRequest, ThumbnailResponse } from 'shared-lib';
+import {
+  AssemblingImage,
+  CategoryDTO, ContextAction, ImageRequest,
+  ProjectDTO,
+  Thumbnail,
+  ThumbnailRequest,
+  ThumbnailResponse,
+} from 'shared-lib';
 import { NgbDropdown, NgbNav } from '@ng-bootstrap/ng-bootstrap';
 import { ElectronIpcService } from '../../../services/electron-ipc.service';
 import { FormControl } from '@angular/forms';
@@ -37,6 +44,9 @@ export class ImagesPanelComponent implements OnInit, AfterViewInit {
 
   @Output()
   openImage = new EventEmitter<Thumbnail>();
+
+  @Output()
+  queryImage = new EventEmitter<Thumbnail>();
 
   category = new FormControl(1);
   filter = new FormControl('');
@@ -85,5 +95,34 @@ export class ImagesPanelComponent implements OnInit, AfterViewInit {
       this.currentPage = page;
       this.isLoading = false;
     });
+  }
+
+  contextMenu(thumbnail: Thumbnail, idx: number) {
+    this.eIpc.send<ImageRequest, ContextAction<AssemblingImage>>('menu:context:get-thumbnail-context', {
+      projectPath: this.projectDto!.path,
+      imgId: thumbnail.imgId
+    }).then(x => {
+      switch (x.name) {
+        case 'similarity':
+          this.queryImage.emit(thumbnail);
+          break;
+
+        case 'open':
+          this.openImage.emit(thumbnail);
+          break
+
+        case 'archive':
+          this.eIpc.send<ImageRequest, void>('image:archive', { projectPath: this.projectDto!.path, imgId: thumbnail.imgId}).then(() => {
+            this.thumbnails.splice(idx, 1);
+          })
+          break;
+
+        case 'unarchive':
+          this.eIpc.send<ImageRequest, void>('image:unarchive', { projectPath: this.projectDto!.path, imgId: thumbnail.imgId}).then(() => {
+            this.thumbnails.splice(idx, 1);
+          })
+          break;
+      }
+    })
   }
 }

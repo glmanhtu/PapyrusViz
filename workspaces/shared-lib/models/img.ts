@@ -23,6 +23,12 @@ export type ThumbnailRequest = {
 	perPage: number
 }
 
+
+export type ImageRequest = {
+	projectPath: string,
+	imgId: number
+}
+
 export type Thumbnail = {
 	imgId: number,
 	path: string,

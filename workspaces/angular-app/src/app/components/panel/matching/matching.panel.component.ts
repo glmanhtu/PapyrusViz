@@ -17,8 +17,8 @@
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import {
-  CategoryDTO,
-  ImgDto,
+  AssemblingImage,
+  CategoryDTO, ContextAction, ImageRequest,
   MatchingImgRequest, MatchingRequest,
   MatchingResponse,
   ProjectDTO, Thumbnail,
@@ -55,7 +55,7 @@ export class MatchingPanelComponent implements OnInit {
   thumbnails: Thumbnail[] = [];
   activatedMatching: MatchingResponse | undefined;
 
-  imgDto: ImgDto;
+  queryImgId: number;
 
   currentPage = 0;
   isLoading: boolean = false; // is a boolean flag to track whether new items are being loaded.
@@ -83,8 +83,8 @@ export class MatchingPanelComponent implements OnInit {
     this.thumbnails.length = 0;
   }
 
-  findMatching(img: ImgDto) {
-    this.imgDto = img
+  findMatching(img: {id: number}) {
+    this.queryImgId = img.id
     this.getThumbnails();
   }
 
@@ -127,8 +127,37 @@ export class MatchingPanelComponent implements OnInit {
     })
   }
 
+  contextMenu(thumbnail: Thumbnail, idx: number) {
+    this.eIpc.send<ImageRequest, ContextAction<AssemblingImage>>('menu:context:get-thumbnail-context', {
+      projectPath: this.projectDto!.path,
+      imgId: thumbnail.imgId
+    }).then(x => {
+      switch (x.name) {
+        case 'similarity':
+          this.findMatching({id: thumbnail.imgId})
+          break;
+
+        case 'open':
+          this.openImage.emit(thumbnail);
+          break
+
+        case 'archive':
+          this.eIpc.send<ImageRequest, void>('image:archive', { projectPath: this.projectDto!.path, imgId: thumbnail.imgId}).then(() => {
+            this.thumbnails.splice(idx, 1);
+          })
+          break;
+
+        case 'unarchive':
+          this.eIpc.send<ImageRequest, void>('image:unarchive', { projectPath: this.projectDto!.path, imgId: thumbnail.imgId}).then(() => {
+            this.thumbnails.splice(idx, 1);
+          })
+          break;
+      }
+    })
+  }
+
   getThumbnails(page = 0, reset = true) {
-    if (!this.activatedMatching || !this.imgDto || this.isLoading || (this.isCompleted && !reset)) {
+    if (!this.activatedMatching || !this.queryImgId || this.isLoading || (this.isCompleted && !reset)) {
       return;
     }
     this.isLoading = true;
@@ -136,7 +165,7 @@ export class MatchingPanelComponent implements OnInit {
       projectPath: this.projectDto.path,
       categoryId: this.category.value!,
       matchingId: this.activatedMatching.id,
-      imgId: this.imgDto.id,
+      imgId: this.queryImgId,
       page: page,
       perPage: 20
     }

@@ -25,5 +25,5 @@
 </form>
 
 <div class="container">
-	<app-thumbnail (openImage)="openImage.emit($event)" *ngFor="let thumbnail of thumbnails" [thumbnail]="thumbnail"></app-thumbnail>
+	<app-thumbnail (openImage)="openImage.emit($event)" *ngFor="let thumbnail of thumbnails; index as i" [thumbnail]="thumbnail" (contextmenu)="contextMenu(thumbnail, i)"></app-thumbnail>
 </div>

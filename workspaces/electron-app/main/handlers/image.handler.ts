@@ -22,13 +22,26 @@ import { categoryTbl, DefaultCategory } from '../entities/category';
 import { takeUniqueOrThrow } from '../utils/data.utils';
 import path from 'node:path';
 import { dbService } from '../services/database.service';
-import { ThumbnailRequest, ThumbnailResponse } from 'shared-lib';
+import { ImageRequest, ThumbnailRequest, ThumbnailResponse } from 'shared-lib';
 
 
 export class ImageHandler extends BaseHandler {
 	constructor() {
 		super();
 		this.addRoute('image:get-thumbnails', this.getImages.bind(this));
+		this.addRoute('image:archive', this.archiveImage.bind(this));
+		this.addRoute('image:unarchive', this.unarchiveImage.bind(this));
+	}
+
+
+	private async archiveImage(request: ImageRequest): Promise<void> {
+		const database = dbService.getConnection(request.projectPath);
+		await database.update(imgTbl).set({status: ImgStatus.ARCHIVED}).where(eq(imgTbl.id, request.imgId));
+	}
+
+	private async unarchiveImage(request: ImageRequest): Promise<void> {
+		const database = dbService.getConnection(request.projectPath);
+		await database.update(imgTbl).set({status: ImgStatus.ONLINE}).where(eq(imgTbl.id, request.imgId));
 	}
 
 	private async getImages(request: ThumbnailRequest): Promise<ThumbnailResponse> {
@@ -45,7 +58,7 @@ export class ImageHandler extends BaseHandler {
 					? eq(imgTbl.categoryId, request.categoryId)
 					: undefined,
 				category.name === DefaultCategory.ACHIEVED
-					? eq(imgTbl.status, ImgStatus.ACHIEVED)
+					? eq(imgTbl.status, ImgStatus.ARCHIVED)
 					: eq(imgTbl.status, ImgStatus.ONLINE)
 			))
 			.orderBy(imgTbl.name)
