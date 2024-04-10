@@ -25,12 +25,9 @@
 				<button type="button" class="nav-link" (click)="add($event)">+</button>
 			</li>
 
-			@for (assembling of assemblings; track assembling) {
-				<li [ngbNavItem]="assembling.id" class="nav-item">
-					<button ngbNavLink class="nav-link" role="tab">
-						{{ assembling.name }}
-						<span class="btn-close ms-3 fw-light" (click)="close($event, assembling.id)"></span>
-					</button>
+			@for (assembling of assemblings; track assembling; let  i = $index) {
+				<li [ngbNavItem]="assembling.id" class="nav-item" >
+					<app-nav-main [assembling]="assembling" [projectDto]="projectDto" (closeAssembling)="assemblings.splice(i, 1)"></app-nav-main>
 					<ng-template ngbNavContent>
 						<app-board-main [assembling]="assembling" [projectDto]="projectDto" (queryImage)="findMatching($event)"></app-board-main>
 					</ng-template>

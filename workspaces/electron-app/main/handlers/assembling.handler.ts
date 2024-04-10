@@ -20,11 +20,11 @@ import {
 	AssemblingDTO, AssemblingExportRequest,
 	AssemblingImage,
 	AssemblingImageChangeRequest, AssemblingImageRequest,
-	GetAssemblingRequest, IMessage, Progress,
+	GetAssemblingRequest, IMessage, Message, PRequest, Progress,
 	Transforms,
 } from 'shared-lib';
 import { dbService } from '../services/database.service';
-import { assemblingTbl } from '../entities/assembling';
+import { AssemblingStatus, assemblingTbl } from '../entities/assembling';
 import { imgAssemblingTbl } from '../entities/img-assembling';
 import { imgTbl } from '../entities/img';
 import { and, eq } from 'drizzle-orm';
@@ -35,7 +35,6 @@ import { projectService } from '../services/project.service';
 import { imageService } from '../services/image.service';
 import sharp from 'sharp';
 import * as dataUtils from '../utils/data.utils';
-import { Message } from 'shared-lib/.dist/models/common';
 
 
 
@@ -44,6 +43,8 @@ export class AssemblingHandler extends BaseHandler {
 		super();
 		this.addRoute('assembling:get-assemblings', this.getAssemblings.bind(this));
 		this.addRoute('assembling:create-assembling', this.createAssembling.bind(this));
+		this.addRoute('assembling:update-assembling', this.updateAssembling.bind(this));
+		this.addRoute('assembling:close-assembling', this.closeAssembling.bind(this));
 		this.addRoute('assembling:get-activated-assembling-id', this.getActivatedAssemblingId.bind(this));
 		this.addRoute('assembling:update-assembling-img', this.updateAssemblingImage.bind(this));
 		this.addRoute('assembling:create-assembling-img', this.createAssemblingImage.bind(this));
@@ -59,7 +60,8 @@ export class AssemblingHandler extends BaseHandler {
 
 	private async getAssemblings(projectPath: string): Promise<AssemblingDTO[]> {
 		const database = dbService.getConnection(projectPath);
-		return database.select().from(assemblingTbl);
+		// We don't specify projectId since there should be only one project available at a time
+		return database.select().from(assemblingTbl).where(eq(assemblingTbl.status, AssemblingStatus.ENABLED));
 	}
 
 	private async getActivatedAssemblingId(projectPath: string): Promise<number> {
@@ -164,6 +166,21 @@ export class AssemblingHandler extends BaseHandler {
 			description: `Final output image is generated!`
 		}))
 
+	}
+
+	private async updateAssembling(payload: PRequest<AssemblingDTO>): Promise<void> {
+		const database = dbService.getConnection(payload.projectPath);
+		await database.update(assemblingTbl).set({
+			name: payload.payload.name,
+			group: payload.payload.group,
+		}).where(eq(assemblingTbl.id, payload.payload.id));
+	}
+
+	private async closeAssembling(payload: PRequest<number>): Promise<void> {
+		const database = dbService.getConnection(payload.projectPath);
+		await database.update(assemblingTbl).set({
+			status: AssemblingStatus.CLOSED,
+		}).where(eq(assemblingTbl.id, payload.payload));
 	}
 
 	private async createAssembling(projectPath: string): Promise<AssemblingDTO> {

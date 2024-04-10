@@ -1,4 +1,4 @@
-/*
+/*!
  * Copyright (C) 2024  Manh Tu VU
  *
  * This program is free software: you can redistribute it and/or modify
@@ -14,24 +14,3 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
-import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
-import { projectTbl } from './project';
-import { sql } from "drizzle-orm";
-
-export enum AssemblingStatus {
-    ENABLED = 1,
-    CLOSED = 2
-}
-
-export const assemblingTbl = sqliteTable('assembling', {
-    id: integer('id').primaryKey({autoIncrement: true}),
-    name: text('name'),
-    group: text('group'),
-    status: integer('status').default(AssemblingStatus.ENABLED),
-    createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
-    projectId: integer('project_id').references(() => projectTbl.id),
-});
-
-
-export type Assembling = typeof assemblingTbl.$inferSelect

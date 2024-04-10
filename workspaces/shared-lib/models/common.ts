@@ -22,6 +22,11 @@ export type Progress = {
 }
 
 
+export type PRequest<R> = {
+	projectPath: string,
+	payload: R
+}
+
 export interface IMessage<R> {
 	status: string,
 	payload: R | string,

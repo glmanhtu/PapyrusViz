@@ -18,6 +18,7 @@
 import { BaseHandler } from "./base.handler";
 import { app, BrowserWindow, globalShortcut, Menu } from 'electron';
 import {
+	AssemblingDTO,
 	AssemblingImage,
 	AssemblingImageRequest,
 	ChannelMessage,
@@ -38,6 +39,7 @@ export class MenuHandler extends BaseHandler {
 		super();
 		this.addRoute('menu:context:get-image-context', this.getImageContext.bind(this));
 		this.addRoute('menu:context:get-thumbnail-context', this.getThumbnailContext.bind(this));
+		this.addRoute('menu:context:get-assembling-context', this.getAssemblingContext.bind(this));
 		this.mainWin = mainWin;
 		this.registerMenu();
 	}
@@ -143,6 +145,29 @@ export class MenuHandler extends BaseHandler {
 						resolve({ name: 'similarity', data: null })
 					}
 				}
+			]
+			const menu = Menu.buildFromTemplate(template)
+			menu.popup({ window: this.mainWin })
+		});
+	}
+
+
+	private async getAssemblingContext(): Promise<ContextAction<AssemblingDTO>> {
+		return new Promise<ContextAction<AssemblingDTO>>((resolve, _) => {
+			const template: Electron.MenuItemConstructorOptions[] = [
+				{
+					label: 'Rename',
+					click: () => {
+						resolve({ name: 'rename', data: null })
+					}
+				},
+				{ type: 'separator' },
+				{
+					label: 'Close',
+					click: () => {
+						resolve({ name: 'close', data: null })
+					}
+				},
 			]
 			const menu = Menu.buildFromTemplate(template)
 			menu.popup({ window: this.mainWin })

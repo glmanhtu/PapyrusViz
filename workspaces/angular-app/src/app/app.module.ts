@@ -41,6 +41,7 @@ import { MatchingPanelComponent } from './components/panel/matching/matching.pan
 import { ImagesPanelComponent } from './components/panel/images/images.panel.component';
 import { ProgressComponent } from './shared/components/progress/progress.component';
 import { InfoModalComponent } from './shared/components/info-modal/info-modal.component';
+import { NavMainComponent } from './components/main/nav/nav.main.component';
 
 
 // AoT requires an exported function for factories
@@ -63,7 +64,8 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
 		MatchingPanelComponent,
 		ImagesPanelComponent,
 		ProgressComponent,
-		InfoModalComponent
+		InfoModalComponent,
+		NavMainComponent
   ],
 	imports: [
 		BrowserModule,
