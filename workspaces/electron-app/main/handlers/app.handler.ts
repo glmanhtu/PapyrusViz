@@ -16,16 +16,17 @@
  */
 
 import { BaseHandler } from "./base.handler";
-import { BrowserWindow } from 'electron';
+import { App } from '../components/app';
 
 export class AppHandler extends BaseHandler {
-	constructor(private readonly mainWin: BrowserWindow) {
+	constructor() {
 		super();
 		this.addRoute('app:quit', this.quit.bind(this));
-		this.mainWin = mainWin;
 	}
 
 	private async quit(): Promise<void> {
-		this.mainWin.close();
+		for (const win of App.getWindows()) {
+			win.electronWindow.close();
+		}
 	}
 }

@@ -15,8 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import * as remoteMain from '@electron/remote/main';
-import { app, BrowserWindow, ipcMain, nativeImage } from 'electron';
+import { app, BrowserWindow, nativeImage } from 'electron';
 import * as path from 'node:path';
 import { Logger } from '../utils/logger';
 import { GlobalConfig } from 'shared-lib';
@@ -55,11 +54,6 @@ export class Window {
 				devTools: global.appConfig.isOpenDevTools
 			},
 		});
-
-		// Disable the remote module to enhance security
-		if (global.appConfig.isEnableRemoteModule) {
-			remoteMain.enable(this._electronWindow.webContents);
-		}
 	}
 
 	private loadIcon(): Electron.NativeImage | undefined {
@@ -93,23 +87,14 @@ export class Window {
 			this.openDevTools();
 		}
 
-		// When the window is closed`
-		this._electronWindow.on('closed', () => {
-			// Remove IPC Main listeners
-			ipcMain.removeAllListeners();
-			// Delete current reference
-			delete this._electronWindow;
-		});
+	}
+
+	public cleanup() {
+		delete this._electronWindow;
 	}
 
 	private openDevTools(): void {
 		this._electronWindow.webContents.openDevTools();
-		this._electronWindow.webContents.on('devtools-opened', () => {
-			this._electronWindow.focus();
-			setImmediate(() => {
-				this._electronWindow.focus();
-			});
-		});
 	}
 
 

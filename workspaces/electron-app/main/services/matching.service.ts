@@ -17,7 +17,7 @@
 
 import { dbService } from './database.service';
 import { takeUniqueOrThrow } from '../utils/data.utils';
-import { MatchingDto, MatchingType } from 'shared-lib';
+import { MatchingDto, MatchingMethod, MatchingType } from 'shared-lib';
 import { projectService } from './project.service';
 import { Matching, matchingImgTbl, matchingTbl } from '../entities/matching';
 import { createReadStream } from 'fs';
@@ -25,7 +25,6 @@ import * as csv from '@fast-csv/parse';
 import { imageService } from './image.service';
 import { configService } from './config.service';
 import { Config } from '../entities/user-config-tbl';
-import { MatchingMethod } from 'shared-lib/.dist/models/matching';
 
 class MatchingService {
 

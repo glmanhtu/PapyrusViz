@@ -41,19 +41,20 @@ global.appConfig =
 		? defaultConfig
 		: _.merge(defaultConfig, currentConfig);
 
-// Launch app
-App.launch((mainWin) => {
 
-	const handlers = [
-		new DialogHandler(mainWin),
-		new MenuHandler(mainWin),
-		new AppHandler(mainWin),
-		new ProjectHandler(),
-		new CategoryHandler(),
-		new ImageHandler(),
-		new AssemblingHandler(),
-		new MatchingHandler()
-	]
-	App.registerHandlers(handlers);
-});
+const handlers = [
+	new DialogHandler(),
+	new MenuHandler(),
+	new AppHandler(),
+	new ProjectHandler(),
+	new CategoryHandler(),
+	new ImageHandler(),
+	new AssemblingHandler(),
+	new MatchingHandler()
+]
+
+App.registerHandlers(handlers);
+
+// Launch app
+App.launch();
 

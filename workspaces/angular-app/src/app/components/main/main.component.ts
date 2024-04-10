@@ -60,7 +60,15 @@ export class MainComponent implements OnInit {
   }
 
   hotKeyListener(message: IMessage<string>) {
-    this.getActivatedBoard().commandListener(message.payload);
+    let board: BoardMainComponent;
+    try {
+      board = this.getActivatedBoard()
+    } catch (err) {
+      // If an error is occurred here, it is likely that UI hasn't been loaded yet
+      // Therefore, it is okay to ignore this error.
+      return;
+    }
+    board.commandListener(message.payload);
   }
 
   getActivatedBoard(): BoardMainComponent {

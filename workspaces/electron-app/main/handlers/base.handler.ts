@@ -31,14 +31,14 @@ export abstract class BaseHandler {
 		this.routes.set(action, method);
 	}
 
-	protected addContinuousRoute(action: string, method: (payload: unknown, reply: (message: IMessage<unknown>) => void) => Promise<void>): void {
+	protected addContinuousRoute(action: string, method: (payload: unknown, reply: (message: IMessage<unknown>) => void, clientId?: number) => Promise<void>): void {
 		if (!action.includes('::')) {
 			throw new Error('Continuous Route must use :: to separate controller and action')
 		}
 		this.continuousHandlers.set(action, method);
 	}
 
-	public getRoutes(): Map<string, (payload: unknown) => Promise<unknown>> {
+	public getRoutes(): Map<string, (payload: unknown, clientId?: number) => Promise<unknown>> {
 		return this.routes;
 	}
 

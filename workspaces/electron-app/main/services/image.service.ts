@@ -18,10 +18,10 @@
 import { Category } from '../entities/category';
 import { Img, imgTbl } from '../entities/img';
 import path from 'node:path';
-import { ImgDto } from 'shared-lib/.dist/models/img';
 import sharp from 'sharp';
 import { like } from 'drizzle-orm';
 import { dbService } from './database.service';
+import { ImgDto } from 'shared-lib';
 
 class ImageService {
 

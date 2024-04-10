@@ -17,8 +17,7 @@
 
 import { Component, ElementRef, Inject, Input, ViewChild, Output, EventEmitter } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
-import { ImgDto } from 'shared-lib/.dist/models/img';
-import { Transforms } from 'shared-lib';
+import { ImgDto, Transforms } from 'shared-lib';
 
 
 @Component({

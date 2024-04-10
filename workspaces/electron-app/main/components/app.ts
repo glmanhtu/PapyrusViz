@@ -15,40 +15,43 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { app, BrowserWindow, ipcMain, shell, protocol, net } from 'electron';
+import { app, ipcMain, shell, protocol, net, BrowserWindow } from 'electron';
 import { Window } from './window';
 import { BaseHandler } from '../handlers/base.handler';
-import { IMessage } from 'shared-lib';
-import { Message } from 'shared-lib/.dist/models/common';
+import { IMessage, Message } from 'shared-lib';
 import { Logger } from '../utils/logger';
 
 export class App {
-	private static _wrapper: Window;
+	private static _windows = new Map<number, Window>();
 
-	public static launch(callback: (mainWin: BrowserWindow) => void): void {
+	public static launch(): void {
 		app.on('window-all-closed', App.quit);
 		app.whenReady().then(() => {
 			protocol.handle('atom', (request) =>
 				net.fetch('file://' + request.url.slice('atom://'.length)))
-			App.start();
-			callback(this.electronWindow);
+			App.createWindow();
 		});
 
 		// Limit navigation and open external links in default browser
 		app.on('web-contents-created', App.openExternalLinksInDefaultBrowser);
 	}
 
-	public static get electronWindow(): BrowserWindow | undefined {
-		return this._wrapper ? this._wrapper.electronWindow : undefined;
+	public static getWindows(): Window[] {
+		return [...this._windows.values()];
+	}
+
+	public static getWindow(id: number): BrowserWindow {
+		return this._windows.get(id).electronWindow;
 	}
 
 	public static registerHandlers(handlers: BaseHandler[]) {
 		const combinedRouteMap = this.combineRoutes(...handlers);
 		ipcMain.on('ipc-request', async (event, message: { type: string; payload: unknown; requestId: string }) => {
 			const { type, payload, requestId } = message;
+			console.log(message)
 			const handlerFunction = combinedRouteMap.get(type);
 			if (handlerFunction) {
-				handlerFunction(payload)
+				handlerFunction(payload, event.sender.id)
 					.then((response) => {
 						event.reply(`ipc-response:${requestId}`, Message.success(response));
 					}).catch((err) => {
@@ -68,7 +71,7 @@ export class App {
 			if (handlerFunction) {
 				handlerFunction(payload, async (message) => {
 					event.reply(`ipc-continuous-response:${requestId}`, message);
-				}).then(() => {
+				}, event.sender.id).then(() => {
 					event.reply(`ipc-continuous-response:${requestId}`, Message.complete(''));
 				}).catch((err) => {
 					Logger.error(err)
@@ -79,17 +82,25 @@ export class App {
 			}
 		})
 	}
-
-	private static start() {
-		App._wrapper = new Window();
+	public static createWindow() {
+		const window = new Window();
+		const clientId = window.electronWindow.webContents.id;
+		App._windows.set(clientId, window);
+		window.electronWindow.on('closed', () => {
+			window.cleanup();
+			App._windows.delete(clientId);
+		})
+		console.log(`Windows ${clientId} is created!`)
+		return clientId
 	}
 
 	private static quit() {
+		ipcMain.removeAllListeners();
 		app.quit();
 	}
 
-	private static combineRoutes(...handlers: BaseHandler[]): Map<string, (payload: unknown) => Promise<unknown>> {
-		const combined = new Map<string, (payload: unknown) => Promise<unknown>>();
+	private static combineRoutes(...handlers: BaseHandler[]): Map<string, (payload: unknown, clientId?: number) => Promise<unknown>> {
+		const combined = new Map<string, (payload: unknown, clientId?: number) => Promise<unknown>>();
 		handlers.forEach(handler => {
 			handler.getRoutes().forEach((value, key) => {
 				combined.set(key, value);
@@ -98,8 +109,8 @@ export class App {
 		return combined;
 	}
 
-	private static combineContinuousRoutes(...handlers: BaseHandler[]): Map<string, (payload: unknown, listener: (message: IMessage<unknown>) => void) => Promise<void>> {
-		const combined = new Map<string, (payload: unknown, listener: (message: IMessage<unknown>) => void) => Promise<void>>();
+	private static combineContinuousRoutes(...handlers: BaseHandler[]): Map<string, (payload: unknown, listener: (message: IMessage<unknown>) => void, clientId?: number) => Promise<void>> {
+		const combined = new Map<string, (payload: unknown, listener: (message: IMessage<unknown>) => void, clientId?: number) => Promise<void>>();
 		handlers.forEach(handler => {
 			handler.getContinuousHandlers().forEach((value, key) => {
 				combined.set(key, value);

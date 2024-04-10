@@ -16,7 +16,7 @@
  */
 
 import { BaseHandler } from "./base.handler";
-import { app, BrowserWindow, globalShortcut, Menu } from 'electron';
+import { app, globalShortcut, Menu } from 'electron';
 import {
 	AssemblingDTO,
 	AssemblingImage,
@@ -34,14 +34,14 @@ import { takeUniqueOrThrow } from '../utils/data.utils';
 import { assemblingService } from '../services/assembling.service';
 import { imageService } from '../services/image.service';
 import MenuItemConstructorOptions = Electron.MenuItemConstructorOptions;
+import { App } from '../components/app';
 
 export class MenuHandler extends BaseHandler {
-	constructor(private readonly mainWin: BrowserWindow) {
+	constructor() {
 		super();
 		this.addRoute('menu:context:get-image-context', this.getImageContext.bind(this));
 		this.addRoute('menu:context:get-thumbnail-context', this.getThumbnailContext.bind(this));
 		this.addRoute('menu:context:get-assembling-context', this.getAssemblingContext.bind(this));
-		this.mainWin = mainWin;
 		this.registerMenu();
 	}
 
@@ -53,7 +53,11 @@ export class MenuHandler extends BaseHandler {
 				payload: command
 			}
 		}
-		this.mainWin.webContents.send('ipc-extras', message)
+		for (const win of App.getWindows()) {
+			if (win.electronWindow.isFocused()) {
+				win.electronWindow.webContents.send('ipc-extras', message)
+			}
+		}
 	}
 
 	private registerMenu() {
@@ -80,12 +84,19 @@ export class MenuHandler extends BaseHandler {
 				{ role: 'quit' }
 			]
 		}] : [];
-		
+
 		const menu: MenuItemConstructorOptions[] = [
 			{
 				label: 'File',
 				submenu: [
-					isMac ? { role: 'close' } : { role: 'quit' }
+					isMac ? { role: 'close' } : { role: 'quit' },
+					{
+						label: 'New Window',
+						accelerator: 'CmdOrCtrl+N',
+						click: () => {
+							App.createWindow();
+						}
+					}
 				]
 			},
 			{
@@ -127,7 +138,7 @@ export class MenuHandler extends BaseHandler {
 		Menu.setApplicationMenu(Menu.buildFromTemplate(template));
 	}
 
-	private async getThumbnailContext(payload: ImageRequest): Promise<ContextAction<AssemblingImage>> {
+	private async getThumbnailContext(payload: ImageRequest, clientId: number): Promise<ContextAction<AssemblingImage>> {
 		const database = dbService.getConnection(payload.projectPath);
 		const img = await database.select().from(imgTbl)
 			.where(eq(imgTbl.id, payload.imgId)).then(takeUniqueOrThrow);
@@ -164,12 +175,12 @@ export class MenuHandler extends BaseHandler {
 				}
 			]
 			const menu = Menu.buildFromTemplate(template)
-			menu.popup({ window: this.mainWin })
+			menu.popup({ window: App.getWindow(clientId) })
 		});
 	}
 
 
-	private async getAssemblingContext(): Promise<ContextAction<AssemblingDTO>> {
+	private async getAssemblingContext(_: unknown, clientId: number): Promise<ContextAction<AssemblingDTO>> {
 		return new Promise<ContextAction<AssemblingDTO>>((resolve, _) => {
 			const template: Electron.MenuItemConstructorOptions[] = [
 				{
@@ -189,12 +200,12 @@ export class MenuHandler extends BaseHandler {
 				},
 			]
 			const menu = Menu.buildFromTemplate(template)
-			menu.popup({ window: this.mainWin })
+			menu.popup({ window: App.getWindow(clientId) })
 		});
 	}
 
 
-	private async getImageContext(payload: AssemblingImageRequest): Promise<ContextAction<AssemblingImage>> {
+	private async getImageContext(payload: AssemblingImageRequest, clientId: number): Promise<ContextAction<AssemblingImage>> {
 		const database = dbService.getConnection(payload.projectPath);
 		const img = await database.select().from(imgTbl)
 			.where(eq(imgTbl.id, payload.imageId)).then(takeUniqueOrThrow);
@@ -250,7 +261,7 @@ export class MenuHandler extends BaseHandler {
 				}
 			]
 			const menu = Menu.buildFromTemplate(template)
-			menu.popup({ window: this.mainWin })
+			menu.popup({ window: App.getWindow(clientId) })
 		});
 
 	}
