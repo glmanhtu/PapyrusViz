@@ -59,6 +59,9 @@
 	</select>
 </form>
 
-<div class="container">
+<div class="container" *ngIf="activatedMatching">
 	<app-thumbnail (openImage)="openImage.emit($event)" *ngFor="let thumbnail of thumbnails; index as i" (contextmenu)="contextMenu(thumbnail, i)" [thumbnail]="thumbnail"></app-thumbnail>
+	<span *ngIf="thumbnails.length === 0 && queryImgId !== undefined" class="align-items-center align-content-center">
+		No matching found!
+	</span>
 </div>

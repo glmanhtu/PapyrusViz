@@ -33,6 +33,7 @@ import { eq } from 'drizzle-orm';
 import { takeUniqueOrThrow } from '../utils/data.utils';
 import { assemblingService } from '../services/assembling.service';
 import { imageService } from '../services/image.service';
+import MenuItemConstructorOptions = Electron.MenuItemConstructorOptions;
 
 export class MenuHandler extends BaseHandler {
 	constructor(private readonly mainWin: BrowserWindow) {
@@ -65,7 +66,22 @@ export class MenuHandler extends BaseHandler {
 		app.on('browser-window-blur', function() {
 			globalShortcut.unregister('CommandOrControl+A');
 		});
-		const menu = Menu.buildFromTemplate([
+		const template: MenuItemConstructorOptions[] = isMac ? [{
+			label: app.name,
+			submenu: [
+				{ role: 'about' },
+				{ type: 'separator' },
+				{ role: 'services' },
+				{ type: 'separator' },
+				{ role: 'hide' },
+				{ role: 'hideOthers' },
+				{ role: 'unhide' },
+				{ type: 'separator' },
+				{ role: 'quit' }
+			]
+		}] : [];
+		
+		const menu: MenuItemConstructorOptions[] = [
 			{
 				label: 'File',
 				submenu: [
@@ -106,8 +122,9 @@ export class MenuHandler extends BaseHandler {
 					{ role: 'togglefullscreen' }
 				]
 			},
-		]);
-		Menu.setApplicationMenu(menu);
+		];
+		template.push(...menu)
+		Menu.setApplicationMenu(Menu.buildFromTemplate(template));
 	}
 
 	private async getThumbnailContext(payload: ImageRequest): Promise<ContextAction<AssemblingImage>> {
