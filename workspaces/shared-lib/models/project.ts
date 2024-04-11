@@ -22,3 +22,9 @@ export type ProjectDTO = {
 	dataPath: string,
 	createdAt?: string
 }
+
+export type ProjectInfo = {
+	projName: string,
+	projPath: string,
+	datasetPath: string
+}

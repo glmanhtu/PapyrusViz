@@ -19,8 +19,7 @@ import { Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core'
 import { NgbModal, NgbModalConfig } from '@ng-bootstrap/ng-bootstrap';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap/modal/modal-ref';
 import { ElectronIpcService } from '../../../services/electron-ipc.service';
-import { ProjectInfo } from '../../../../../../electron-app/main/models/app-data';
-import { FileDialogRequest, FileDialogResponse, Progress, ProjectDTO } from 'shared-lib';
+import { FileDialogRequest, FileDialogResponse, Progress, ProjectDTO, ProjectInfo } from 'shared-lib';
 import { BroadcastService, PROJECT_BROADCAST_SERVICE_TOKEN } from '../../../services/broadcast.service';
 import { ProgressComponent } from '../../../shared/components/progress/progress.component';
 import { ModalService } from '../../../services/modal.service';

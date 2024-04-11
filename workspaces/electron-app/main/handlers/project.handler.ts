@@ -16,7 +16,16 @@
  */
 
 import { BaseHandler } from './base.handler';
-import { GlobalConfig, IMessage, MatchingMethod, MatchingType, Message, Progress, ProjectDTO } from 'shared-lib';
+import {
+	GlobalConfig,
+	IMessage,
+	MatchingMethod,
+	MatchingType,
+	Message,
+	Progress,
+	ProjectDTO,
+	ProjectInfo,
+} from 'shared-lib';
 import { promises as fs } from 'fs';
 
 import { projectTbl } from '../entities/project';
@@ -27,7 +36,6 @@ import { imgTbl } from '../entities/img';
 import * as dataUtils from '../utils/data.utils';
 import { takeUniqueOrThrow } from '../utils/data.utils';
 import * as pathUtils from '../utils/path.utils';
-import { ProjectInfo } from '../models/app-data';
 import { dbService } from '../services/database.service';
 import { OldProjectModel } from '../models/project';
 import { assemblingTbl } from '../entities/assembling';

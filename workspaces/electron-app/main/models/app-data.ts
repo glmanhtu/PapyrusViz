@@ -15,11 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export type ProjectInfo = {
-	projName: string,
-	projPath: string,
-	datasetPath: string
-}
+
+
+import { ProjectInfo } from 'shared-lib';
 
 export type AppData = {
 	projects: ProjectInfo[]
