@@ -289,6 +289,7 @@ export class ProjectHandler extends BaseHandler {
 			path: '',
 			projectId: projectId
 		})
+		await assemblingService.createAssembling(payload.path);
 		await this.addProjectToAppData({projName: payload.name, projPath: payload.path, datasetPath: payload.dataPath});
 	}
 
