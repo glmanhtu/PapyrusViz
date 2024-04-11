@@ -25,6 +25,7 @@ import { ConfirmModalComponent } from './components/confirm-modal/confirm-modal.
 import { ReactiveFormsModule } from '@angular/forms';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { CommonModule } from '@angular/common';
+import { MatchingButtonComponent } from './components/matching-button/matching-button.component';
 
 @NgModule({
 	declarations: [
@@ -34,6 +35,7 @@ import { CommonModule } from '@angular/common';
 		ProgressComponent,
 		InfoModalComponent,
 		ConfirmModalComponent,
+		MatchingButtonComponent
   ],
 	imports: [
 		ReactiveFormsModule,
@@ -47,6 +49,7 @@ import { CommonModule } from '@angular/common';
 		ProgressComponent,
 		InfoModalComponent,
 		ConfirmModalComponent,
+		MatchingButtonComponent
 	]
 })
 export class SharedModule {}

@@ -15,51 +15,13 @@
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<div class="form-group" *ngIf="!activatedMatching">
-	<label>No similarity matrix found!</label>
+<app-matching-button #matchingButton [projectDto]="projectDto"></app-matching-button>
 
-	<button type="button" class="btn btn-success btn-sm mt-2" (click)="createMatching()">Create matching</button>
-</div>
-<form  *ngIf="activatedMatching">
+<select *ngIf="matchingButton.activatedMatching" class="form-control form-control-sm mb-1" [formControl]="category" (change)="getThumbnails()">
+	<option *ngFor="let category of categories" [selected]="category.isActivated" value="{{category.id}}">{{category.name}}</option>
+</select>
 
-	<div ngbDropdown class="d-flex align-items-center" container="body">
-
-		<div class="input-group input-group-sm mb-1">
-			<span class="input-group-text" id="basic-addon3">Matching: </span>
-			<button type="button" class="btn btn-outline-success btn-sm flex-grow-1" id="dropdownForm1" ngbDropdownToggle>
-				{{activatedMatching.name}}
-			</button>
-		</div>
-
-		<div ngbDropdownMenu aria-labelledby="dropdownForm1">
-			<div class="overflow-auto">
-				<table class="table table-sm p-3">
-					<tbody>
-					<tr *ngFor="let matching of matchings" >
-						<td class="ps-2 pe-5">{{matching.name}}</td>
-						<td>
-							<div class="text-right d-flex justify-content-end">
-								<button type="button" class="btn btn-outline-success btn-sm me-1" (click)="setActivatedMatching(matching)">Select</button>
-								<button type="button" class="btn btn-outline-danger btn-sm" (click)="deleteMatching(matching)">X</button>
-							</div>
-						</td>
-					</tr>
-					</tbody>
-				</table>
-			</div>
-
-			<div class="text-right d-flex justify-content-end">
-				<button type="button" class="btn btn-outline-success btn-sm me-2" (click)="createMatching()" >Create matching</button>
-			</div>
-		</div>
-	</div>
-
-	<select class="form-control form-control-sm mb-1" [formControl]="category" (change)="getThumbnails()">
-		<option *ngFor="let category of categories" [selected]="category.isActivated" value="{{category.id}}">{{category.name}}</option>
-	</select>
-</form>
-
-<div class="container" *ngIf="activatedMatching">
+<div class="container" *ngIf="matchingButton.activatedMatching">
 	<app-thumbnail (openImage)="openImage.emit($event)" *ngFor="let thumbnail of thumbnails; index as i" (contextmenu)="contextMenu(thumbnail, i)" [thumbnail]="thumbnail"></app-thumbnail>
 	<span *ngIf="thumbnails.length === 0 && queryImgId !== undefined" class="align-items-center align-content-center">
 		No matching found!

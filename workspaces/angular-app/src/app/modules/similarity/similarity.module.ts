@@ -21,10 +21,16 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { SimilarityComponent } from './similarity.component';
+import { NavComponent } from './components/nav/nav.component';
+import { PanelComponent } from './components/panel/panel.component';
+import { MainComponent } from './components/main/main.component';
 
 @NgModule({
 	declarations: [
-		SimilarityComponent
+		NavComponent,
+		SimilarityComponent,
+		PanelComponent,
+		MainComponent
   ],
 	imports: [
 		ReactiveFormsModule,

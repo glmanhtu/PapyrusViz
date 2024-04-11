@@ -15,12 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import {
   AssemblingImage,
   CategoryDTO, ContextAction, ImageRequest,
-  MatchingImgRequest, MatchingRequest,
-  MatchingResponse,
+  MatchingImgRequest,
   ProjectDTO, Thumbnail,
   ThumbnailResponse,
 } from 'shared-lib';
@@ -28,7 +27,7 @@ import { NgbDropdown, NgbNav } from '@ng-bootstrap/ng-bootstrap';
 import { ElectronIpcService } from '../../../../../services/electron-ipc.service';
 import { SimilarityCreationComponent } from '../../../../../shared/components/similarity/creation/similarity.creation.component';
 import { FormControl } from '@angular/forms';
-import { ModalService } from '../../../../../services/modal.service';
+import { MatchingButtonComponent } from '../../../../../shared/components/matching-button/matching-button.component';
 
 @Component({
   selector: 'app-matching-panel',
@@ -41,6 +40,9 @@ export class MatchingPanelComponent implements OnInit {
   @Input()
   projectDto: ProjectDTO;
 
+  @ViewChild(MatchingButtonComponent)
+  matchingComponent: MatchingButtonComponent;
+
   @Input()
   similarityCreationComponent: SimilarityCreationComponent;
 
@@ -51,9 +53,7 @@ export class MatchingPanelComponent implements OnInit {
   categories: CategoryDTO[] = [];
   category = new FormControl(1);
 
-  matchings: MatchingResponse[] = [];
   thumbnails: Thumbnail[] = [];
-  activatedMatching: MatchingResponse | undefined;
 
   queryImgId: number | undefined = undefined;
 
@@ -64,23 +64,9 @@ export class MatchingPanelComponent implements OnInit {
 
   constructor(
     private eIpc: ElectronIpcService,
-    private modalService: ModalService
   ) {}
 
   ngOnInit(): void {
-    this.initMatchings()
-  }
-
-  initMatchings() {
-    this.eIpc.send<string, MatchingResponse[]>('matching:get-matchings', this.projectDto!.path).then((matchings) => {
-      this.matchings = matchings;
-    });
-
-    this.eIpc.send<string, MatchingResponse>('matching:get-activated-matching', this.projectDto!.path).then((matching) => {
-      this.activatedMatching = matching;
-    });
-
-    this.thumbnails.length = 0;
   }
 
   findMatching(img: {id: number}) {
@@ -88,43 +74,8 @@ export class MatchingPanelComponent implements OnInit {
     this.getThumbnails();
   }
 
-  createMatching() {
-    this.modalService.similarityCreation(this.projectDto).result.then((x) => {
-      if (x) {
-        this.initMatchings();
-      }
-    })
-  }
-
   loadData() {
     this.getThumbnails(this.currentPage + 1, false);
-  }
-
-  setActivatedMatching(matching: MatchingResponse) {
-    this.eIpc.send<MatchingRequest, void>('matching:set-activated-matching', {
-      projectPath: this.projectDto.path,
-      matchingId: matching.id
-    }).then(() => {
-      this.activatedMatching = matching;
-      this.thumbnails = [];
-    })
-  }
-
-  deleteMatching(matching: MatchingResponse) {
-    this.eIpc.send<MatchingRequest, void>('matching:delete-matching', {
-      projectPath: this.projectDto.path,
-      matchingId: matching.id
-    }).then(() => {
-      this.matchings = this.matchings.filter(x => x.id !== matching.id);
-      if (this.matchings.length > 0) {
-        if (this.activatedMatching === undefined || this.activatedMatching.id === matching.id) {
-          this.setActivatedMatching(this.matchings[0]);
-        }
-      } else {
-        this.activatedMatching = undefined;
-      }
-      this.thumbnails = [];
-    })
   }
 
   contextMenu(thumbnail: Thumbnail, idx: number) {
@@ -157,14 +108,14 @@ export class MatchingPanelComponent implements OnInit {
   }
 
   getThumbnails(page = 0, reset = true) {
-    if (!this.activatedMatching || this.queryImgId === undefined || this.isLoading || (this.isCompleted && !reset)) {
+    if (!this.matchingComponent.activatedMatching || this.queryImgId === undefined || this.isLoading || (this.isCompleted && !reset)) {
       return;
     }
     this.isLoading = true;
     const thumbnailRequest: MatchingImgRequest = {
       projectPath: this.projectDto.path,
       categoryId: this.category.value!,
-      matchingId: this.activatedMatching.id,
+      matchingId: this.matchingComponent.activatedMatching.id,
       imgId: this.queryImgId,
       page: page,
       perPage: 20
