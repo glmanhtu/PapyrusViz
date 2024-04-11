@@ -231,6 +231,7 @@ export class ProjectHandler extends BaseHandler {
 		const databaseFile = pathUtils.projectFile(payload.path)
 		const database = dbService.createConnection(databaseFile);
 		dbService.migrateDatabase(database, path.join(__dirname, 'schema'));
+		dbService.addConnection(payload.path, database)
 
 		const project = await database.insert(projectTbl).values({
 			...payload,
@@ -239,7 +240,7 @@ export class ProjectHandler extends BaseHandler {
 		const projectId = project.insertedId;
 
 		await reply(Message.success({
-			percentage: 5, title: 'Step 1/3 - Creating project', description: 'Writing project information...'
+			percentage: 5, title: 'Step 2/3 - Collecting images', description: 'Scanning images in the provided dataset...'
 		}));
 
 		const imageMap = await pathUtils.getFilesRecursively(payload.dataPath);
