@@ -28,7 +28,7 @@ import {
 } from 'shared-lib';
 import { ElectronIpcService } from '../../../../services/electron-ipc.service';
 import { NgbNav, NgbNavChangeEvent } from '@ng-bootstrap/ng-bootstrap';
-import { PanelComponent } from './panel/panel.component';
+import { PanelComponent } from '../panel/panel.component';
 import { BoardMainComponent } from './board/board.main.component';
 
 @Component({

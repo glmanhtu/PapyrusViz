@@ -17,13 +17,13 @@
 
 import { NgModule, NgZone } from '@angular/core';
 import { NavComponent } from './components/nav/nav.component';
-import { PanelComponent } from './components/main/panel/panel.component';
+import { PanelComponent } from './components/panel/panel.component';
 import { MainComponent } from './components/main/main.component';
 import { ProjectManagementComponent } from './components/project/management/project.management.component';
 import { ProjectCreationComponent } from './components/project/creation/project.creation.component';
 import { BoardMainComponent } from './components/main/board/board.main.component';
-import { MatchingPanelComponent } from './components/main/panel/matching/matching.panel.component';
-import { ImagesPanelComponent } from './components/main/panel/images/images.panel.component';
+import { MatchingPanelComponent } from './components/panel/matching/matching.panel.component';
+import { ImagesPanelComponent } from './components/panel/images/images.panel.component';
 import { NavMainComponent } from './components/main/nav/nav.main.component';
 import { HomeComponent } from './home.component';
 import { BroadcastService, PROJECT_BROADCAST_SERVICE_TOKEN } from '../../services/broadcast.service';
