@@ -33,9 +33,9 @@ import {
   ProjectDTO, Thumbnail,
   Transforms,
 } from 'shared-lib';
-import { ElectronIpcService } from '../../../services/electron-ipc.service';
-import { FrameComponent } from '../../../shared/components/frame/frame.component';
-import { ModalService } from '../../../services/modal.service';
+import { ElectronIpcService } from '../../../../../services/electron-ipc.service';
+import { FrameComponent } from '../../../../../shared/components/frame/frame.component';
+import { ModalService } from '../../../../../services/modal.service';
 
 @Component({
   selector: 'app-board-main',

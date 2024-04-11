@@ -25,9 +25,9 @@ import {
   AssemblingDTO, ContextAction, PRequest,
   ProjectDTO,
 } from 'shared-lib';
-import { ElectronIpcService } from '../../../services/electron-ipc.service';
+import { ElectronIpcService } from '../../../../../services/electron-ipc.service';
 import { FormControl } from '@angular/forms';
-import { ModalService } from '../../../services/modal.service';
+import { ModalService } from '../../../../../services/modal.service';
 
 @Component({
   selector: 'app-nav-main',

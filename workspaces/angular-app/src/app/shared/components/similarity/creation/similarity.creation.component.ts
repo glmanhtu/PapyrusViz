@@ -17,7 +17,7 @@
 
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap/modal/modal-ref';
-import { ElectronIpcService } from '../../../services/electron-ipc.service';
+import { ElectronIpcService } from '../../../../services/electron-ipc.service';
 import { FormControl, FormGroup } from '@angular/forms';
 import {
   FileDialogRequest,
@@ -27,7 +27,7 @@ import {
   MatchingType, Progress,
   ProjectDTO,
 } from 'shared-lib';
-import { ProgressComponent } from '../../../shared/components/progress/progress.component';
+import { ProgressComponent } from '../../progress/progress.component';
 
 @Component({
   selector: 'app-similarity-creation',

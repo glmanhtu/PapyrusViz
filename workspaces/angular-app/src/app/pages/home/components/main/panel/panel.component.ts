@@ -16,14 +16,14 @@
  */
 
 import { Component, ElementRef, Inject, Input, OnInit, ViewChild } from '@angular/core';
-import { BroadcastService, PROJECT_BROADCAST_SERVICE_TOKEN } from '../../services/broadcast.service';
+import { BroadcastService, PROJECT_BROADCAST_SERVICE_TOKEN } from '../../../../../services/broadcast.service';
 import { CategoryDTO, ProjectDTO, Thumbnail } from 'shared-lib';
 import { NgbDropdown, NgbNav } from '@ng-bootstrap/ng-bootstrap';
-import { ElectronIpcService } from '../../services/electron-ipc.service';
-import { SimilarityCreationComponent } from '../similarity/creation/similarity.creation.component';
+import { ElectronIpcService } from '../../../../../services/electron-ipc.service';
+import { SimilarityCreationComponent } from '../../../../../shared/components/similarity/creation/similarity.creation.component';
 import { ImagesPanelComponent } from './images/images.panel.component';
 import { MatchingPanelComponent } from './matching/matching.panel.component';
-import { MainComponent } from '../main/main.component';
+import { MainComponent } from '../main.component';
 
 @Component({
   selector: 'app-panel',

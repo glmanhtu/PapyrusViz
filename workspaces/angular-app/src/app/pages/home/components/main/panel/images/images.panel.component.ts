@@ -25,7 +25,7 @@ import {
   ThumbnailResponse,
 } from 'shared-lib';
 import { NgbDropdown, NgbNav } from '@ng-bootstrap/ng-bootstrap';
-import { ElectronIpcService } from '../../../services/electron-ipc.service';
+import { ElectronIpcService } from '../../../../../../services/electron-ipc.service';
 import { FormControl } from '@angular/forms';
 
 @Component({

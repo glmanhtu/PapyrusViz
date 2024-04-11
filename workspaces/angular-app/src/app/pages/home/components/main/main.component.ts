@@ -16,7 +16,7 @@
  */
 
 import { Component, Inject, Input, OnInit, QueryList, ViewChildren } from '@angular/core';
-import { BroadcastService, PROJECT_BROADCAST_SERVICE_TOKEN } from '../../services/broadcast.service';
+import { BroadcastService, PROJECT_BROADCAST_SERVICE_TOKEN } from '../../../../services/broadcast.service';
 import {
   AssemblingDTO,
   ExtrasChannels,
@@ -26,9 +26,9 @@ import {
   ProjectDTO,
   Thumbnail,
 } from 'shared-lib';
-import { ElectronIpcService } from '../../services/electron-ipc.service';
+import { ElectronIpcService } from '../../../../services/electron-ipc.service';
 import { NgbNav, NgbNavChangeEvent } from '@ng-bootstrap/ng-bootstrap';
-import { PanelComponent } from '../panel/panel.component';
+import { PanelComponent } from './panel/panel.component';
 import { BoardMainComponent } from './board/board.main.component';
 
 @Component({

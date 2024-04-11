@@ -25,10 +25,10 @@ import {
   ThumbnailResponse,
 } from 'shared-lib';
 import { NgbDropdown, NgbNav } from '@ng-bootstrap/ng-bootstrap';
-import { ElectronIpcService } from '../../../services/electron-ipc.service';
-import { SimilarityCreationComponent } from '../../similarity/creation/similarity.creation.component';
+import { ElectronIpcService } from '../../../../../../services/electron-ipc.service';
+import { SimilarityCreationComponent } from '../../../../../../shared/components/similarity/creation/similarity.creation.component';
 import { FormControl } from '@angular/forms';
-import { ModalService } from '../../../services/modal.service';
+import { ModalService } from '../../../../../../services/modal.service';
 
 @Component({
   selector: 'app-matching-panel',

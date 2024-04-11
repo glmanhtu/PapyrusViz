@@ -22,26 +22,26 @@ import { BrowserModule } from '@angular/platform-browser';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { AppComponent } from './app.component';
-import { NavComponent } from './components/nav/nav.component';
-import { PanelComponent } from './components/panel/panel.component';
-import { MainComponent } from './components/main/main.component';
+import { NavComponent } from './pages/home/components/nav/nav.component';
+import { PanelComponent } from './pages/home/components/main/panel/panel.component';
+import { MainComponent } from './pages/home/components/main/main.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { ProjectManagementComponent } from './components/project/management/project.management.component';
-import { ProjectCreationComponent } from './components/project/creation/project.creation.component';
+import { ProjectManagementComponent } from './shared/components/project/management/project.management.component';
+import { ProjectCreationComponent } from './shared/components/project/creation/project.creation.component';
 import {
 	BroadcastService,
 	PROJECT_BROADCAST_SERVICE_TOKEN,
 } from './services/broadcast.service';
 import { ProjectDTO } from 'shared-lib';
 import { ThumbnailComponent } from './shared/components/thumbnail/thumbnail.component';
-import { BoardMainComponent } from './components/main/board/board.main.component';
+import { BoardMainComponent } from './pages/home/components/main/board/board.main.component';
 import { FrameComponent } from './shared/components/frame/frame.component';
-import { SimilarityCreationComponent } from './components/similarity/creation/similarity.creation.component';
-import { MatchingPanelComponent } from './components/panel/matching/matching.panel.component';
-import { ImagesPanelComponent } from './components/panel/images/images.panel.component';
+import { SimilarityCreationComponent } from './shared/components/similarity/creation/similarity.creation.component';
+import { MatchingPanelComponent } from './pages/home/components/main/panel/matching/matching.panel.component';
+import { ImagesPanelComponent } from './pages/home/components/main/panel/images/images.panel.component';
 import { ProgressComponent } from './shared/components/progress/progress.component';
 import { InfoModalComponent } from './shared/components/info-modal/info-modal.component';
-import { NavMainComponent } from './components/main/nav/nav.main.component';
+import { NavMainComponent } from './pages/home/components/main/nav/nav.main.component';
 import { ConfirmModalComponent } from './shared/components/confirm-modal/confirm-modal.component';
 import { HomeComponent } from './pages/home/home.component';
 import { SimilarityComponent } from './pages/similarity/similarity.component';

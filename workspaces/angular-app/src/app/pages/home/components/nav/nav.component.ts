@@ -16,7 +16,7 @@
  */
 
 import { Component, Inject, Input, OnInit } from '@angular/core';
-import { BroadcastService, PROJECT_BROADCAST_SERVICE_TOKEN } from '../../services/broadcast.service';
+import { BroadcastService, PROJECT_BROADCAST_SERVICE_TOKEN } from '../../../../services/broadcast.service';
 import {
   AssemblingExportRequest,
   FileSaveResponse,
@@ -24,8 +24,8 @@ import {
   ProjectDTO,
 } from 'shared-lib';
 import { MainComponent } from '../main/main.component';
-import { ElectronIpcService } from '../../services/electron-ipc.service';
-import { ModalService } from '../../services/modal.service';
+import { ElectronIpcService } from '../../../../services/electron-ipc.service';
+import { ModalService } from '../../../../services/modal.service';
 
 @Component({
   selector: 'app-nav',
