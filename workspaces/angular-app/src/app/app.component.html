@@ -15,11 +15,4 @@
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<app-nav [mainComponent]="main"></app-nav>
-<div class="flex-fill d-flex flex-row overflow-auto">
-    <app-panel #panel [mainComponent]="main" id="thumbnail-column" class="sidebar d-flex p-1 flex-column"></app-panel>
-    <app-main #main id="board-column" [panel]="panel" class="main flex-fill p-1" style="width: 75%;"></app-main>
-</div>
-<!--<div class="flex-shrink-1 bg-primary text-white p-1">-->
-<!--	<span>Bottom Bar</span>-->
-<!--</div>-->
+<router-outlet></router-outlet>

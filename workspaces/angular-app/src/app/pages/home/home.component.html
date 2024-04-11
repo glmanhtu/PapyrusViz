@@ -14,18 +14,11 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
-
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>Papyrus Visualization</title>
-    <base href="/" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <!--<meta http-equiv="Content-Security-Policy" content="script-src 'self'" />-->
-    <link rel="icon" type="image/x-icon" href="assets/icons/favicon.ico" />
-  </head>
-  <body>
-    <app-root class="vh-100 vw-100">Loading...</app-root>
-  </body>
-</html>
+<app-nav [mainComponent]="main"></app-nav>
+<div class="flex-fill d-flex flex-row overflow-auto">
+	<app-panel #panel [mainComponent]="main" id="thumbnail-column" class="sidebar d-flex p-1 flex-column"></app-panel>
+	<app-main #main id="board-column" [panel]="panel" class="main flex-fill p-1" style="width: 75%;"></app-main>
+</div>
+<!--<div class="flex-shrink-1 bg-primary text-white p-1">-->
+<!--	<span>Bottom Bar</span>-->
+<!--</div>-->

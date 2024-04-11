@@ -16,7 +16,6 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { ModalService } from './services/modal.service';
 
 @Component({
   selector: 'app-root',
@@ -27,11 +26,9 @@ export class AppComponent implements OnInit {
   title = 'Papyrus Visualization';
 
   constructor(
-    private modalService: ModalService,
   ) {}
 
   ngOnInit(): void {
-    this.modalService.projectManagement();
   }
 
 }

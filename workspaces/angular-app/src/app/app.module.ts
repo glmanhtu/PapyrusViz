@@ -43,6 +43,8 @@ import { ProgressComponent } from './shared/components/progress/progress.compone
 import { InfoModalComponent } from './shared/components/info-modal/info-modal.component';
 import { NavMainComponent } from './components/main/nav/nav.main.component';
 import { ConfirmModalComponent } from './shared/components/confirm-modal/confirm-modal.component';
+import { HomeComponent } from './pages/home/home.component';
+import { AppRoutingModule } from './app-routing.module';
 
 
 // AoT requires an exported function for factories
@@ -67,10 +69,12 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
 		ProgressComponent,
 		InfoModalComponent,
 		NavMainComponent,
-		ConfirmModalComponent
+		ConfirmModalComponent,
+		HomeComponent
   ],
 	imports: [
 		BrowserModule,
+		AppRoutingModule,
 		NgbModule,
 		HttpClientModule,
 		ReactiveFormsModule,

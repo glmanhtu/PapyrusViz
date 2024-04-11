@@ -1,4 +1,4 @@
-/*!
+/*
  * Copyright (C) 2024  Manh Tu VU
  *
  * This program is free software: you can redistribute it and/or modify
@@ -14,3 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
+import { Component, OnInit } from '@angular/core';
+import { ModalService } from '../../services/modal.service';
+
+@Component({
+  selector: 'app-home',
+  host: {
+    class: 'vh-100 vw-100 d-flex flex-column overflow-hidden'
+  },
+  templateUrl: './home.component.html',
+  styleUrls: ['./home.component.scss'],
+})
+export class HomeComponent implements OnInit {
+
+  constructor(private modalService: ModalService) {
+  }
+
+  ngOnInit(): void {
+    this.modalService.projectManagement();
+  }
+}
