@@ -15,7 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { ProjectDTO } from 'shared-lib';
+import { ElectronIpcService } from '../../services/electron-ipc.service';
 
 @Component({
   selector: 'app-similarity',
@@ -27,9 +29,16 @@ import { Component, OnInit } from '@angular/core';
 })
 export class SimilarityComponent implements OnInit {
 
-  constructor() {
+  @Input() projectPath: string;
+
+  projectDto: ProjectDTO;
+
+  constructor(private eIpc: ElectronIpcService) {
   }
 
   ngOnInit(): void {
+    this.eIpc.send<string, ProjectDTO>('project:load-project', this.projectPath).then((project) => {
+      this.projectDto = project;
+    });
   }
 }
