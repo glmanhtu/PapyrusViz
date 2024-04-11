@@ -57,7 +57,7 @@ export function projectFile(projectPath: string) {
 }
 
 export async function getFilesRecursively(directory: string, topLvDir = '', level = 0): Promise<Map<string, string[]>> {
-    let imageMap = new Map<string, string[]>();
+    const imageMap = new Map<string, string[]>();
     const filesInDirectory = await fs.readdir(directory);
     for (let i = 0; i < filesInDirectory.length; i++) {
         const absolute = path.join(directory, filesInDirectory[i]);
@@ -67,7 +67,12 @@ export async function getFilesRecursively(directory: string, topLvDir = '', leve
                 currentTopLvDir = absolute
             }
             const dirImageMap = await getFilesRecursively(absolute, currentTopLvDir, level + 1);
-            imageMap = new Map([...Array.from(imageMap.entries()), ...Array.from(dirImageMap.entries())]);
+            dirImageMap.forEach((values, key) => {
+                if (!imageMap.has(key)) {
+                    imageMap.set(key, [])
+                }
+                imageMap.get(key).push(...values)
+            })
         } else {
             const fileExt = absolute.split('.').pop().toLowerCase();
             if (['jpg', 'jpeg', 'png'].includes(fileExt)) {

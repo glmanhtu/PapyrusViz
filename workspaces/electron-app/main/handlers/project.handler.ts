@@ -87,7 +87,7 @@ export class ProjectHandler extends BaseHandler {
 
 
 		const categoryMap = new Map<string, number>;
-		const rootDirs = [...data.rootDirs.available, { name: DefaultCategory.ACHIEVED, path: ''}];
+		const rootDirs = [...data.rootDirs.available, { name: DefaultCategory.ARCHIVED, path: ''}];
 		await Promise.all(rootDirs.map(async (rootDir) => {
 			const category = await database.insert(categoryTbl).values({
 				name: rootDir.name,
@@ -242,9 +242,7 @@ export class ProjectHandler extends BaseHandler {
 			percentage: 5, title: 'Step 1/3 - Creating project', description: 'Writing project information...'
 		}));
 
-		const imageMap = await pathUtils.getFilesRecursively(payload.dataPath, DefaultCategory.ALL_IMAGES);
-		// We add an 'Achieved' to the list of image map to store the achieved images in the future
-		imageMap.set(DefaultCategory.ACHIEVED, []);
+		const imageMap = await pathUtils.getFilesRecursively(payload.dataPath);
 		const nImages: number = [...imageMap.values()].reduce((acc, x) => acc + x.length, 0);
 		await reply(Message.success({
 			percentage: 10, title: 'Step 2/3 - Collecting images', description: `Collected ${nImages} images...`
@@ -255,7 +253,7 @@ export class ProjectHandler extends BaseHandler {
 		let count = 0;
 		for (const [rootDir, images] of imageMap) {
 			const category = await database.insert(categoryTbl).values({
-				name: path.basename(rootDir),
+				name: path.basename(rootDir) || DefaultCategory.ALL_IMAGES,
 				path: rootDir,
 				projectId: projectId
 			}).returning({insertedId: categoryTbl.id}).then(takeUniqueOrThrow)
@@ -285,6 +283,12 @@ export class ProjectHandler extends BaseHandler {
 				}
 			}
 		}
+		// We add an 'Archived' category to store the archived images in the future
+		await database.insert(categoryTbl).values({
+			name: DefaultCategory.ARCHIVED,
+			path: '',
+			projectId: projectId
+		})
 		await this.addProjectToAppData({projName: payload.name, projPath: payload.path, datasetPath: payload.dataPath});
 	}
 

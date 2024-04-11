@@ -22,7 +22,7 @@ import { imgTbl } from './img';
 
 export enum DefaultCategory {
     ALL_IMAGES = 'All images',
-    ACHIEVED = 'Achieved'
+    ARCHIVED = 'Achieved'
 }
 
 export const categoryTbl = sqliteTable('category', {

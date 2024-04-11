@@ -31,7 +31,6 @@ import { and, eq } from 'drizzle-orm';
 import { categoryTbl } from '../entities/category';
 import { assemblingService } from '../services/assembling.service';
 import { takeUniqueOrThrow } from '../utils/data.utils';
-import { projectService } from '../services/project.service';
 import { imageService } from '../services/image.service';
 import sharp from 'sharp';
 import * as dataUtils from '../utils/data.utils';
@@ -56,6 +55,10 @@ export class AssemblingHandler extends BaseHandler {
 
 	public async deleteAssemblingImage(payload: AssemblingImageRequest): Promise<void> {
 		return assemblingService.deleteAssembledImage(payload.projectPath, payload.assemblingId, payload.imageId)
+	}
+
+	private async createAssembling(projectPath: string): Promise<AssemblingDTO> {
+		return assemblingService.createAssembling(projectPath);
 	}
 
 	private async getAssemblings(projectPath: string): Promise<AssemblingDTO[]> {
@@ -181,23 +184,6 @@ export class AssemblingHandler extends BaseHandler {
 		await database.update(assemblingTbl).set({
 			status: AssemblingStatus.CLOSED,
 		}).where(eq(assemblingTbl.id, payload.payload));
-	}
-
-	private async createAssembling(projectPath: string): Promise<AssemblingDTO> {
-		const database = dbService.getConnection(projectPath);
-		const project = await projectService.getProjectByPath(projectPath);
-		const assembling = await database.insert(assemblingTbl).values({
-			name: 'Assembling #',
-			group: 'default',
-			projectId: project.id
-		}).returning({insertedId: assemblingTbl.id}).then(takeUniqueOrThrow)
-		const assemblingId = assembling.insertedId;
-		await assemblingService.updateActivatedAssembling(projectPath, assemblingId);
-
-		await database.update(assemblingTbl)
-			.set({name: 'Assembling #' + assemblingId})
-			.where(eq(assemblingTbl.id, assemblingId));
-		return await database.select().from(assemblingTbl).where(eq(assemblingTbl.id, assemblingId)).then(takeUniqueOrThrow)
 	}
 
 	private async createAssemblingImage(request: AssemblingImageChangeRequest): Promise<AssemblingImage> {

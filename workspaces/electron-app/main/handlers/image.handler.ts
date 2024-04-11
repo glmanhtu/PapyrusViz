@@ -57,7 +57,7 @@ export class ImageHandler extends BaseHandler {
 				category.path !== ''
 					? eq(imgTbl.categoryId, request.categoryId)
 					: undefined,
-				category.name === DefaultCategory.ACHIEVED
+				category.name === DefaultCategory.ARCHIVED
 					? eq(imgTbl.status, ImgStatus.ARCHIVED)
 					: eq(imgTbl.status, ImgStatus.ONLINE)
 			))

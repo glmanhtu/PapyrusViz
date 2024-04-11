@@ -21,10 +21,29 @@ import { dbService } from './database.service';
 import { Img } from '../entities/img';
 import { imgAssemblingTbl } from '../entities/img-assembling';
 import { takeUniqueOrThrow } from '../utils/data.utils';
-import { AssemblingImage, Transforms } from 'shared-lib';
+import { AssemblingDTO, AssemblingImage, Transforms } from 'shared-lib';
 import { configService } from './config.service';
+import { projectService } from './project.service';
+import { assemblingTbl } from '../entities/assembling';
 
 class AssemblingService {
+
+	public async createAssembling(projectPath: string): Promise<AssemblingDTO> {
+		const database = dbService.getConnection(projectPath);
+		const project = await projectService.getProjectByPath(projectPath);
+		const assembling = await database.insert(assemblingTbl).values({
+			name: 'Assembling #',
+			group: 'default',
+			projectId: project.id
+		}).returning({insertedId: assemblingTbl.id}).then(takeUniqueOrThrow)
+		const assemblingId = assembling.insertedId;
+		await assemblingService.updateActivatedAssembling(projectPath, assemblingId);
+
+		await database.update(assemblingTbl)
+			.set({name: 'Assembling #' + assemblingId})
+			.where(eq(assemblingTbl.id, assemblingId));
+		return await database.select().from(assemblingTbl).where(eq(assemblingTbl.id, assemblingId)).then(takeUniqueOrThrow)
+	}
 
 	public async updateActivatedAssembling(projectPath: string, assemblingId: number): Promise<void> {
 		await configService.updateConfig(projectPath, Config.ACTIVATED_ASSEMBLING_ID, assemblingId.toString());
