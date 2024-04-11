@@ -38,6 +38,10 @@ export interface ChannelMessage<R> {
 	message: IMessage<R>
 }
 
+export type WindowTask = {
+	projectPath: string,
+	task: string
+}
 
 export class Message<R> implements IMessage<R> {
 

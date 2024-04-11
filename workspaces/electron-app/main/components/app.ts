@@ -18,11 +18,12 @@
 import { app, ipcMain, shell, protocol, net, BrowserWindow } from 'electron';
 import { Window } from './window';
 import { BaseHandler } from '../handlers/base.handler';
-import { IMessage, Message } from 'shared-lib';
+import { IMessage, Message, WindowTask } from 'shared-lib';
 import { Logger } from '../utils/logger';
 
 export class App {
 	private static _windows = new Map<number, Window>();
+	private static _tasks = new Map<number, WindowTask>();
 
 	public static launch(): void {
 		app.on('window-all-closed', App.quit);
@@ -42,6 +43,10 @@ export class App {
 
 	public static getWindow(id: number): BrowserWindow {
 		return this._windows.get(id).electronWindow;
+	}
+
+	public static getTask(id: number): unknown {
+		return this._tasks.get(id);
 	}
 
 	public static registerHandlers(handlers: BaseHandler[]) {
@@ -82,13 +87,15 @@ export class App {
 			}
 		})
 	}
-	public static createWindow() {
+	public static createWindow(data: WindowTask = { projectPath: '', task: 'default' }) {
 		const window = new Window();
 		const clientId = window.electronWindow.webContents.id;
+		App._tasks.set(clientId, data);
 		App._windows.set(clientId, window);
 		window.electronWindow.on('closed', () => {
 			window.cleanup();
 			App._windows.delete(clientId);
+			App._tasks.delete(clientId);
 		})
 		console.log(`Windows ${clientId} is created!`)
 		return clientId

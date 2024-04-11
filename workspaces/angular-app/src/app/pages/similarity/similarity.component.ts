@@ -16,27 +16,20 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { ElectronIpcService } from './services/electron-ipc.service';
-import { WindowTask } from 'shared-lib';
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
+  selector: 'app-similarity',
+  host: {
+    class: 'vh-100 vw-100 d-flex flex-column overflow-hidden'
+  },
+  templateUrl: './similarity.component.html',
+  styleUrls: ['./similarity.component.scss'],
 })
-export class AppComponent implements OnInit {
-  title = 'Papyrus Visualization';
+export class SimilarityComponent implements OnInit {
 
-  task: WindowTask;
-
-  constructor(
-    private eIpc: ElectronIpcService
-  ) {}
-
-  ngOnInit(): void {
-    this.eIpc.send<void, WindowTask>('app:get-task', undefined).then((x) => {
-      this.task = x;
-    });
+  constructor() {
   }
 
+  ngOnInit(): void {
+  }
 }

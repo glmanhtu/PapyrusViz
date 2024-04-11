@@ -1,4 +1,4 @@
-/*
+/*!
  * Copyright (C) 2024  Manh Tu VU
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,28 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit } from '@angular/core';
-import { ElectronIpcService } from './services/electron-ipc.service';
-import { WindowTask } from 'shared-lib';
-
-@Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
-})
-export class AppComponent implements OnInit {
-  title = 'Papyrus Visualization';
-
-  task: WindowTask;
-
-  constructor(
-    private eIpc: ElectronIpcService
-  ) {}
-
-  ngOnInit(): void {
-    this.eIpc.send<void, WindowTask>('app:get-task', undefined).then((x) => {
-      this.task = x;
-    });
-  }
-
+.sidebar {
+    flex: 0 0 25%;
+    max-width: 300px;
 }
+

@@ -44,7 +44,7 @@ import { InfoModalComponent } from './shared/components/info-modal/info-modal.co
 import { NavMainComponent } from './components/main/nav/nav.main.component';
 import { ConfirmModalComponent } from './shared/components/confirm-modal/confirm-modal.component';
 import { HomeComponent } from './pages/home/home.component';
-import { AppRoutingModule } from './app-routing.module';
+import { SimilarityComponent } from './pages/similarity/similarity.component';
 
 
 // AoT requires an exported function for factories
@@ -70,11 +70,11 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
 		InfoModalComponent,
 		NavMainComponent,
 		ConfirmModalComponent,
-		HomeComponent
+		HomeComponent,
+		SimilarityComponent
   ],
 	imports: [
 		BrowserModule,
-		AppRoutingModule,
 		NgbModule,
 		HttpClientModule,
 		ReactiveFormsModule,

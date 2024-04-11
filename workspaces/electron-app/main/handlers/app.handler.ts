@@ -17,16 +17,33 @@
 
 import { BaseHandler } from "./base.handler";
 import { App } from '../components/app';
+import { WindowTask } from 'shared-lib';
 
 export class AppHandler extends BaseHandler {
 	constructor() {
 		super();
 		this.addRoute('app:quit', this.quit.bind(this));
+		this.addRoute('app:open-similarity', this.openSimilarityPage.bind(this));
+		this.addRoute('app:get-task', this.getTask.bind(this));
 	}
 
 	private async quit(): Promise<void> {
 		for (const win of App.getWindows()) {
 			win.electronWindow.close();
 		}
+	}
+
+	private async openSimilarityPage(projectPath: string): Promise<void> {
+		const data: WindowTask = {
+			projectPath: projectPath,
+			task: 'similarity'
+		}
+		App.createWindow(data);
+	}
+
+	private async getTask(_: unknown, clientId: number): Promise<unknown> {
+		return new Promise(resolve => {
+			return resolve(App.getTask(clientId))
+		});
 	}
 }

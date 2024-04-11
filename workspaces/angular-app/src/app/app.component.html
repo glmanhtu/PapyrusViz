@@ -14,5 +14,8 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
+<div class="vh-100 vw-100" *ngIf="task">
+	<app-home *ngIf="task.task === 'default'"></app-home>
+	<app-similarity *ngIf="task.task === 'similarity'"></app-similarity>
+</div>
 
-<router-outlet></router-outlet>
