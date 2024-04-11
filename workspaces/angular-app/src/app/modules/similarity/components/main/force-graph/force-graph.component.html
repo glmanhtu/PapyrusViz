@@ -14,11 +14,6 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
-<sim-nav [projectDto]="projectDto"></sim-nav>
-<div class="flex-fill d-flex flex-row overflow-auto" *ngIf="projectDto">
-	<sim-panel #panel [projectDto]="projectDto" class="sidebar d-flex p-1 flex-column"></sim-panel>
-	<sim-main [panel]="panel" [projectDto]="projectDto" class="main flex-fill p-1" style="width: 75%;"></sim-main>
+
+<div class="h-100" #chartContainer>
 </div>
-<!--<div class="flex-shrink-1 bg-primary text-white p-1">-->
-<!--	<span>Bottom Bar</span>-->
-<!--</div>-->

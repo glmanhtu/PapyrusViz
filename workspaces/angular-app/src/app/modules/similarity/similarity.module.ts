@@ -24,13 +24,15 @@ import { SimilarityComponent } from './similarity.component';
 import { NavComponent } from './components/nav/nav.component';
 import { PanelComponent } from './components/panel/panel.component';
 import { MainComponent } from './components/main/main.component';
+import { ForceGraphComponent } from './components/main/force-graph/force-graph.component';
 
 @NgModule({
 	declarations: [
 		NavComponent,
 		SimilarityComponent,
 		PanelComponent,
-		MainComponent
+		MainComponent,
+		ForceGraphComponent
   ],
 	imports: [
 		ReactiveFormsModule,

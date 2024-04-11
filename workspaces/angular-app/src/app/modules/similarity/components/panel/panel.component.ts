@@ -18,6 +18,7 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { CategoryDTO, MatchingResponse, ProjectDTO, Thumbnail } from 'shared-lib';
 import { NgbDropdown, NgbNav } from '@ng-bootstrap/ng-bootstrap';
+import { MatchingButtonComponent } from '../../../../shared/components/matching-button/matching-button.component';
 
 @Component({
   selector: 'sim-panel',
@@ -28,6 +29,7 @@ import { NgbDropdown, NgbNav } from '@ng-bootstrap/ng-bootstrap';
 export class PanelComponent implements OnInit {
 
   @ViewChild('scrollContainer') scrollContainer!: ElementRef;
+  @ViewChild(MatchingButtonComponent) matchingButton: MatchingButtonComponent;
 
   matchings: MatchingResponse[] = [];
   thumbnails: Thumbnail[] = [];
@@ -43,7 +45,6 @@ export class PanelComponent implements OnInit {
 
   ngOnInit(): void {
   }
-
 
   onScroll() {
   }

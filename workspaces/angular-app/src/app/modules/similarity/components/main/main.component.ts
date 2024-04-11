@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, ElementRef, Input, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import {
   ExtrasChannels,
   IMessage,
@@ -23,17 +23,26 @@ import {
 } from 'shared-lib';
 import { ElectronIpcService } from '../../../../services/electron-ipc.service';
 import { NgbNav } from '@ng-bootstrap/ng-bootstrap';
+import { PanelComponent } from '../panel/panel.component';
+
 
 @Component({
   selector: 'sim-main',
   providers: [NgbNav],
+  encapsulation: ViewEncapsulation.None,
   templateUrl: './main.component.html',
   styleUrls: ['./main.component.scss'],
 })
 export class MainComponent implements OnInit {
 
+  @ViewChild('chartContainer') chartContainer: ElementRef;
+
   @Input()
   projectDto: ProjectDTO;
+  @Input()
+  panel: PanelComponent;
+
+  threshold = 0.5;
 
   constructor(
     private eIpc: ElectronIpcService) {
@@ -46,5 +55,4 @@ export class MainComponent implements OnInit {
   hotKeyListener(message: IMessage<string>) {
     console.log(message)
   }
-
 }

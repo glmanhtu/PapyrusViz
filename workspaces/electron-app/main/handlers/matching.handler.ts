@@ -18,19 +18,19 @@
 import { BaseHandler } from './base.handler';
 
 import {
-	IMessage,
+	IMessage, Link,
 	MatchingDto,
 	MatchingImgRequest,
 	MatchingRequest,
 	MatchingResponse, Message,
-	Progress,
+	Progress, SimilarityRequest,
 	ThumbnailResponse,
 } from 'shared-lib';
 import { dbService } from '../services/database.service';
 import { matchingImgTbl, matchingTbl } from '../entities/matching';
 import { projectService } from '../services/project.service';
 import { takeUniqueOrThrow } from '../utils/data.utils';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, gt } from 'drizzle-orm';
 import { configService } from '../services/config.service';
 import { Config } from '../entities/user-config-tbl';
 import { categoryTbl, DefaultCategory } from '../entities/category';
@@ -47,7 +47,22 @@ export class MatchingHandler extends BaseHandler {
 		this.addRoute('matching:get-activated-matching', this.getActivatedMatching.bind(this))
 		this.addRoute('matching:set-activated-matching', this.setActivatedMatching.bind(this))
 		this.addRoute('matching:delete-matching', this.deleteMatching.bind(this))
+		this.addRoute('matching:fetch-similarity', this.fetchSimilarities.bind(this))
 		this.addRoute('matching:find-matching-imgs', this.findMatchingImages.bind(this))
+	}
+
+	private async fetchSimilarities(request: SimilarityRequest): Promise<Link[]> {
+		const database = dbService.getConnection(request.projectPath);
+		return database.select().from(matchingImgTbl)
+			.where(
+				and(
+					eq(matchingImgTbl.matchingId, request.matchingId),
+					gt(matchingImgTbl.score, request.similarity - 0.000001)
+				)
+			)
+			.then(items => items.map(x => (
+				{ source: x.sourceImgId, target: x.targetImgId, similarity: x.score }
+			)));
 	}
 
 	private async findMatchingImages(request: MatchingImgRequest): Promise<ThumbnailResponse> {
