@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Component, ElementRef, Input, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import {
   ExtrasChannels,
   IMessage,
@@ -29,7 +29,6 @@ import { PanelComponent } from '../panel/panel.component';
 @Component({
   selector: 'sim-main',
   providers: [NgbNav],
-  encapsulation: ViewEncapsulation.None,
   templateUrl: './main.component.html',
   styleUrls: ['./main.component.scss'],
 })
@@ -41,8 +40,6 @@ export class MainComponent implements OnInit {
   projectDto: ProjectDTO;
   @Input()
   panel: PanelComponent;
-
-  threshold = 0.5;
 
   constructor(
     private eIpc: ElectronIpcService) {

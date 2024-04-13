@@ -37,7 +37,7 @@ class AssemblingService {
 			projectId: project.id
 		}).returning({insertedId: assemblingTbl.id}).then(takeUniqueOrThrow)
 		const assemblingId = assembling.insertedId;
-		await assemblingService.updateActivatedAssembling(projectPath, assemblingId);
+		await this.updateActivatedAssembling(projectPath, assemblingId);
 
 		await database.update(assemblingTbl)
 			.set({name: 'Assembling #' + assemblingId})

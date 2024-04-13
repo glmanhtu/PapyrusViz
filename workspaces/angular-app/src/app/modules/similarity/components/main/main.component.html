@@ -17,6 +17,6 @@
 
 <div class="card text-center h-100">
 	<div class="card-body h-100 overflow-auto" *ngIf="panel.matchingButton.activatedMatching">
-		<sim-force-graph [projectDto]="projectDto" [matching]="panel.matchingButton.activatedMatching"></sim-force-graph>
+		<sim-force-graph [projectDto]="projectDto" [threshold]="panel.threshold" [matching]="panel.matchingButton.activatedMatching"></sim-force-graph>
 	</div>
 </div>

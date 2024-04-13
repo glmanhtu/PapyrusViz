@@ -14,18 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
-.container {
-  display: flex;
-  justify-content: center;
-}
-
-.node {
-  stroke: #fff;
-  stroke-width: 2px;
-}
-
-.link {
+.links line {
   stroke: #999;
   stroke-opacity: 0.6;
+}
+
+.nodes circle {
+  stroke: #fff;
+  stroke-width: 1.5px;
 }

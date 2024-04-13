@@ -15,11 +15,15 @@
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<div class="card text-center sidebar-content h-100" id="thumbnail-container" *ngIf="projectDto">
-		<div class="card-header py-2 mb-2">
+<div class="card sidebar-content h-100" id="thumbnail-container" *ngIf="projectDto">
+		<div class="card-header text-center py-2">
 			Matching configuration
 		</div>
-		<app-matching-button [projectDto]="projectDto"></app-matching-button>
-		<div class="card-body h-100 overflow-auto" #scrollContainer style="padding: 1.25rem .5rem 0 .5rem;" (scroll)="onScroll()">
+		<div class="card-body h-100 overflow-auto container" #scrollContainer style="padding: 1.25rem .5rem 0 .5rem;" (scroll)="onScroll()">
+			<app-matching-button [projectDto]="projectDto"></app-matching-button>
+			<div class="mt-5">
+				<label class="form-label input-group-sm">Similarity Threshold</label>
+				<input type="range" class="form-range" min="0" max="100" step="0.5" [formControl]="threshold">
+			</div>
 		</div>
 	</div>

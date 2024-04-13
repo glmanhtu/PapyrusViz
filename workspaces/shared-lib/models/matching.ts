@@ -52,9 +52,10 @@ export type SimilarityRequest = {
 	similarity: number
 }
 
+
 export interface Link {
-	source: number;
-	target: number;
+	source: string;
+	target: string;
 	similarity: number;
 }
 

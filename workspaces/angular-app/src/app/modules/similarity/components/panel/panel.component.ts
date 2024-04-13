@@ -19,6 +19,7 @@ import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { CategoryDTO, MatchingResponse, ProjectDTO, Thumbnail } from 'shared-lib';
 import { NgbDropdown, NgbNav } from '@ng-bootstrap/ng-bootstrap';
 import { MatchingButtonComponent } from '../../../../shared/components/matching-button/matching-button.component';
+import { FormControl } from '@angular/forms';
 
 @Component({
   selector: 'sim-panel',
@@ -39,6 +40,8 @@ export class PanelComponent implements OnInit {
   @Input()
   projectDto: ProjectDTO;
   categories: CategoryDTO[] = [];
+
+  threshold = new FormControl(75);
 
   constructor(
   ) {}

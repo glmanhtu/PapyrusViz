@@ -19,7 +19,13 @@ import { dbService } from './database.service';
 import { takeUniqueOrThrow } from '../utils/data.utils';
 import { MatchingDto, MatchingMethod, MatchingType } from 'shared-lib';
 import { projectService } from './project.service';
-import { Matching, matchingImgTbl, matchingTbl } from '../entities/matching';
+import {
+	Matching,
+	matchingImgRecordTbl,
+	matchingRecordScoreTbl,
+	matchingRecordTbl,
+	matchingTbl,
+} from '../entities/matching';
 import { createReadStream } from 'fs';
 import * as csv from '@fast-csv/parse';
 import { imageService } from './image.service';
@@ -43,75 +49,104 @@ class MatchingService {
 				eq(matchingTbl.id, matching.insertedId)
 		)});
 	}
+
+	public async getMatchingRecordByName(projectPath: string, name: string, matchingId: number) {
+		const database = dbService.getConnection(projectPath);
+		return database.query.matchingRecordTbl.findFirst({
+			where: (matchingRecordTbl, {eq, and}) => (
+				and(
+					eq(matchingRecordTbl.matchingId, matchingId),
+					eq(matchingRecordTbl.name, name)
+				)
+			)
+		});
+	}
+
 	public async processSimilarity(projectPath: string, matching: Matching, reply: (current: number, total: number) => Promise<void>): Promise<string[]> {
 		const stream = createReadStream(matching.matrixPath)
 			.pipe(csv.parse({ headers: true }));
 
-		const idMap = new Map<string, number>();
-
-		const findImgId = async (imName: string) => {
-			if (idMap.has(imName)) {
-				return new Promise<number>((resolve, _) => resolve(idMap.get(imName)));
+		const recordIdMap = new Map<string, number>();
+		const nonMappingCategories : string[] = [];
+		const findRecordId = async (recordName: string) => {
+			if (recordIdMap.has(recordName)) {
+				return new Promise<number>((resolve, _) => resolve(recordIdMap.get(recordName)));
 			}
-			let img;
-			if (matching.matchingMethod === MatchingMethod.NAME) {
-				img = await imageService.findBestMatchByName(projectPath, imName);
-			} else if (matching.matchingMethod === MatchingMethod.PATH) {
-				img = await imageService.findBestMatchByPath(projectPath, imName);
+			const matchingRecord = await this.getMatchingRecordByName(projectPath, recordName, matching.id)
+			if (matchingRecord) {
+				recordIdMap.set(recordName, matchingRecord.id);
 			} else {
-				throw new Error(`Matching Method ${matching.matchingMethod} is not implemented!`)
+				const recordId = await database.insert(matchingRecordTbl)
+					.values({ name: recordName, matchingId: matching.id })
+					.returning({insertedId: matchingRecordTbl.id}).then(takeUniqueOrThrow);
+
+				let imgs;
+				if (matching.matchingMethod === MatchingMethod.NAME) {
+					imgs = await imageService.findBestMatchByName(projectPath, recordName);
+				} else if (matching.matchingMethod === MatchingMethod.PATH) {
+					imgs = await imageService.findBestMatchByPath(projectPath, recordName);
+				} else {
+					throw new Error(`Matching Method ${matching.matchingMethod} is not implemented!`)
+				}
+				if (imgs.length > 0) {
+					await database.insert(matchingImgRecordTbl).values(
+						imgs.map(x => ({
+							imgId: x.id, matchingRecordId: recordId.insertedId, matchingId: matching.id
+						}))
+					);
+				} else {
+					nonMappingCategories.push(recordName);
+				}
+				recordIdMap.set(recordName, recordId.insertedId);
 			}
-			if (img.length > 0) {
-				idMap.set(imName, img[0].id);
-				return img[0].id;
-			}
-			idMap.set(imName, undefined);
-			return undefined;
+
+			return recordIdMap.get(recordName);
 		};
 
 		const database = dbService.getConnection(projectPath);
 		let count = 0;
-		const nonMappingCategories = [];
+
 		for await (const  row of stream) {
-			const srcImgId = await findImgId(row['']);
+			const srcRecordId = await findRecordId(row[''])
+			delete row[''];
+			const targetImgs = Array.from(Object.entries(row), ([name, value]) => ({ name, value: parseFloat(value as string) }));
+			const sortedTarget = matching.matchingType === MatchingType.DISTANCE
+				? targetImgs.sort((a, b) => (a.value - b.value))
+				: targetImgs.sort((a, b) => (b.value - a.value))
 			const values = [];
-			for (const [targetIm, distance] of Object.entries(row)) {
-				if (targetIm === '') {
-					continue;
-				}
-				let score = parseFloat(distance as string);
+			for (let i = 0; i < sortedTarget.length; i++) {
+				const targetIm = sortedTarget[i].name;
+				let score = sortedTarget[i].value;
 				if (matching.matchingType === MatchingType.DISTANCE) {
 					score = 1 / (1 + score);
 				}
-				const targetImgId = await findImgId(targetIm);
-				if (targetImgId !== undefined) {
-					values.push({
-						sourceImgId: srcImgId,
-						targetImgId: targetImgId,
-						score: score,
-						matchingId: matching.id,
-						rank: 0
-					});
-				} else {
-					nonMappingCategories.push(targetIm)
+
+				const targetRecordId = await findRecordId(targetIm);
+				values.push({
+					sourceId: srcRecordId,
+					targetId: targetRecordId,
+					matchingId: matching.id,
+					score: score,
+					rank: i + 1
+				});
+				if (values.length > 500) {
+					await database.insert(matchingRecordScoreTbl).values(values);
+					values.length = 0;
 				}
+			}
+			if (values.length > 0) {
+				await database.insert(matchingRecordScoreTbl).values(values);
+				values.length = 0;
 			}
 
-			// Sort the records based on score
-			const sortedValues = values.sort((a, b) => (b.score - a.score))
-			let rank = 1;
-			for (let i = 0; i < values.length; i++) {
-				if (i > 0 && sortedValues[i].score < sortedValues[i - 1].score) {
-					rank += 1
-				}
-				sortedValues[i].rank = rank
-			}
-			await database.insert(matchingImgTbl).values(sortedValues);
+
 			count += 1;
-			await reply( count, values.length)
+			await reply( count, sortedTarget.length)
 		}
+
 		return nonMappingCategories;
 	}
+
 
 	public async setActivatedMatching(projectPath: string, matchingId: number): Promise<void> {
 		return configService.updateConfig(projectPath, Config.ACTIVATED_MATCHING_ID, matchingId.toString());
