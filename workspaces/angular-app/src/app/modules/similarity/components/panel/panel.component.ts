@@ -19,7 +19,7 @@ import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { CategoryDTO, MatchingResponse, ProjectDTO, Thumbnail } from 'shared-lib';
 import { NgbDropdown, NgbNav } from '@ng-bootstrap/ng-bootstrap';
 import { MatchingButtonComponent } from '../../../../shared/components/matching-button/matching-button.component';
-import { FormControl } from '@angular/forms';
+import { FormControl, FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'sim-panel',
@@ -41,7 +41,11 @@ export class PanelComponent implements OnInit {
   projectDto: ProjectDTO;
   categories: CategoryDTO[] = [];
 
-  threshold = new FormControl(75);
+  threshold = new FormControl(0.75)
+  forceControl = new FormGroup({
+    charge: new FormControl(-100)
+  })
+
 
   constructor(
   ) {}

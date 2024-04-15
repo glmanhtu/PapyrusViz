@@ -68,7 +68,7 @@ export class MatchingHandler extends BaseHandler {
 				)
 			)
 			.then(items => items.map(x => (
-				{ source: "A" + x.sourceId, target: "A" + x.targetId, similarity: x.score }
+				{ source: "" + x.sourceId, target: "" + x.targetId, similarity: x.score }
 			)));
 	}
 
