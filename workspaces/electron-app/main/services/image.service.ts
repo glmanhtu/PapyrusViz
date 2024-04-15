@@ -19,7 +19,7 @@ import { Category } from '../entities/category';
 import { Img, imgTbl } from '../entities/img';
 import path from 'node:path';
 import sharp from 'sharp';
-import { eq, like } from 'drizzle-orm';
+import { eq, like, or } from 'drizzle-orm';
 import { dbService } from './database.service';
 import { ImgDto } from 'shared-lib';
 
@@ -35,7 +35,11 @@ class ImageService {
 	public async findBestMatchByName(projectPath: string, name: string): Promise<Img[]> {
 		const database = dbService.getConnection(projectPath);
 		return database.select()
-			.from(imgTbl).where(eq(imgTbl.name, name))
+			.from(imgTbl).where(
+				or(
+					eq(imgTbl.name, name),
+					like(imgTbl.name, `${name}-_`)
+				))
 			.orderBy(imgTbl.name);
 	}
 

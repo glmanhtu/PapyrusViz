@@ -43,7 +43,9 @@ export class PanelComponent implements OnInit {
 
   threshold = new FormControl(0.75)
   forceControl = new FormGroup({
-    charge: new FormControl(-100)
+    charge: new FormControl(-100),
+    textMode: new FormControl('0'),
+    autoColor: new FormControl('1')
   })
 
 

@@ -46,6 +46,26 @@ export type MatchingRequest = {
 	matchingId: number
 }
 
+export type RecordMatchingRequest = {
+	projectPath: string,
+	matchingId: number,
+	recordId: number
+}
+
+export type RecordImgMatchingResponse = {
+	name: string,
+	img: {
+		id: number,
+		path: string,
+		width: number,
+		height: number
+	}
+	category: {
+		id: number,
+		name: string
+	}
+}
+
 export type SimilarityRequest = {
 	projectPath: string,
 	matchingId: number,
@@ -54,6 +74,18 @@ export type SimilarityRequest = {
 
 
 export interface Link {
+	source: {
+		id: string,
+		name: string
+	};
+	target: {
+		id: string,
+		name: string
+	};
+	similarity: number;
+}
+
+export interface FLink {
 	source: string;
 	target: string;
 	similarity: number;

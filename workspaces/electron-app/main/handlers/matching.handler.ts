@@ -23,7 +23,7 @@ import {
 	MatchingImgRequest,
 	MatchingRequest,
 	MatchingResponse, Message,
-	Progress, SimilarityRequest,
+	Progress, RecordImgMatchingResponse, RecordMatchingRequest, SimilarityRequest,
 	ThumbnailResponse,
 } from 'shared-lib';
 import { dbService } from '../services/database.service';
@@ -35,7 +35,7 @@ import {
 } from '../entities/matching';
 import { projectService } from '../services/project.service';
 import { takeUniqueOrThrow } from '../utils/data.utils';
-import { and, eq, gt, lt } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { configService } from '../services/config.service';
 import { Config } from '../entities/user-config-tbl';
 import { categoryTbl, DefaultCategory } from '../entities/category';
@@ -53,23 +53,58 @@ export class MatchingHandler extends BaseHandler {
 		this.addRoute('matching:delete-matching', this.deleteMatching.bind(this))
 		this.addRoute('matching:fetch-similarity', this.fetchSimilarities.bind(this))
 		this.addRoute('matching:find-matching-imgs', this.findMatchingImages.bind(this))
+		this.addRoute('matching:get-record-imgs', this.getRecordImages.bind(this))
+	}
+
+	private async getRecordImages(request: RecordMatchingRequest): Promise<RecordImgMatchingResponse[]> {
+		const database = dbService.getConnection(request.projectPath);
+
+		return database.select().from(matchingImgRecordTbl)
+			.where(and(
+				eq(matchingImgRecordTbl.matchingRecordId, request.recordId)
+			))
+			.innerJoin(matchingRecordTbl, eq(matchingRecordTbl.id, matchingImgRecordTbl.matchingRecordId))
+			.innerJoin(imgTbl, eq(imgTbl.id, matchingImgRecordTbl.imgId))
+			.innerJoin(categoryTbl, eq(categoryTbl.id, imgTbl.categoryId))
+			.then(items => items.map(x => ({
+				name: x['matching-record'].name,
+				img: {
+					id: x.img.id,
+					path: "atom://" + path.join(request.projectPath, x.img.thumbnail),
+					width: x.img.width,
+					height: x.img.height
+				},
+				category: {
+					id: x.category.id,
+					name: x.category.name
+				}
+			})));
 	}
 
 	private async fetchSimilarities(request: SimilarityRequest): Promise<Link[]> {
 		const database = dbService.getConnection(request.projectPath);
-		return database.select().from(matchingRecordScoreTbl)
-			.where(
-				and(
-					eq(matchingRecordScoreTbl.matchingId, request.matchingId),
-					// For each pair of image, we have an original version and reverse version of it in this table
-					// Hence, we need to filter them before return the results
-					lt(matchingRecordScoreTbl.sourceId, matchingRecordScoreTbl.targetId),
-					gt(matchingRecordScoreTbl.score, request.similarity - 0.000001)
-				)
-			)
-			.then(items => items.map(x => (
-				{ source: "" + x.sourceId, target: "" + x.targetId, similarity: x.score }
-			)));
+
+		return database.query.matchingRecordScoreTbl.findMany({
+			where: (matchingRecordScoreTbl, {eq, lt, gt, and}) => (and(
+				eq(matchingRecordScoreTbl.matchingId, request.matchingId),
+				// For each pair of image, we have an original version and reverse version of it in this table
+				// Hence, we need to filter them before return the results
+				lt(matchingRecordScoreTbl.sourceId, matchingRecordScoreTbl.targetId),
+				gt(matchingRecordScoreTbl.score, request.similarity - 0.000001)
+			)),
+			with: {
+				source: true,
+				target: true
+			}
+		}).then(items => items.map(x => ({
+			source: {
+				id: x.source.id.toString(),
+				name: x.source.name
+			}, target: {
+				id: x.target.id.toString(),
+				name: x.target.name
+			}, similarity: Math.round(x.score * 1000 + Number.EPSILON) / 1000
+		})))
 	}
 
 	private async findMatchingImages(request: MatchingImgRequest): Promise<ThumbnailResponse> {

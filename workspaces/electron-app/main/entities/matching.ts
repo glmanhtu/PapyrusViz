@@ -74,7 +74,8 @@ export const matchingImgRelations = relations(imgTbl, ({ many }) => ({
 }));
 
 export const matchingRecordRelations = relations(matchingRecordTbl, ({ many }) => ({
-    matchingRecordScore: many(matchingRecordScoreTbl)
+    matchingRecordScore: many(matchingRecordScoreTbl),
+    matchingRecordImage: many(matchingImgRecordTbl)
 }));
 
 export const matchingRecordScoreRelations = relations(matchingRecordScoreTbl, ({ one }) => ({
