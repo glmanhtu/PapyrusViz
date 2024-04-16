@@ -82,6 +82,12 @@
 					"config": {}
 				},
 				{
+					"name": "@electron-forge/maker-zip",
+					"config": {
+						"platforms": ["linux"]
+					}
+				},
+				{
 					"name": "@electron-forge/maker-squirrel",
 					"config": {}
 				}

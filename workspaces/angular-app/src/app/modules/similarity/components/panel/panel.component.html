@@ -61,24 +61,28 @@
 					</div>
 				</fieldset>
 
-				<fieldset class="form-group mt-3">
-					<div class="row">
-						<legend class="col-form-label col-sm-5 pt-0">Auto color:</legend>
-						<div class="col-sm-7">
-							<div class="form-check">
+				<fieldset class="form-group mt-3 row">
+						<legend class="col-form-label col-sm-3 pt-0">Auto color:</legend>
+						<div class="col-sm-9">
+							<div class="form-check ps-0">
+								<input class="me-2" type="radio" value="2" id="auto-color-community" formControlName="autoColor">
+								<label for="auto-color-community">
+									Community detection
+								</label>
+							</div>
+							<div class="form-check ps-0">
 								<input class="me-2" type="radio" value="1" id="auto-color-prefix" formControlName="autoColor">
 								<label for="auto-color-prefix">
 									Prefix name
 								</label>
 							</div>
-							<div class="form-check">
+							<div class="form-check ps-0">
 								<input class="me-2" type="radio" value="0" id="auto-color-none" formControlName="autoColor">
 								<label for="auto-color-none">
 									None
 								</label>
 							</div>
 						</div>
-					</div>
 				</fieldset>
 			</form>
 

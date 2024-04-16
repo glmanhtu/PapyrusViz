@@ -36,6 +36,26 @@ import * as d3d from 'd3-force-3d';
 import { FormControl, FormGroup } from '@angular/forms';
 import ForceGraph, { ForceGraphInstance, NodeObject } from 'force-graph';
 
+
+export interface Edge {
+  source: string;
+  target: string;
+  weight?: number;
+}
+
+export interface Communities {
+  [id: string]: number;
+}
+
+export interface jLouvainGenerator {
+  (): Communities;
+  nodes: (nodes: string[]) => jLouvainGenerator;
+  edges: (edges: Edge[]) => jLouvainGenerator;
+}
+
+declare function jLouvain(): jLouvainGenerator;
+
+
 interface Node extends NodeObject {
   id: string;
   name: string;
@@ -152,6 +172,7 @@ export class ForceGraphComponent implements OnInit, AfterViewInit, OnDestroy {
     this.graphObject = ForceGraph()(this.chartContainer.nativeElement);
     this.graphObject.d3Force('x', d3d.forceX(rect.width / 2).strength(0.1))
     this.graphObject.d3Force('y', d3d.forceY(rect.height / 2).strength(0.1))
+    // this.graphObject.d3Force('link')!.strength((link: Link) => (2 / link.similarity))
     this.graphObject.centerAt(rect.left, rect.top)
     // eslint-disable-next-line
     this.graphObject.linkLabel(x => (x as any).similarity)
@@ -175,10 +196,10 @@ export class ForceGraphComponent implements OnInit, AfterViewInit, OnDestroy {
       // console.log(this.graphObject.d3Force('charge')!.strength())
       // this.graphObject.d3ReheatSimulation()
     });
-    this.threshold.valueChanges.subscribe((val) => {
+    this.threshold.valueChanges.subscribe(async (val) => {
       if (val > 0.5) {
         console.log('Update ' + val )
-        this.updateGraph(val);
+        await this.updateGraph(val);
       }
     })
   }
@@ -223,15 +244,38 @@ export class ForceGraphComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  updateGraph(similarity: number) {
+  extractLinkNodes(data: Link[]): [Node[], FLink[]] {
+    const links: FLink[] = [];
+    const nodes = new Map<string, Node>();
+    for (const item of data) {
+      links.push({
+        source: item.source.id,
+        target: item.target.id,
+        similarity: item.similarity
+      })
+      for (const node of [item.source, item.target]) {
+        if (!nodes.has(node.id)) {
+          nodes.set(node.id, {
+            ...node,
+            group: extractLeadingNumbers(node.name) || 0
+          })
+        }
+      }
+    }
+    return [[...nodes.values()], links]
+  }
+
+  async updateGraph(similarity: number) {
+
     // this.simulation.stop();
     this.graphObject
       .d3Force('charge')!.strength(this.forceControl.getRawValue()['charge'])
 
-    const autoColor = this.forceControl.getRawValue()['autoColor'] === '1';
+    const autoColor = parseInt(this.forceControl.getRawValue()['autoColor']);
     const defaultColor = 'rgba(31, 120, 180, 0.92)';
     const highlightNodes = new Set<Node>();
     const imgMap = new Map<string, InfoPanelData>;
+
     this.graphObject.onNodeHover(nodeHover => {
       highlightNodes.clear();
       if (nodeHover) {
@@ -240,65 +284,58 @@ export class ForceGraphComponent implements OnInit, AfterViewInit, OnDestroy {
     })
 
     // const color = d3.scaleOrdinal(d3.schemeCategory10);
-    this.eIpc.send<SimilarityRequest, Link[]>('matching:fetch-similarity', {
+    const data = await this.eIpc.send<SimilarityRequest, Link[]>('matching:fetch-similarity', {
       projectPath: this.projectDto.path,
       matchingId: this.matching.id,
       similarity: similarity
-    }).then(data => {
-      this.graphObject.pauseAnimation();
-      const links: FLink[] = [];
-      const nodes = new Map<string, Node>();
-      for (const item of data) {
-        links.push({
-          source: item.source.id,
-          target: item.target.id,
-          similarity: item.similarity
-        })
-        for (const node of [item.source, item.target]) {
-          if (!nodes.has(node.id)) {
-            nodes.set(node.id, {
-              ...node,
-              group: extractLeadingNumbers(node.name) || 0
-            })
-          }
-        }
-      }
-      const nodeArr = [...nodes.values()]
-      this.graphObject
-        .graphData({nodes: nodeArr, links: links})
-        .nodeCanvasObject((node, ctx, globalScale) => {
-          if (this.forceControl.getRawValue()['textMode'] === '1') {
-            const label = (node as Node).name;
-            const fontSize = 12 / globalScale;
-            ctx.font = `${fontSize}px Sans-Serif`;
-            const textWidth = ctx.measureText(label).width;
-            const bckgDimensions = [textWidth, fontSize].map(n => n + fontSize * 0.2); // some padding
-
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-            ctx.fillRect(node.x! - bckgDimensions[0] / 2, node.y! - bckgDimensions[1] / 2, bckgDimensions[0], bckgDimensions[1]);
-
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            // eslint-disable-next-line
-            ctx.fillStyle = autoColor ? (node as any).color : defaultColor;
-            ctx.fillText(label, node.x!, node.y!);
-
-            // (node as any).__bckgDimensions = bckgDimensions; // to re-use in nodePointerAreaPaint
-          } else {
-
-            ctx.beginPath();
-            ctx.arc(node.x!, node.y!, 3 * 1.4, 0, 2 * Math.PI, false);
-            // eslint-disable-next-line
-            ctx.fillStyle = autoColor ? (node as any).color : defaultColor;
-            ctx.fill();
-          }
-
-          if (node.id === nodeArr[nodeArr.length - 1].id) {
-            // Start to draw tooltip when all nodes are drawn
-            this.drawTooltipNodes(ctx, highlightNodes, imgMap)
-          }
-        })
-      this.graphObject.resumeAnimation();
     })
+
+    this.graphObject.pauseAnimation();
+    const [nodeArr, links] =  this.extractLinkNodes(data)
+
+    if (autoColor === 2) {
+      const community = jLouvain().nodes(nodeArr.map(x => x.id))
+        .edges(links.map(x => ({ ...x, weight: x.similarity })))
+      const community_assignment_result = community()
+      for (const node of nodeArr) {
+        node.group = community_assignment_result[node.id]
+      }
+    }
+
+    this.graphObject
+      .graphData({nodes: nodeArr, links: links})
+      .nodeCanvasObject((node, ctx, globalScale) => {
+        if (this.forceControl.getRawValue()['textMode'] === '1') {
+          const label = (node as Node).name;
+          const fontSize = 12 / globalScale;
+          ctx.font = `${fontSize}px Sans-Serif`;
+          const textWidth = ctx.measureText(label).width;
+          const bckgDimensions = [textWidth, fontSize].map(n => n + fontSize * 0.2); // some padding
+
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+          ctx.fillRect(node.x! - bckgDimensions[0] / 2, node.y! - bckgDimensions[1] / 2, bckgDimensions[0], bckgDimensions[1]);
+
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          // eslint-disable-next-line
+          ctx.fillStyle = autoColor > 0 ? (node as any).color : defaultColor;
+          ctx.fillText(label, node.x!, node.y!);
+
+          // (node as any).__bckgDimensions = bckgDimensions; // to re-use in nodePointerAreaPaint
+        } else {
+
+          ctx.beginPath();
+          ctx.arc(node.x!, node.y!, 3 * 1.4, 0, 2 * Math.PI, false);
+          // eslint-disable-next-line
+          ctx.fillStyle = autoColor > 0 ? (node as any).color : defaultColor;
+          ctx.fill();
+        }
+
+        if (node.id === nodeArr[nodeArr.length - 1].id) {
+          // Start to draw tooltip when all nodes are drawn
+          this.drawTooltipNodes(ctx, highlightNodes, imgMap)
+        }
+      })
+    this.graphObject.resumeAnimation();
   }
 }
