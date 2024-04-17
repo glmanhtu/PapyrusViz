@@ -34,7 +34,18 @@ class AssemblingService {
 		const assembling = await database.insert(assemblingTbl).values({
 			name: 'Assembling #',
 			group: 'default',
-			projectId: project.id
+			projectId: project.id,
+			transforms: {
+				origin: {
+					x: 0,
+					y: 0
+				},
+				scale: 1,
+				last: {
+					x: 0,
+					y: 0
+				}
+			}
 		}).returning({insertedId: assemblingTbl.id}).then(takeUniqueOrThrow)
 		const assemblingId = assembling.insertedId;
 		await this.updateActivatedAssembling(projectPath, assemblingId);

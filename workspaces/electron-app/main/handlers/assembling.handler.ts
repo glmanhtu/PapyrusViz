@@ -176,6 +176,7 @@ export class AssemblingHandler extends BaseHandler {
 		await database.update(assemblingTbl).set({
 			name: payload.payload.name,
 			group: payload.payload.group,
+			transforms: payload.payload.transforms
 		}).where(eq(assemblingTbl.id, payload.payload.id));
 	}
 

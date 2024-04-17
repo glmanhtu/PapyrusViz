@@ -29,7 +29,7 @@ import {
   AssemblingDTO,
   AssemblingImage,
   AssemblingImageChangeRequest, AssemblingImageRequest, ContextAction,
-  GetAssemblingRequest, ImgDto,
+  GetAssemblingRequest, GlobalTransform, ImgDto, PRequest,
   ProjectDTO, Thumbnail,
   Transforms,
 } from 'shared-lib';
@@ -39,6 +39,9 @@ import { ModalService } from '../../../../../services/modal.service';
 
 @Component({
   selector: 'app-board-main',
+  host: {
+    class: 'h-100 w-100'
+  },
   templateUrl: './board.main.component.html',
   styleUrls: ['./board.main.component.scss'],
 })
@@ -64,6 +67,7 @@ export class BoardMainComponent implements OnInit {
         this.assemblingImages = items;
     });
   }
+
 
   commandListener(command: string) {
     switch (command) {
@@ -214,6 +218,16 @@ export class BoardMainComponent implements OnInit {
       projectPath: this.projectDto.path,
       assemblingId: this.assembling.id,
       imageId: assemblingImgId
+    })
+  }
+
+  onGlobalTransform(globalTransform: GlobalTransform) {
+    return this.eIpc.send<PRequest<AssemblingDTO>, void>('assembling:update-assembling', {
+      projectPath: this.projectDto.path,
+      payload: {
+        ...this.assembling,
+        transforms: globalTransform
+      }
     })
   }
 

@@ -15,9 +15,13 @@
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<div id="board" class="h-100">
-	<app-frame *ngFor="let img of assemblingImages; index as i"
-						 [transforms]="img.transforms" [image]="img.img"
-						 (transformEvent)="onTransform(img, $event)" (contextMenuEvent)="handleContextMenu(i)">
-	</app-frame>
+<div id="board" class="h-100 w-100" appPanZoom [container]="boardContainer"
+		 [hasFrameSelected]="selectedFrames.size > 0" [globalTransform]="assembling.transforms" (changes)="onGlobalTransform($event)">
+	<div class="h-100 w-100" style="position: absolute" #boardContainer>
+		<app-frame *ngFor="let img of assemblingImages; index as i"
+							 [globalTransform]="assembling.transforms"
+							 [transforms]="img.transforms" [image]="img.img"
+							 (transformEvent)="onTransform(img, $event)" (contextMenuEvent)="handleContextMenu(i)">
+		</app-frame>
+	</div>
 </div>

@@ -136,7 +136,18 @@ export class ProjectHandler extends BaseHandler {
 			const assembling = await database.insert(assemblingTbl).values({
 				name: assembled.name,
 				group: assembled.parent,
-				projectId: project.insertedId
+				projectId: project.insertedId,
+				transforms: {
+					origin: {
+						x: 0,
+						y: 0
+					},
+					scale: 1,
+					last: {
+						x: 0,
+						y: 0
+					}
+				}
 			}).returning({insertedId: assemblingTbl.id}).then(takeUniqueOrThrow)
 			const assemblingId = assembling.insertedId;
 

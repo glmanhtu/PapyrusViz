@@ -26,6 +26,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { CommonModule } from '@angular/common';
 import { MatchingButtonComponent } from './components/matching-button/matching-button.component';
+import { PanZoomDirective } from './directives/pan-zoom.directive';
 
 @NgModule({
 	declarations: [
@@ -35,7 +36,8 @@ import { MatchingButtonComponent } from './components/matching-button/matching-b
 		ProgressComponent,
 		InfoModalComponent,
 		ConfirmModalComponent,
-		MatchingButtonComponent
+		MatchingButtonComponent,
+		PanZoomDirective
   ],
 	imports: [
 		ReactiveFormsModule,
@@ -49,7 +51,8 @@ import { MatchingButtonComponent } from './components/matching-button/matching-b
 		ProgressComponent,
 		InfoModalComponent,
 		ConfirmModalComponent,
-		MatchingButtonComponent
+		MatchingButtonComponent,
+		PanZoomDirective
 	]
 })
 export class SharedModule {}

@@ -18,6 +18,7 @@
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
 import { projectTbl } from './project';
 import { sql } from "drizzle-orm";
+import { GlobalTransform } from 'shared-lib';
 
 export enum AssemblingStatus {
     ENABLED = 1,
@@ -29,6 +30,7 @@ export const assemblingTbl = sqliteTable('assembling', {
     name: text('name'),
     group: text('group'),
     status: integer('status').default(AssemblingStatus.ENABLED),
+    transforms: text('transforms', { mode: 'json' }).$type<GlobalTransform>(),
     createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
     projectId: integer('project_id').references(() => projectTbl.id),
 });

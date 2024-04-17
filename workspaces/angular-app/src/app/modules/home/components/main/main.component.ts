@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Component, Inject, Input, OnInit, QueryList, ViewChildren } from '@angular/core';
+import { Component, Inject, Input, OnInit, QueryList, ViewChildren, ViewEncapsulation } from '@angular/core';
 import { BroadcastService, PROJECT_BROADCAST_SERVICE_TOKEN } from '../../../../services/broadcast.service';
 import {
   AssemblingDTO,
@@ -33,6 +33,10 @@ import { BoardMainComponent } from './board/board.main.component';
 
 @Component({
   selector: 'app-main',
+  encapsulation: ViewEncapsulation.None,
+  host: {
+    class: 'h-100 w-100'
+  },
   providers: [NgbNav],
   templateUrl: './main.component.html',
   styleUrls: ['./main.component.scss'],

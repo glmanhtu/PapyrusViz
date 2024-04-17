@@ -40,3 +40,8 @@
 #activated-image {
     box-shadow: rgb(31, 193, 27) 0 0 0 2px;
 }
+
+.tab-content > .tab-pane {
+    width: 100% !important;
+    height: 100% !important;
+}
