@@ -46,6 +46,7 @@ export class PanZoomDirective implements OnInit{
 	@HostListener("wheel", ["$event"])
 	public onScroll(event: WheelEvent) {
 		event.preventDefault();
+		event.stopPropagation();
 		const container = this.container;
 		const scale = this.globalTransform.scale
 		const rect = container.getBoundingClientRect();
@@ -76,6 +77,7 @@ export class PanZoomDirective implements OnInit{
 
 	@HostListener("mousedown", ["$event"])
 	onMouseDown(event: MouseEvent) {
+		event.preventDefault();
 	  // Start panning
 	  this.last = { x: event.clientX, y: event.clientY };
 	  const mouseMoveListener = (moveEvent: MouseEvent) => {

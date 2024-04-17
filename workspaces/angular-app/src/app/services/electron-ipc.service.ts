@@ -37,6 +37,15 @@ export class ElectronIpcService {
 		return this._api.send<P, R>(type, payload);
 	}
 
+	public debounce<P>(delay: number) {
+		let timerId: number;
+		return (type: string, payload: P) => {
+			console.log("Clear " + timerId)
+			clearTimeout(timerId);
+			timerId = setTimeout(() => this.send(type, payload), delay);
+		};
+	}
+
 	public sendAndListen<P, R>(type: string, payload: P, listener: (message: IMessage<R>) => void): void {
 		this._api.sendAndListen<P, R>(type, payload, (message) => {
 			this.ngZone.run(() => {
