@@ -67,7 +67,8 @@ export class ProjectHandler extends BaseHandler {
 		const appData = await dataUtils.readAppData();
 		appData.projects = appData.projects.filter((x) => x.projPath !== projectPath);
 		await dataUtils.writeAppData(appData);
-		await fs.rm(projectPath, { recursive: true, force: true });
+		const option = { recursive: true, force: true }
+		await fs.rm(projectPath, option);
 	}
 
 	private async migrateOldProject(projectPath: string, reply: (message: IMessage<string | Progress>) => Promise<void>): Promise<void> {
