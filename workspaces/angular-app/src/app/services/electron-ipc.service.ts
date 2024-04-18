@@ -23,6 +23,7 @@ import { ExtrasChannels, IMessage, WindowApi } from 'shared-lib';
 })
 export class ElectronIpcService {
 	private _api!: WindowApi;
+	private debounceTimeouts = new Map<string, number>();
 
 	constructor(private ngZone: NgZone) {
 		if (window && (window as Window).api) {
@@ -37,12 +38,18 @@ export class ElectronIpcService {
 		return this._api.send<P, R>(type, payload);
 	}
 
-	public debounce<P>(delay: number) {
-		let timerId: number;
+	public debounce<P>(delay: number, ...keys: string[]) {
 		return (type: string, payload: P) => {
-			console.log("Clear " + timerId)
-			clearTimeout(timerId);
-			timerId = setTimeout(() => this.send(type, payload), delay);
+			const key = type + '::' + keys.join('-');
+			let timerId = this.debounceTimeouts.get(key)
+			if (timerId) {
+				clearTimeout(timerId);
+			}
+			timerId = setTimeout(() => {
+				this.send<P, unknown>(type, payload)
+				this.debounceTimeouts.delete(key)
+			}, delay);
+			this.debounceTimeouts.set(key, timerId);
 		};
 	}
 

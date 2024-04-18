@@ -222,7 +222,7 @@ export class BoardMainComponent implements OnInit {
   }
 
   onGlobalTransform(globalTransform: GlobalTransform) {
-    return this.eIpc.send<PRequest<AssemblingDTO>, void>('assembling:update-assembling', {
+    return this.eIpc.debounce<PRequest<AssemblingDTO>>(1000, this.projectDto.path, this.assembling.id.toString())('assembling:update-assembling', {
       projectPath: this.projectDto.path,
       payload: {
         ...this.assembling,
@@ -232,7 +232,7 @@ export class BoardMainComponent implements OnInit {
   }
 
   onTransform(assemblingImage: AssemblingImage, transforms: Transforms) {
-    return this.eIpc.send<AssemblingImageChangeRequest, void>('assembling:update-assembling-img', {
+    return this.eIpc.debounce<AssemblingImageChangeRequest>(1000, this.projectDto.path, this.assembling.id.toString(), assemblingImage.img.id.toString())('assembling:update-assembling-img', {
       projectPath: this.projectDto.path,
       assemblingId: this.assembling.id,
       imageId: assemblingImage.img.id,
