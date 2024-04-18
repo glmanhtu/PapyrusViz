@@ -22,7 +22,7 @@ import {
 	MatchingDto,
 	MatchingImgRequest,
 	MatchingRequest,
-	MatchingResponse, Message,
+	MatchingResponse, MdsResult, Message,
 	Progress, RecordImgMatchingResponse, RecordMatchingRequest, SimilarityRequest,
 	ThumbnailResponse,
 } from 'shared-lib';
@@ -42,6 +42,7 @@ import { categoryTbl, DefaultCategory } from '../entities/category';
 import { ImgStatus, imgTbl } from '../entities/img';
 import path from 'node:path';
 import { matchingService } from '../services/matching.service';
+import numeric from 'numeric';
 
 export class MatchingHandler extends BaseHandler {
 	constructor() {
@@ -54,8 +55,37 @@ export class MatchingHandler extends BaseHandler {
 		this.addRoute('matching:fetch-similarity', this.fetchSimilarities.bind(this))
 		this.addRoute('matching:find-matching-imgs', this.findMatchingImages.bind(this))
 		this.addRoute('matching:get-record-imgs', this.getRecordImages.bind(this))
+		this.addRoute('matching:get-mds', this.getMds.bind(this))
 	}
 
+	private async getMds(request: MatchingRequest): Promise<MdsResult[]> {
+		const database = dbService.getConnection(request.projectPath);
+		const similarities = await this.fetchSimilarities({...request, similarity: 0})
+		const ids = await database.select().from(matchingRecordTbl)
+			.where(eq(matchingRecordTbl.matchingId, request.matchingId))
+			.orderBy(matchingRecordTbl.name);
+		const idToIdx = new Map<string, number>();
+		const data: number[][] = new Array(ids.length).fill(0).map(() => new Array(ids.length).fill(0));
+		ids.forEach((value, index) => {
+			idToIdx.set(value.id.toString(), index);
+		})
+		for (const item of similarities) {
+			const source = idToIdx.get(item.source.id);
+			const target = idToIdx.get(item.target.id)
+			const originScore = (1 / item.similarity) - 1
+			data[source][target] = originScore; // Similarity to distance
+			data[target][source] = originScore;
+		}
+		const positions = numeric.transpose(matchingService.mds(data));
+		return ids.map(x => ({
+			id: x.id.toString(),
+			name: x.name,
+			position: {
+				x: positions[0][idToIdx.get(x.id.toString())],
+				y: positions[1][idToIdx.get(x.id.toString())]
+			}
+		}))
+	}
 	private async getRecordImages(request: RecordMatchingRequest): Promise<RecordImgMatchingResponse[]> {
 		const database = dbService.getConnection(request.projectPath);
 

@@ -72,6 +72,14 @@ export type SimilarityRequest = {
 	similarity: number
 }
 
+export interface MdsResult {
+	id: string,
+	name: string,
+	position: {
+		x: number,
+		y: number
+	}
+}
 
 export interface Link {
 	source: {

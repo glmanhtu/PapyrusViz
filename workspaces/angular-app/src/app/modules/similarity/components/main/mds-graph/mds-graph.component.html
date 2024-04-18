@@ -15,9 +15,5 @@
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<div class="card text-center h-100">
-	<div class="card-body h-100 overflow-hidden" *ngIf="panel.matchingButton.activatedMatching">
-<!--		<sim-force-graph [projectDto]="projectDto" [threshold]="panel.threshold" [matching]="panel.matchingButton.activatedMatching" [forceControl]="panel.forceControl"></sim-force-graph>-->
-		<sim-mds-graph [projectDto]="projectDto" [threshold]="panel.threshold" [matching]="panel.matchingButton.activatedMatching" [forceControl]="panel.forceControl"></sim-mds-graph>
-	</div>
+<div class="h-100" #chartContainer>
 </div>

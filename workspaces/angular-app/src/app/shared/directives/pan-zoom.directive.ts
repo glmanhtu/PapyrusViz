@@ -17,7 +17,6 @@
 
 import { Directive, ElementRef, EventEmitter, HostListener, Input, OnInit, Output } from '@angular/core';
 import { GlobalTransform } from 'shared-lib';
-import { parseInt } from 'lodash';
 
 @Directive({
 	selector: "[appPanZoom]",

@@ -25,6 +25,7 @@ import { NavComponent } from './components/nav/nav.component';
 import { PanelComponent } from './components/panel/panel.component';
 import { MainComponent } from './components/main/main.component';
 import { ForceGraphComponent } from './components/main/force-graph/force-graph.component';
+import { MdsGraphComponent } from './components/main/mds-graph/mds-graph.component';
 
 @NgModule({
 	declarations: [
@@ -32,7 +33,8 @@ import { ForceGraphComponent } from './components/main/force-graph/force-graph.c
 		SimilarityComponent,
 		PanelComponent,
 		MainComponent,
-		ForceGraphComponent
+		ForceGraphComponent,
+		MdsGraphComponent
   ],
 	imports: [
 		ReactiveFormsModule,
