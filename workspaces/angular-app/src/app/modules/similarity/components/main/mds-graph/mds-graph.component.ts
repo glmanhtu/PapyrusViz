@@ -27,13 +27,36 @@ import {
 } from '@angular/core';
 import {
   MatchingRequest, MatchingResponse, MdsResult,
-  ProjectDTO
+  ProjectDTO, RecordImgMatchingResponse, RecordMatchingRequest,
 } from 'shared-lib';
 import { ElectronIpcService } from '../../../../../services/electron-ipc.service';
 import { NgbNav } from '@ng-bootstrap/ng-bootstrap';
 import { FormControl, FormGroup } from '@angular/forms';
 import * as d3 from 'd3'
 
+
+interface InfoPanelData {
+  name: string;
+  bulletins: string[];
+  imageSrc: string;
+  width: number;
+  height: number;
+}
+
+function extractLeadingNumbers(inputString: string): number | null {
+  // Regular expression to match leading numbers
+  const leadingNumbersRegex = /^(\d+)/;
+
+  // Executing the regex on the input string
+  const match = inputString.match(leadingNumbersRegex);
+
+  // If there's a match, return the parsed number, otherwise return null
+  if (match && match[1]) {
+    return parseInt(match[1], 10);
+  } else {
+    return null;
+  }
+}
 
 @Component({
   selector: 'sim-mds-graph',
@@ -92,6 +115,7 @@ export class MdsGraphComponent implements OnInit, AfterViewInit, OnDestroy {
         if (item.position.y < this.domains.minY) {
           this.domains.minY = item.position.y
         }
+        item.group = extractLeadingNumbers(item.name) || 0
       })
 
       this.updateGraph()
@@ -111,6 +135,55 @@ export class MdsGraphComponent implements OnInit, AfterViewInit, OnDestroy {
 
   updateGraph() {
     const rect = this.chartContainer.nativeElement.getBoundingClientRect();
+    const tooltip = d3.select("#tooltip");
+    const tooltipName = d3.select("#tooltip-name");
+    const tooltipImage = d3.select("#tooltip-image");
+    const tooltipAttribute = d3.select("#tooltip-attribute");
+
+    d3.select(this.chartContainer.nativeElement).select('svg').remove();
+    const color = d3.scaleSequential(d3.interpolateRainbow)
+
+    const imgMap = new Map<string, InfoPanelData>();
+
+    const drawTooltip = (event: MouseEvent, d: MdsResult) => {
+      const info = imgMap.get(d.name)!;
+      tooltipName.text(info.name);
+      tooltipImage.attr('src', info.imageSrc);
+      tooltipAttribute.text('');
+      for (const bulletin of info.bulletins) {
+        tooltipAttribute.append('li').text(bulletin);
+      }
+
+      tooltip.style('display', 'flex');
+      tooltip.style('top', `${event.clientY - rect.top + 30}px`);
+      tooltip.style('left', `${event.clientX - rect.left + 20}px`);
+    }
+
+    const tooltipMouseover = (event: MouseEvent, d: MdsResult) => {
+      if (!imgMap.has(d.name)) {
+        this.eIpc.send<RecordMatchingRequest, RecordImgMatchingResponse[]>('matching:get-record-imgs', {
+          projectPath: this.projectDto.path,
+          recordId: parseInt(d.id as string),
+          matchingId: this.matching.id
+        }).then(items => {
+          const im = items[0];
+          const ratio = im.img.width > im.img.height
+            ? 200 / im.img.width
+            : 200 / im.img.height
+          const item: InfoPanelData = {
+            name: im.name,
+            imageSrc: im.img.path,
+            bulletins: items.map(x => x.category.name),
+            width: Math.round(im.img.width * ratio),
+            height: Math.round(im.img.height * ratio)
+          }
+          imgMap.set(d.name, item);
+          drawTooltip(event, d)
+        });
+      } else {
+        drawTooltip(event, d)
+      }
+    }
 
     const padding =  32,
       w = rect.width,
@@ -156,11 +229,41 @@ export class MdsGraphComponent implements OnInit, AfterViewInit, OnDestroy {
       .enter()
       .append("g");
 
-    nodes.append("circle")
-      .attr("r", pointRadius)
-      .attr("fill", 'rgba(31, 120, 180, 0.92)')
-      .attr("cx", function(d) { return xScale(d.position.x); })
-      .attr("cy", function(d) { return yScale(d.position.y); });
+    const fillColour = (d: MdsResult) => {
+      if (this.forceControl.getRawValue()['autoColor'] === '1') {
+        return color(d.group! / 100);
+      } else {
+        return '#000';
+      }
+    }
+
+    if (this.forceControl.getRawValue()['textMode'] === '1') {
+      nodes.append("text")
+        .attr("text-anchor", "middle")
+        .attr("fill", fillColour) // Set fill color based on group
+        .text((d) => d.name)
+        .attr('class', 'mds-text mds-element')
+        .attr('font-size', '0.8em')
+        .attr("x", function(d) { return xScale(d.position.x); })
+        .attr("y", function(d) { return yScale(d.position.y); })
+        .on('mouseover', tooltipMouseover)
+        .on('mouseout', () => {
+          tooltip.style('display', 'none');
+        });
+    } else {
+      nodes.append("circle")
+        .attr("r", pointRadius)
+        // .attr("fill", 'rgba(31, 120, 180, 0.92)')
+        .attr("fill", fillColour) // Set fill color based on group
+        .attr('class', 'mds-element')
+        .attr("cx", function(d) { return xScale(d.position.x); })
+        .attr("cy", function(d) { return yScale(d.position.y); })
+        .on('mouseover', tooltipMouseover)
+        .on('mouseout', () => {
+          tooltip.style('display', 'none');
+        });
+
+    }
 
     // Step 3: Create a function that will be called on each zoom event
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -174,12 +277,11 @@ export class MdsGraphComponent implements OnInit, AfterViewInit, OnDestroy {
 
       // Apply the new transform to your graph container
       container.attr('transform', transform);
+
+      // Adjust the font size of the text nodes based on the current zoom scale
+      nodes.select('text')
+        .style('font-size', `${.8 / transform.k}em`);
     }
 
-    // nodes.append("text")
-    //   .attr("text-anchor", "middle")
-    //   .text((d) => d.name)
-    //   .attr("x", function(d) { return xScale(d.position.x); })
-    //   .attr("y", function(d) { return yScale(d.position.y) - 2 *pointRadius; });
   }
 }

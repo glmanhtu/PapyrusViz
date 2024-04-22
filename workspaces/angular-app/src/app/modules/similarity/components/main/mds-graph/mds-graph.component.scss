@@ -23,3 +23,35 @@
   stroke: #fff;
   stroke-width: 1.5px;
 }
+
+.mds-text {
+    font-family: 'Roboto', sans-serif;
+}
+
+#tooltip {
+  position: absolute;
+  text-align: center;
+  background: white;
+  border: 1px solid black;
+  border-radius: 8px;
+  display: none;
+  z-index: 9999;
+  width: fit-content;
+  padding: 10px;
+}
+
+#tooltip-name {
+  text-align: left;
+}
+
+#tooltip-image {
+  max-width: 100%;
+}
+
+#tooltip-attribute li {
+  white-space: nowrap;
+}
+
+.mds-element {
+  cursor: pointer;
+}

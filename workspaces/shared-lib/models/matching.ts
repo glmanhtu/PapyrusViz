@@ -78,7 +78,8 @@ export interface MdsResult {
 	position: {
 		x: number,
 		y: number
-	}
+	},
+	group?: number
 }
 
 export interface Link {
