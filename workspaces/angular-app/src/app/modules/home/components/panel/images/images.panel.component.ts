@@ -94,7 +94,12 @@ export class ImagesPanelComponent implements OnInit, AfterViewInit {
       this.thumbnails.push(...result.thumbnails);
       this.currentPage = page;
       this.isLoading = false;
-    });
+    }).catch((err) => {
+      console.log(err);
+      this.isLoading = false;
+      this.isCompleted = true;
+      this.thumbnails.length = 0;
+    })
   }
 
   contextMenu(thumbnail: Thumbnail, idx: number) {

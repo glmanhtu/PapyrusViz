@@ -131,6 +131,11 @@ export class MatchingPanelComponent implements OnInit {
       this.thumbnails.push(...result.thumbnails);
       this.currentPage = page;
       this.isLoading = false;
-    });
+    }).catch((err) => {
+      console.error(err);
+      this.isLoading = false;
+      this.isCompleted = true;
+      this.thumbnails.length = 0;
+    })
   }
 }
