@@ -42,7 +42,7 @@ import { categoryTbl, DefaultCategory } from '../entities/category';
 import { ImgStatus, imgTbl } from '../entities/img';
 import path from 'node:path';
 import { matchingService } from '../services/matching.service';
-import numeric from 'numeric';
+import { JMatrix } from 'cmatrix';
 
 export class MatchingHandler extends BaseHandler {
 	constructor() {
@@ -65,7 +65,7 @@ export class MatchingHandler extends BaseHandler {
 			.where(eq(matchingRecordTbl.matchingId, request.matchingId))
 			.orderBy(matchingRecordTbl.name);
 		const idToIdx = new Map<string, number>();
-		const data: number[][] = new Array(ids.length).fill(0).map(() => new Array(ids.length).fill(0));
+		const matrix = new JMatrix(ids.length, ids.length, 0);
 		ids.forEach((value, index) => {
 			idToIdx.set(value.id.toString(), index);
 		})
@@ -73,10 +73,10 @@ export class MatchingHandler extends BaseHandler {
 			const source = idToIdx.get(item.source.id);
 			const target = idToIdx.get(item.target.id)
 			const originScore = (1 / item.similarity) - 1
-			data[source][target] = originScore; // Similarity to distance
-			data[target][source] = originScore;
+			matrix.setCell(source, target, originScore);
+			matrix.setCell(target, source, originScore);
 		}
-		const positions = numeric.transpose(matchingService.mds(data));
+		const positions = matrix.mds(2, 100, 2024);
 		return ids.map(x => ({
 			id: x.id.toString(),
 			name: x.name,

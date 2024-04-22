@@ -94,28 +94,22 @@ export class MdsGraphComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       })
 
-      this.updateGraph(this.threshold.value)
+      this.updateGraph()
     })
 
     this.forceControl.valueChanges.subscribe((values) => {
       console.log(values)
-      this.updateGraph(this.threshold.value);
+      this.updateGraph();
       // console.log(this.graphObject.d3Force('charge')!.strength())
       // this.graphObject.d3ReheatSimulation()
     });
-    this.threshold.valueChanges.subscribe(async (val) => {
-      if (val > 0.5) {
-        console.log('Update ' + val )
-        await this.updateGraph(val);
-      }
-    })
   }
 
 
   ngOnInit(): void {
   }
 
-  async updateGraph(similarity: number) {
+  updateGraph() {
     const rect = this.chartContainer.nativeElement.getBoundingClientRect();
 
     const padding =  32,
@@ -127,35 +121,60 @@ export class MdsGraphComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const xScale = d3.scaleLinear(xDomain, [padding, w - padding])
     const yScale = d3.scaleLinear(yDomain, [padding, h - padding])
-    const xAxis = d3.axisBottom(xScale)
-        // .ticks( 7);
+    // const xAxis = d3.axisBottom(xScale)
+    //     // .ticks( 7);
+    //
+    // const yAxis = d3.axisLeft(yScale)
+    //     // .ticks( 7);
 
-    const yAxis = d3.axisLeft(yScale)
-        // .ticks( 7);
+    const zoom = d3.zoom()
+      .scaleExtent([1, 10]) // This controls how much you can zoom in and out
+      .translateExtent([[-100, -100], [w + 100, h + 100]]) // This controls how much you can pan
+      .on('zoom', zoomed); // This is the zoom event listener
 
     const svg = d3.select(this.chartContainer.nativeElement).append("svg")
       .attr("width", w)
-      .attr("height", h);
+      .attr("height", h)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .call(zoom as any);
 
-    svg.append("g")
-      .attr("class", "axis")
-      .attr("transform", "translate(0," + (h - padding + 2*pointRadius) + ")")
-      .call(xAxis);
+    // Create a container within the SVG to hold your graph, and apply transformations to this container
+    const container = svg.append('g');
 
-    svg.append("g")
-      .attr("class", "axis")
-      .attr("transform", "translate(" + (padding - 2*pointRadius) + ",0)")
-      .call(yAxis);
+    // container.append("g")
+    //   .attr("class", "axis")
+    //   .attr("transform", "translate(0," + (h - padding + 2*pointRadius) + ")")
+    //   .call(xAxis);
+    //
+    // container.append("g")
+    //   .attr("class", "axis")
+    //   .attr("transform", "translate(" + (padding - 2*pointRadius) + ",0)")
+    //   .call(yAxis);
 
-    const nodes = svg.selectAll("circle")
+    const nodes = container.selectAll("circle")
       .data(this.data)
       .enter()
       .append("g");
 
     nodes.append("circle")
       .attr("r", pointRadius)
+      .attr("fill", 'rgba(31, 120, 180, 0.92)')
       .attr("cx", function(d) { return xScale(d.position.x); })
       .attr("cy", function(d) { return yScale(d.position.y); });
+
+    // Step 3: Create a function that will be called on each zoom event
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    function zoomed(event: any) {
+      // Get the current zoom state
+      let transform = event.transform;
+
+      if (transform.k === 1) {
+        transform = d3.zoomIdentity;
+      }
+
+      // Apply the new transform to your graph container
+      container.attr('transform', transform);
+    }
 
     // nodes.append("text")
     //   .attr("text-anchor", "middle")

@@ -31,35 +31,10 @@ import * as csv from '@fast-csv/parse';
 import { imageService } from './image.service';
 import { configService } from './config.service';
 import { Config } from '../entities/user-config-tbl';
-import numeric from 'numeric';
+
 
 class MatchingService {
 
-	public mds(distances: number[][], dimensions = 2) {
-		const M = numeric.mul(numeric.pow(distances, 2), -0.5);
-
-		// double centre the rows/columns
-		function mean(A: number[][]) {
-			return numeric.div(numeric.add.apply(null, A), A.length);
-		}
-		const rowMeans = mean(M),
-			colMeans = mean(numeric.transpose(M)),
-			totalMean = mean(rowMeans);
-
-		for (let i = 0; i < M.length; ++i) {
-			for (let j =0; j < M[0].length; ++j) {
-				M[i][j] += totalMean - rowMeans[i] - colMeans[j];
-			}
-		}
-
-		// take the SVD of the double centred matrix, and return the
-		// points from it
-		const ret = numeric.svd(M),
-			eigenValues = numeric.sqrt(ret.S);
-		return ret.U.map(function(row) {
-			return numeric.mul(row, eigenValues).splice(0, dimensions);
-		});
-	}
 	public async createMatching(payload: MatchingDto): Promise<Matching> {
 		const database = dbService.getConnection(payload.projectPath);
 		const project = await projectService.getProjectByPath(payload.projectPath);
