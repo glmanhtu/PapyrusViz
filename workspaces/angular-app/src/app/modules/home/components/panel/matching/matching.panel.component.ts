@@ -107,7 +107,7 @@ export class MatchingPanelComponent implements OnInit {
     })
   }
 
-  getThumbnails(page = 0, reset = true) {
+  async getThumbnails(page = 0, reset = true) {
     if (!this.matchingComponent.activatedMatching || this.queryImgId === undefined || this.isLoading || (this.isCompleted && !reset)) {
       return;
     }

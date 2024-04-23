@@ -71,7 +71,7 @@ export class ImagesPanelComponent implements OnInit, AfterViewInit {
     this.getThumbnails(this.currentPage + 1, false);
   }
 
-  getThumbnails(page = 0, reset = true) {
+  async getThumbnails(page = 0, reset = true) {
     if (this.isLoading || (this.isCompleted && !reset)) {
       return;
     }

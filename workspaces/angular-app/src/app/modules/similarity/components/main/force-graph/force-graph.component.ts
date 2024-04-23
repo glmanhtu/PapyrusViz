@@ -233,7 +233,7 @@ export class ForceGraphComponent implements OnInit, AfterViewInit, OnDestroy {
           const item: InfoPanelData = {
             name: im.name,
             imageSrc: im.img.path,
-            bulletins: items.map(x => x.category.name),
+            bulletins: [...new Set<string>(items.map(x => x.category.name))],
             width: Math.round(im.img.width * ratio),
             height: Math.round(im.img.height * ratio)
           }

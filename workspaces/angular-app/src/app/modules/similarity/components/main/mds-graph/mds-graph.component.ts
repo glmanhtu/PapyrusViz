@@ -37,7 +37,7 @@ import * as d3 from 'd3'
 
 interface InfoPanelData {
   name: string;
-  bulletins: string[];
+  bulletins: Set<string>;
   imageSrc: string;
   width: number;
   height: number;
@@ -100,7 +100,6 @@ export class MdsGraphComponent implements OnInit, AfterViewInit, OnDestroy {
       projectPath: this.projectDto.path,
       matchingId: this.matching.id
     }).then(results => {
-      console.log(results)
       this.data = results;
       this.data.forEach(item => {
         if (item.position.x > this.domains.maxX) {
@@ -121,8 +120,7 @@ export class MdsGraphComponent implements OnInit, AfterViewInit, OnDestroy {
       this.updateGraph()
     })
 
-    this.forceControl.valueChanges.subscribe((values) => {
-      console.log(values)
+    this.forceControl.valueChanges.subscribe((_) => {
       this.updateGraph();
       // console.log(this.graphObject.d3Force('charge')!.strength())
       // this.graphObject.d3ReheatSimulation()
@@ -173,7 +171,7 @@ export class MdsGraphComponent implements OnInit, AfterViewInit, OnDestroy {
           const item: InfoPanelData = {
             name: im.name,
             imageSrc: im.img.path,
-            bulletins: items.map(x => x.category.name),
+            bulletins: new Set<string>(items.map(x => x.category.name)),
             width: Math.round(im.img.width * ratio),
             height: Math.round(im.img.height * ratio)
           }
