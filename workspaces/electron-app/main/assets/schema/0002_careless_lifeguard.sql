@@ -1,1 +1,0 @@
-ALTER TABLE assembling ADD `status` integer DEFAULT 1;

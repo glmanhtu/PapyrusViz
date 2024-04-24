@@ -67,7 +67,8 @@ export class ProjectHandler extends BaseHandler {
 		const appData = await dataUtils.readAppData();
 		appData.projects = appData.projects.filter((x) => x.projPath !== projectPath);
 		await dataUtils.writeAppData(appData);
-		await fs.rm(projectPath, { recursive: true, force: true });
+		const option = { recursive: true, force: true }
+		await fs.rm(projectPath, option);
 	}
 
 	private async migrateOldProject(projectPath: string, reply: (message: IMessage<string | Progress>) => Promise<void>): Promise<void> {
@@ -114,7 +115,7 @@ export class ProjectHandler extends BaseHandler {
 					await database.insert(imgTbl).values({
 						id: parseInt(key) + 1,
 						path: path.relative(rootDir, oldImg.path),
-						name: oldImg.name,
+						name: oldImg.name.split('.')[0],
 						thumbnail: path.relative(data.projPath, oldImg.thumbnails),
 						width: oldImg.width,
 						height: oldImg.height,
@@ -136,7 +137,18 @@ export class ProjectHandler extends BaseHandler {
 			const assembling = await database.insert(assemblingTbl).values({
 				name: assembled.name,
 				group: assembled.parent,
-				projectId: project.insertedId
+				projectId: project.insertedId,
+				transforms: {
+					origin: {
+						x: 0,
+						y: 0
+					},
+					scale: 1,
+					last: {
+						x: 0,
+						y: 0
+					}
+				}
 			}).returning({insertedId: assemblingTbl.id}).then(takeUniqueOrThrow)
 			const assemblingId = assembling.insertedId;
 
@@ -281,7 +293,7 @@ export class ProjectHandler extends BaseHandler {
 					await database.insert(imgTbl).values({
 						...metadata,
 						path: path.relative(rootDir, images[i]),
-						name: path.basename(images[i]),
+						name: path.basename(images[i]).split('.')[0],
 						thumbnail: path.relative(payload.path, thumbnailPath),
 						categoryId: category.insertedId
 					});

@@ -19,7 +19,7 @@ import { Category } from '../entities/category';
 import { Img, imgTbl } from '../entities/img';
 import path from 'node:path';
 import sharp from 'sharp';
-import { like } from 'drizzle-orm';
+import { eq, like, or } from 'drizzle-orm';
 import { dbService } from './database.service';
 import { ImgDto } from 'shared-lib';
 
@@ -35,17 +35,19 @@ class ImageService {
 	public async findBestMatchByName(projectPath: string, name: string): Promise<Img[]> {
 		const database = dbService.getConnection(projectPath);
 		return database.select()
-			.from(imgTbl).where(like(imgTbl.name, '%' + name + '%'))
-			.orderBy(imgTbl.name)
-			.limit(3);
+			.from(imgTbl).where(
+				or(
+					eq(imgTbl.name, name),
+					like(imgTbl.name, `${name}-_`)
+				))
+			.orderBy(imgTbl.name);
 	}
 
 	public async findBestMatchByPath(projectPath: string, name: string): Promise<Img[]> {
 		const database = dbService.getConnection(projectPath);
 		return database.select()
 			.from(imgTbl).where(like(imgTbl.path, '%' + name + '%'))
-			.orderBy(imgTbl.name)
-			.limit(3);
+			.orderBy(imgTbl.name);
 	}
 
 	public async resize(inputFile: string, outputFile: string, width: number, height: number) {

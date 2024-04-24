@@ -31,12 +31,8 @@
 			<div class="progress-bar" id="progressBar" role="progressbar" [ngStyle]="{'width.%': progress.percentage}"
 					 aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="progress.percentage"></div>
 		</div>
-		<div class="row">
-				<pre>
-					<code id="project-error" *ngIf="errorMessage !== ''">
-						{{errorMessage}}
-					</code>
-				</pre>
+		<div class="row overflow-auto" [style.max-height.px]="250">
+				<pre><code id="project-error" *ngIf="errorMessage !== ''">{{errorMessage}}</code></pre>
 		</div>
 	</div>
 	<div class="modal-footer">

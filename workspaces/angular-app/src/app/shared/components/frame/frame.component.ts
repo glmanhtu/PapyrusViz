@@ -17,7 +17,7 @@
 
 import { Component, ElementRef, Inject, Input, ViewChild, Output, EventEmitter } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
-import { ImgDto, Transforms } from 'shared-lib';
+import { GlobalTransform, ImgDto, Transforms } from 'shared-lib';
 
 
 @Component({
@@ -33,6 +33,9 @@ export class FrameComponent {
 
   @Input()
   image: ImgDto;
+
+  @Input()
+  globalTransform: GlobalTransform
 
   @Input()
   transforms: Transforms;
@@ -74,8 +77,8 @@ export class FrameComponent {
     const duringDrag = (e: MouseEvent) => {
       const dx = e.clientX - mouseX;
       const dy = e.clientY - mouseY;
-      this.transforms.left = positionX + dx;
-      this.transforms.top = positionY + dy;
+      this.transforms.left = positionX + dx / this.globalTransform.scale;
+      this.transforms.top = positionY + dy / this.globalTransform.scale;
     };
 
     const finishDrag = (_: MouseEvent) => {

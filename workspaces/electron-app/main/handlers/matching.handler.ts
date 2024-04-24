@@ -18,16 +18,21 @@
 import { BaseHandler } from './base.handler';
 
 import {
-	IMessage,
+	IMessage, Link,
 	MatchingDto,
 	MatchingImgRequest,
 	MatchingRequest,
-	MatchingResponse, Message,
-	Progress,
+	MatchingResponse, MdsResult, Message,
+	Progress, RecordImgMatchingResponse, RecordMatchingRequest, SimilarityRequest,
 	ThumbnailResponse,
 } from 'shared-lib';
 import { dbService } from '../services/database.service';
-import { matchingImgTbl, matchingTbl } from '../entities/matching';
+import {
+	matchingImgRecordTbl,
+	matchingRecordScoreTbl,
+	matchingRecordTbl,
+	matchingTbl,
+} from '../entities/matching';
 import { projectService } from '../services/project.service';
 import { takeUniqueOrThrow } from '../utils/data.utils';
 import { and, eq } from 'drizzle-orm';
@@ -37,7 +42,7 @@ import { categoryTbl, DefaultCategory } from '../entities/category';
 import { ImgStatus, imgTbl } from '../entities/img';
 import path from 'node:path';
 import { matchingService } from '../services/matching.service';
-
+import { JMatrix } from 'cmatrix';
 
 export class MatchingHandler extends BaseHandler {
 	constructor() {
@@ -47,7 +52,89 @@ export class MatchingHandler extends BaseHandler {
 		this.addRoute('matching:get-activated-matching', this.getActivatedMatching.bind(this))
 		this.addRoute('matching:set-activated-matching', this.setActivatedMatching.bind(this))
 		this.addRoute('matching:delete-matching', this.deleteMatching.bind(this))
+		this.addRoute('matching:fetch-similarity', this.fetchSimilarities.bind(this))
 		this.addRoute('matching:find-matching-imgs', this.findMatchingImages.bind(this))
+		this.addRoute('matching:get-record-imgs', this.getRecordImages.bind(this))
+		this.addRoute('matching:get-mds', this.getMds.bind(this))
+	}
+
+	private async getMds(request: MatchingRequest): Promise<MdsResult[]> {
+		const database = dbService.getConnection(request.projectPath);
+		const similarities = await this.fetchSimilarities({...request, similarity: 0})
+		const ids = await database.select().from(matchingRecordTbl)
+			.where(eq(matchingRecordTbl.matchingId, request.matchingId))
+			.orderBy(matchingRecordTbl.name);
+		const idToIdx = new Map<string, number>();
+		const matrix = new JMatrix(ids.length, ids.length, 0);
+		ids.forEach((value, index) => {
+			idToIdx.set(value.id.toString(), index);
+		})
+		for (const item of similarities) {
+			const source = idToIdx.get(item.source.id);
+			const target = idToIdx.get(item.target.id)
+			const originScore = (1 / item.similarity) - 1
+			matrix.setCell(source, target, originScore);
+			matrix.setCell(target, source, originScore);
+		}
+		const positions = matrix.mds(2, 100, 2024);
+		return ids.map(x => ({
+			id: x.id.toString(),
+			name: x.name,
+			position: {
+				x: positions[0][idToIdx.get(x.id.toString())],
+				y: positions[1][idToIdx.get(x.id.toString())]
+			}
+		}))
+	}
+	private async getRecordImages(request: RecordMatchingRequest): Promise<RecordImgMatchingResponse[]> {
+		const database = dbService.getConnection(request.projectPath);
+
+		return database.select().from(matchingImgRecordTbl)
+			.where(and(
+				eq(matchingImgRecordTbl.matchingRecordId, request.recordId)
+			))
+			.innerJoin(matchingRecordTbl, eq(matchingRecordTbl.id, matchingImgRecordTbl.matchingRecordId))
+			.innerJoin(imgTbl, eq(imgTbl.id, matchingImgRecordTbl.imgId))
+			.innerJoin(categoryTbl, eq(categoryTbl.id, imgTbl.categoryId))
+			.then(items => items.map(x => ({
+				name: x['matching-record'].name,
+				img: {
+					id: x.img.id,
+					path: "atom://" + path.join(request.projectPath, x.img.thumbnail),
+					width: x.img.width,
+					height: x.img.height
+				},
+				category: {
+					id: x.category.id,
+					name: x.category.name
+				}
+			})));
+	}
+
+	private async fetchSimilarities(request: SimilarityRequest): Promise<Link[]> {
+		const database = dbService.getConnection(request.projectPath);
+
+		return database.query.matchingRecordScoreTbl.findMany({
+			where: (matchingRecordScoreTbl, {eq, lt, gt, and}) => (and(
+				eq(matchingRecordScoreTbl.matchingId, request.matchingId),
+				// For each pair of image, we have an original version and reverse version of it in this table
+				// Hence, we need to filter them before return the results
+				lt(matchingRecordScoreTbl.sourceId, matchingRecordScoreTbl.targetId),
+				gt(matchingRecordScoreTbl.score, request.similarity - 0.000001)
+			)),
+			with: {
+				source: true,
+				target: true
+			}
+		}).then(items => items.map(x => ({
+			source: {
+				id: x.source.id.toString(),
+				name: x.source.name
+			}, target: {
+				id: x.target.id.toString(),
+				name: x.target.name
+			}, similarity: Math.round(x.score * 1000 + Number.EPSILON) / 1000
+		})))
 	}
 
 	private async findMatchingImages(request: MatchingImgRequest): Promise<ThumbnailResponse> {
@@ -55,10 +142,18 @@ export class MatchingHandler extends BaseHandler {
 		const category = await database.select().from(categoryTbl)
 			.where(eq(categoryTbl.id, request.categoryId)).then(takeUniqueOrThrow);
 
-		const images = database.select().from(matchingImgTbl)
+		const sourceRecord = await database.select().from(matchingImgRecordTbl)
+			.where(
+				and(
+					eq(matchingImgRecordTbl.imgId, request.imgId),
+					eq(matchingImgRecordTbl.matchingId, request.matchingId)
+				)
+			)
+			.then(takeUniqueOrThrow);
+
+		const images = database.select().from(matchingRecordScoreTbl)
 			.where(and(
-				eq(matchingImgTbl.matchingId, request.matchingId),
-				eq(matchingImgTbl.sourceImgId, request.imgId),
+				eq(matchingRecordScoreTbl.sourceId, sourceRecord.matchingRecordId),
 				category.path !== ''
 					? eq(imgTbl.categoryId, request.categoryId)
 					: undefined,
@@ -66,33 +161,20 @@ export class MatchingHandler extends BaseHandler {
 					? eq(imgTbl.status, ImgStatus.ARCHIVED)
 					: eq(imgTbl.status, ImgStatus.ONLINE)
 			))
-			.innerJoin(imgTbl, eq(matchingImgTbl.targetImgId, imgTbl.id))
-			.orderBy(matchingImgTbl.rank)
+			.innerJoin(matchingRecordTbl, eq(matchingRecordScoreTbl.targetId, matchingRecordTbl.id))
+			.innerJoin(matchingImgRecordTbl, eq(matchingImgRecordTbl.matchingRecordId, matchingRecordTbl.id))
+			.innerJoin(imgTbl, eq(matchingImgRecordTbl.imgId, imgTbl.id))
+			.orderBy(matchingRecordScoreTbl.rank)
 			.limit(request.perPage)
 			.offset(request.page * request.perPage);
-
-		// const images = database.query.matchingImgTbl.findMany({
-		// 	limit: request.perPage,
-		// 	offset: request.page * request.perPage,
-		// 	orderBy: [asc(matchingImgTbl.score)],
-		// 	where: (matchingImgTbl, { eq, and }) => (
-		// 		and(
-		// 			eq(matchingImgTbl.matchingId, request.matchingId),
-		// 			eq(matchingImgTbl.sourceImgId, request.imgId),
-		// 		)
-		// 	),
-		// 	with: {
-		// 		targetImg: true
-		// 	}
-		// })
 
 
 		return images.then(items => ({
 			thumbnails: items.map(x => ({
 				imgId: x.img.id, path: "atom://" + path.join(request.projectPath, x.img.thumbnail),
 				imgName: x.img.name,
-				score: x['matching-img'].score,
-				rank: x['matching-img'].rank,
+				score: x['matching-record-score'].score,
+				rank: x['matching-record-score'].rank,
 				orgImgWidth: x.img.width,
 				orgImgHeight: x.img.height
 			}))
@@ -105,10 +187,12 @@ export class MatchingHandler extends BaseHandler {
 		return database.select().from(matchingTbl).where(eq(matchingTbl.projectId, project.id));
 	}
 
-	private async deleteMatching(matchingRequest: MatchingRequest): Promise<void> {
-		const database = dbService.getConnection(matchingRequest.projectPath);
-		await database.delete(matchingImgTbl).where(eq(matchingImgTbl.matchingId, matchingRequest.matchingId));
-		await database.delete(matchingTbl).where(eq(matchingTbl.id, matchingRequest.matchingId));
+	private async deleteMatching(request: MatchingRequest): Promise<void> {
+		const database = dbService.getConnection(request.projectPath);
+		await database.delete(matchingRecordScoreTbl).where(eq(matchingRecordScoreTbl.matchingId, request.matchingId));
+		await database.delete(matchingImgRecordTbl).where(eq(matchingImgRecordTbl.matchingId, request.matchingId));
+		await database.delete(matchingRecordTbl).where(eq(matchingRecordTbl.matchingId, request.matchingId));
+		await database.delete(matchingTbl).where(eq(matchingTbl.id, request.matchingId));
 	}
 
 	private async getActivatedMatching(projectPath: string): Promise<MatchingResponse> {

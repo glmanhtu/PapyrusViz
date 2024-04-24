@@ -21,7 +21,8 @@ export type AssemblingDTO = {
 	id: number,
 	name: string,
 	group: string,
-	createdAt: string
+	createdAt: string,
+	transforms: GlobalTransform
 }
 
 
@@ -61,4 +62,16 @@ export type AssemblingExportRequest = {
 	projectPath: string,
 	assemblingId: number,
 	outputFile: string
+}
+
+export type GlobalTransform = {
+	scale: number,
+	origin: {
+		x: number,
+		y: number
+	}
+	last: {
+		x: number,
+		y: number
+	}
 }

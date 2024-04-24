@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { InfoModalComponent } from '../shared/components/info-modal/info-modal.component';
-import { ProjectManagementComponent } from '../components/project/management/project.management.component';
-import { ProjectCreationComponent } from '../components/project/creation/project.creation.component';
+import { ProjectManagementComponent } from '../modules/home/components/project/management/project.management.component';
+import { ProjectCreationComponent } from '../modules/home/components/project/creation/project.creation.component';
 import { ProgressComponent } from '../shared/components/progress/progress.component';
-import { SimilarityCreationComponent } from '../components/similarity/creation/similarity.creation.component';
+import { SimilarityCreationComponent } from '../shared/components/similarity/creation/similarity.creation.component';
 import { ProjectDTO } from 'shared-lib';
 import { ConfirmModalComponent } from '../shared/components/confirm-modal/confirm-modal.component';
 

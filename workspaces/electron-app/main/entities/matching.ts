@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { sqliteTable, integer, real, index, text } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, integer, real, index, text, primaryKey } from 'drizzle-orm/sqlite-core';
 import { imgTbl } from './img';
 import { relations, sql } from 'drizzle-orm';
 import { projectTbl } from './project';
@@ -36,44 +36,73 @@ export const matchingTbl = sqliteTable('matching', {
     }
 });
 
-
-export const matchingImgTbl = sqliteTable('matching-img', {
+export const matchingRecordTbl = sqliteTable('matching-record', {
     id: integer('id').primaryKey({autoIncrement: true}),
-    sourceImgId: integer('source_img_id').notNull().references(() => imgTbl.id),
-    targetImgId: integer('target_img_id').notNull().references(() => imgTbl.id),
+    name: text('name'),
+    matchingId: integer('matching_id').references(() => matchingTbl.id),
+});
+
+export const matchingRecordScoreTbl = sqliteTable('matching-record-score', {
+    sourceId: integer('source_id').notNull().references(() => matchingRecordTbl.id),
+    targetId: integer('target_id').notNull().references(() => matchingRecordTbl.id),
     score: real('score'),
     rank: integer('rank'),
-    matchingId: integer('matching_id').references(() => matchingTbl.id)
+    matchingId: integer('matching_id').references(() => matchingTbl.id),
 }, (table) => {
     return {
-        srcIdx: index('matching_src_index').on(table.sourceImgId),
-        targetIdx: index('matching_target_index').on(table.targetImgId),
+        pk: primaryKey({columns: [table.sourceId, table.targetId]})
+    }
+});
+
+
+export const matchingImgRecordTbl = sqliteTable('matching-img-record', {
+    imgId: integer('img_id').notNull().references(() => imgTbl.id),
+    matchingRecordId: integer('matching_record_id').notNull().references(() => matchingRecordTbl.id),
+    matchingId: integer('matching_id').references(() => matchingTbl.id),
+}, (table) => {
+    return {
+        pk: primaryKey({columns: [table.imgId, table.matchingRecordId]})
     }
 });
 
 export const matchingTblRelations = relations(matchingTbl, ({ many }) => ({
-    matchingImgTbl: many(matchingImgTbl)
+    matchingRecord: many(matchingRecordTbl)
 }));
 
 export const matchingImgRelations = relations(imgTbl, ({ many }) => ({
-    matchingImgTbl: many(matchingImgTbl)
+    matchingImgRecord: many(matchingImgRecordTbl)
 }));
 
-export const imgToMatchingRelations = relations(matchingImgTbl, ({ one }) => ({
-    matching: one(matchingTbl, {
-        fields: [matchingImgTbl.matchingId],
-        references: [matchingTbl.id],
+export const matchingRecordRelations = relations(matchingRecordTbl, ({ many }) => ({
+    matchingRecordScore: many(matchingRecordScoreTbl),
+    matchingRecordImage: many(matchingImgRecordTbl)
+}));
+
+export const matchingRecordScoreRelations = relations(matchingRecordScoreTbl, ({ one }) => ({
+    source: one(matchingRecordTbl, {
+        fields: [matchingRecordScoreTbl.sourceId],
+        references: [matchingRecordTbl.id],
     }),
-    sourceImg: one(imgTbl, {
-        fields: [matchingImgTbl.sourceImgId],
+
+    target: one(matchingRecordTbl, {
+        fields: [matchingRecordScoreTbl.targetId],
+        references: [matchingRecordTbl.id],
+    })
+}));
+
+export const matchingImgRecordTblRelations = relations(matchingImgRecordTbl, ({ one }) => ({
+    img: one(imgTbl, {
+        fields: [matchingImgRecordTbl.imgId],
         references: [imgTbl.id],
     }),
-    targetImg: one(imgTbl, {
-        fields: [matchingImgTbl.targetImgId],
-        references: [imgTbl.id],
-    }),
+    matchingRecord: one(matchingRecordTbl, {
+        fields: [matchingImgRecordTbl.matchingRecordId],
+        references: [matchingRecordTbl.id],
+    })
 }));
 
 
-export type MatchingImg = typeof matchingImgTbl.$inferSelect
+export type MatchingRecord = typeof matchingRecordTbl.$inferSelect
+export type MatchingImgRecord = typeof matchingImgRecordTbl.$inferSelect
+export type MatchingRecordScore = typeof matchingRecordScoreTbl.$inferSelect
 export type Matching = typeof matchingTbl.$inferSelect

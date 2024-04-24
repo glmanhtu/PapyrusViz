@@ -6,5 +6,9 @@
 		"types": []
 	},
 	"files": ["src/main.ts", "src/polyfills.ts"],
-	"include": ["src/**/*.d.ts", "../shared-lib/.dist/**/*"]
+	"include": [
+		"src/**/*.d.ts",
+		"src/app/declaration/*.d.ts",
+		"../shared-lib/.dist/**/*"
+	]
 }
