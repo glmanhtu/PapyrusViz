@@ -22,7 +22,8 @@ import { categoryTbl, DefaultCategory } from '../entities/category';
 import { takeUniqueOrThrow } from '../utils/data.utils';
 import path from 'node:path';
 import { dbService } from '../services/database.service';
-import { ImageRequest, ThumbnailRequest, ThumbnailResponse } from 'shared-lib';
+import { ImageRequest, ImgDto, ImgSegmentationRequest, ThumbnailRequest, ThumbnailResponse } from 'shared-lib';
+import { imageService } from '../services/image.service';
 
 
 export class ImageHandler extends BaseHandler {
@@ -31,17 +32,38 @@ export class ImageHandler extends BaseHandler {
 		this.addRoute('image:get-thumbnails', this.getImages.bind(this));
 		this.addRoute('image:archive', this.archiveImage.bind(this));
 		this.addRoute('image:unarchive', this.unarchiveImage.bind(this));
+		this.addRoute('image:get-image', this.getImage.bind(this));
+		this.addRoute('image:segment-image', this.segmentImage.bind(this));
 	}
-
 
 	private async archiveImage(request: ImageRequest): Promise<void> {
 		const database = dbService.getConnection(request.projectPath);
 		await database.update(imgTbl).set({status: ImgStatus.ARCHIVED}).where(eq(imgTbl.id, request.imgId));
 	}
 
+	private async segmentImage(request: ImgSegmentationRequest): Promise<void> {
+		const database = dbService.getConnection(request.projectPath);
+		const imData = await database.select()
+			.from(imgTbl)
+			.innerJoin(categoryTbl, eq(imgTbl.categoryId, categoryTbl.id))
+			.where(eq(imgTbl.id, request.imgId))
+			.then(takeUniqueOrThrow);
+		await imageService.extractImageFeatures(imData.img, imData.category);
+	}
+
 	private async unarchiveImage(request: ImageRequest): Promise<void> {
 		const database = dbService.getConnection(request.projectPath);
 		await database.update(imgTbl).set({status: ImgStatus.ONLINE}).where(eq(imgTbl.id, request.imgId));
+	}
+
+	private async getImage(request: ImageRequest): Promise<ImgDto> {
+		const database = dbService.getConnection(request.projectPath);
+		return database.select()
+			.from(imgTbl)
+			.innerJoin(categoryTbl, eq(imgTbl.categoryId, categoryTbl.id))
+			.where(eq(imgTbl.id, request.imgId))
+			.then(takeUniqueOrThrow)
+			.then(x => imageService.resolveImg(x.category, x.img));
 	}
 
 	private async getImages(request: ThumbnailRequest): Promise<ThumbnailResponse> {

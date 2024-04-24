@@ -22,6 +22,7 @@ import sharp from 'sharp';
 import { eq, like, or } from 'drizzle-orm';
 import { dbService } from './database.service';
 import { ImgDto } from 'shared-lib';
+import * as ort from 'onnxruntime-node';
 
 class ImageService {
 
@@ -30,6 +31,21 @@ class ImageService {
 			...img,
 			path: 'atom://' + path.join(category.path, img.path)
 		}
+	}
+
+	public async extractImageFeatures(img: Img, category: Category): Promise<void> {
+		const scale = 1024.0 / Math.max(img.width, img.height);
+		const width = Math.round(img.width * scale);
+		const height = Math.round(img.height * scale);
+		const { data, info } = await sharp(path.join(category.path, img.path))
+			.resize({ width: width, height: height })
+			.flatten({ background: { r: 255, g: 255, b: 255 } })
+			.raw()
+			.toBuffer({ resolveWithObject: true });
+
+		const pixelArray = new Uint8ClampedArray(data.buffer);
+		const imgTensor = new ort.Tensor('uint8', new Uint8Array(pixelArray.buffer), [1, 3, height, width]);
+		console.log("test")
 	}
 
 	public async findBestMatchByName(projectPath: string, name: string): Promise<Img[]> {

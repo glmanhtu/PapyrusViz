@@ -197,6 +197,11 @@ export class BoardMainComponent implements OnInit {
 
         case 'to_back':
           this.toBack(assemblingImage);
+          break
+
+        case 'segment':
+          this.modalService.imageSegmentation(this.projectDto, assemblingImage.img.id);
+          break
       }
     })
   }

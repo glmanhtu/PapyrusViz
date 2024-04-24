@@ -51,3 +51,15 @@ export type ImgDto = {
 	height: number,
 	categoryId: number
 }
+
+export type SegmentationPoint = {
+	x: number,
+	y: number,
+	type: number
+}
+
+export type ImgSegmentationRequest = {
+	imgId: number,
+	projectPath: string,
+	points: SegmentationPoint[]
+}
