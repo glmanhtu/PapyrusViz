@@ -14,7 +14,7 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
-<div *ngIf="image">
+<div>
 	<div class="modal-header text-center">
 		<h4 class="modal-title w-100">Papyrus image segmentation</h4>
 	</div>
@@ -38,11 +38,13 @@
 							<td>
 								<ul class="list-group list-group-flush">
 									<li class="list-group-item" *ngFor="let point of foregroundPoints">{{point.x | number:'1.0-0' | noComma}}, {{point.y | number:'1.0-0' | noComma}}</li>
+									<li class="list-group-item" *ngIf="foregroundPoints.length === 0">-</li>
 								</ul>
 							</td>
 							<td>
 								<ul class="list-group list-group-flush">
 									<li class="list-group-item" *ngFor="let point of backgroundPoints">{{point.x | number:'1.0-0' | noComma}}, {{point.y | number:'1.0-0' | noComma}}</li>
+									<li class="list-group-item" *ngIf="backgroundPoints.length === 0">-</li>
 								</ul>
 							</td>
 						</tr>
@@ -51,12 +53,17 @@
 				</div>
 
 			</div>
-			<div class="col-sm-7">
-				<div class="position-relative text-center">
-					<img #imgElement [src]="image.path" [alt]="image.name" style="max-width: 100%; max-height: 65vh;"
+			<div class="col-sm-7 position-relative text-center">
+				<div *ngIf="image" style="height: 65vh;">
+					<img class="segment-img" #imgElement [src]="image.path" [alt]="image.name" style="max-width: 100%; max-height: 100%;"
 							 (click)="performSegment($event, imgElement)" (contextmenu)="performSegment($event, imgElement)">
-					<img class="position-absolute blending-img" *ngIf="base64Img" [src]="base64Img" [alt]="image.name" style="max-width: 100%; max-height: 65vh;"
+					<img class="segment-img blending-img" *ngIf="base64Img" [src]="base64Img" [alt]="image.name" style="max-width: 100%; max-height: 100%;"
 							 (click)="performSegment($event, imgElement)" (contextmenu)="performSegment($event, imgElement)">
+				</div>
+				<div #mask class="position-absolute w-100 justify-content-center align-items-center" style="height: 65vh; top: 0; left: 0; z-index: 10; background-color: rgba(0, 0, 0, .8); display: flex">
+					<div class="spinner-border text-primary" role="status">
+						<span class="sr-only"></span>
+					</div>
 				</div>
 			</div>
 		</div>

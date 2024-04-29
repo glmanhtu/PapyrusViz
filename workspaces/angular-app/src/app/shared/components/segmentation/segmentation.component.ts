@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { NgbModal, NgbModalConfig } from '@ng-bootstrap/ng-bootstrap';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap/modal/modal-ref';
 import { ImageRequest, ImgDto, ImgSegmentationRequest, ProjectDTO, SegmentationPoint } from 'shared-lib';
@@ -35,15 +35,30 @@ export class SegmentationComponent implements OnInit {
   foregroundPoints: SegmentationPoint[] = [];
   backgroundPoints: SegmentationPoint[] = [];
   base64Img: string | null = null;
-
+  @ViewChild("mask") maskContainer: ElementRef<HTMLDivElement>;
 
   constructor(
     private electronIpc: ElectronIpcService,
   ) {}
 
+  private showMask(show = true) {
+    if (!this.maskContainer) {
+      return;
+    }
+    if (show) {
+      this.maskContainer.nativeElement.style.display = "flex";
+    } else {
+      this.maskContainer.nativeElement.style.display = "none";
+    }
+  }
+
   public loadImage(imageId: number, projectDto: ProjectDTO) {
     this.projectDto = projectDto;
-    this.electronIpc.send<ImgSegmentationRequest, string>('image:register-image-segmentation', { imgId: imageId, projectPath: projectDto.path, points: [] })
+    this.showMask();
+    this.electronIpc.send<ImgSegmentationRequest, string>('image:register-image-segmentation',
+      { imgId: imageId, projectPath: projectDto.path, points: [] }).then(() => {
+        this.showMask(false);
+    })
     this.electronIpc.send<ImageRequest, ImgDto>('image:get-image', { imgId: imageId, projectPath: projectDto.path }).then(img => {
       this.image = img;
     });
@@ -52,6 +67,7 @@ export class SegmentationComponent implements OnInit {
   performSegment(event: MouseEvent, element: HTMLElement) {
     event.stopPropagation();
     event.preventDefault();
+    this.showMask();
     const rect = element.getBoundingClientRect();
     const scale = this.image.width / rect.width;
     const x = (event.clientX - rect.left) * scale;
@@ -65,6 +81,7 @@ export class SegmentationComponent implements OnInit {
     const points = this.foregroundPoints.concat(this.backgroundPoints);
     this.electronIpc.send<ImgSegmentationRequest, string>('image:segment-image', { imgId: this.image.id, projectPath: this.projectDto.path, points: points }).then(result => {
        this.base64Img = result;
+       this.showMask(false);
     })
   }
 
