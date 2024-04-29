@@ -16,13 +16,13 @@
  */
 
 import {
-  Component,
+  Component, ElementRef,
   EventEmitter,
   HostListener,
   Input,
   OnInit,
   Output,
-  QueryList,
+  QueryList, ViewChild,
   ViewChildren,
 } from '@angular/core';
 import {
@@ -52,6 +52,7 @@ export class BoardMainComponent implements OnInit {
 
   @ViewChildren(FrameComponent) frameComponents!: QueryList<FrameComponent>;
   @Output() queryImage = new EventEmitter<ImgDto>();
+  @ViewChild("boardContainer") boardContainer: ElementRef<HTMLDivElement>;
 
   assemblingImages: AssemblingImage[] = [];
   selectedFrames = new Map<number, FrameComponent>;
@@ -100,6 +101,10 @@ export class BoardMainComponent implements OnInit {
 
   addImage(thumbnail: Thumbnail) {
     const imgHeights = []
+    if (this.frameComponents.length === 0) {
+      const containerRect = this.boardContainer.nativeElement.getBoundingClientRect();
+      imgHeights.push(containerRect.height);
+    }
     for (const frame of this.frameComponents) {
       if (frame.image.id === thumbnail.imgId) {
         this.selectedFrames.forEach((x, key) => {
