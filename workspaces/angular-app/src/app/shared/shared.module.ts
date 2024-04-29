@@ -28,6 +28,7 @@ import { CommonModule } from '@angular/common';
 import { MatchingButtonComponent } from './components/matching-button/matching-button.component';
 import { PanZoomDirective } from './directives/pan-zoom.directive';
 import { SegmentationComponent } from './components/segmentation/segmentation.component';
+import { NoCommaPipe } from './directives/no-comma.directive';
 
 @NgModule({
 	declarations: [
@@ -39,6 +40,7 @@ import { SegmentationComponent } from './components/segmentation/segmentation.co
 		ConfirmModalComponent,
 		MatchingButtonComponent,
 		PanZoomDirective,
+		NoCommaPipe,
 		SegmentationComponent
   ],
 	imports: [
@@ -55,6 +57,7 @@ import { SegmentationComponent } from './components/segmentation/segmentation.co
 		ConfirmModalComponent,
 		MatchingButtonComponent,
 		PanZoomDirective,
+		NoCommaPipe,
 		SegmentationComponent
 	]
 })

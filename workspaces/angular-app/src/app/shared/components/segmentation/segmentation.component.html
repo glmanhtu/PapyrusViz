@@ -18,8 +18,48 @@
 	<div class="modal-header text-center">
 		<h4 class="modal-title w-100">Papyrus image segmentation</h4>
 	</div>
-	<div class="modal-body text-center" >
-		<img #imgElement [src]="image.path" [alt]="image.name" style="max-width: 100%; max-height: 65vh;" (click)="performSegment($event, imgElement)">
+	<div class="modal-body container" >
+		<div class="row">
+			<div class="col-sm-5">
+				<div class="container">
+
+					<h4 class="card-subtitle mb-2 text-body-secondary">Instruction:</h4>
+					<p class="card-text mb-3"> Left click on the image to add a foreground point, right click to add a background point.
+						Click on the save button to save the segmentation.</p>
+
+					<h4 class="card-subtitle mb-2 mt-5 text-body-secondary">Registered segmentation points:</h4>
+					<table class="table text-center table-sm">
+						<tbody>
+						<tr>
+							<td>Foreground points</td>
+							<td>Background points</td>
+						</tr>
+						<tr>
+							<td>
+								<ul class="list-group list-group-flush">
+									<li class="list-group-item" *ngFor="let point of foregroundPoints">{{point.x | number:'1.0-0' | noComma}}, {{point.y | number:'1.0-0' | noComma}}</li>
+								</ul>
+							</td>
+							<td>
+								<ul class="list-group list-group-flush">
+									<li class="list-group-item" *ngFor="let point of backgroundPoints">{{point.x | number:'1.0-0' | noComma}}, {{point.y | number:'1.0-0' | noComma}}</li>
+								</ul>
+							</td>
+						</tr>
+						</tbody>
+					</table>
+				</div>
+
+			</div>
+			<div class="col-sm-7">
+				<div class="position-relative text-center">
+					<img #imgElement [src]="image.path" [alt]="image.name" style="max-width: 100%; max-height: 65vh;"
+							 (click)="performSegment($event, imgElement)" (contextmenu)="performSegment($event, imgElement)">
+					<img class="position-absolute blending-img" *ngIf="base64Img" [src]="base64Img" [alt]="image.name" style="max-width: 100%; max-height: 65vh;"
+							 (click)="performSegment($event, imgElement)" (contextmenu)="performSegment($event, imgElement)">
+				</div>
+			</div>
+		</div>
 	</div>
 	<div class="modal-footer">
 		<button type="submit" class="btn btn-success btn-sm">Save</button>

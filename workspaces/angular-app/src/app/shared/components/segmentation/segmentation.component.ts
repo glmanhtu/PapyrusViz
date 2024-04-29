@@ -32,7 +32,9 @@ export class SegmentationComponent implements OnInit {
   private modalRef: NgbModalRef | null = null;
   image: ImgDto;
   projectDto: ProjectDTO;
-  points: SegmentationPoint[] = [];
+  foregroundPoints: SegmentationPoint[] = [];
+  backgroundPoints: SegmentationPoint[] = [];
+  base64Img: string | null = null;
 
 
   constructor(
@@ -41,19 +43,29 @@ export class SegmentationComponent implements OnInit {
 
   public loadImage(imageId: number, projectDto: ProjectDTO) {
     this.projectDto = projectDto;
+    this.electronIpc.send<ImgSegmentationRequest, string>('image:register-image-segmentation', { imgId: imageId, projectPath: projectDto.path, points: [] })
     this.electronIpc.send<ImageRequest, ImgDto>('image:get-image', { imgId: imageId, projectPath: projectDto.path }).then(img => {
       this.image = img;
     });
   }
 
   performSegment(event: MouseEvent, element: HTMLElement) {
+    event.stopPropagation();
+    event.preventDefault();
     const rect = element.getBoundingClientRect();
     const scale = this.image.width / rect.width;
     const x = (event.clientX - rect.left) * scale;
     const y = (event.clientY - rect.top) * scale;
     console.log(x, y);
-    this.points.push({ x, y, type: 1 });
-    this.electronIpc.send<ImgSegmentationRequest, void>('image:segment-image', { imgId: this.image.id, projectPath: this.projectDto.path, points: this.points });
+    if (event.button === 0) {
+      this.foregroundPoints.push({ x, y, type: 1 });
+    } else if(event.button === 2) {
+      this.backgroundPoints.push({ x, y, type: 0 });
+    }
+    const points = this.foregroundPoints.concat(this.backgroundPoints);
+    this.electronIpc.send<ImgSegmentationRequest, string>('image:segment-image', { imgId: this.image.id, projectPath: this.projectDto.path, points: points }).then(result => {
+       this.base64Img = result;
+    })
   }
 
   ngOnInit(): void {

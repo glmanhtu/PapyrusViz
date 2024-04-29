@@ -15,3 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+.blending-img {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, 0);
+  mix-blend-mode: multiply;
+  opacity: 0.7;
+}

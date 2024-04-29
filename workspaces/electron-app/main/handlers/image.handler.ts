@@ -33,6 +33,7 @@ export class ImageHandler extends BaseHandler {
 		this.addRoute('image:archive', this.archiveImage.bind(this));
 		this.addRoute('image:unarchive', this.unarchiveImage.bind(this));
 		this.addRoute('image:get-image', this.getImage.bind(this));
+		this.addRoute('image:register-image-segmentation', this.registerImageSegmentation.bind(this));
 		this.addRoute('image:segment-image', this.segmentImage.bind(this));
 	}
 
@@ -41,14 +42,27 @@ export class ImageHandler extends BaseHandler {
 		await database.update(imgTbl).set({status: ImgStatus.ARCHIVED}).where(eq(imgTbl.id, request.imgId));
 	}
 
-	private async segmentImage(request: ImgSegmentationRequest): Promise<void> {
+	private async registerImageSegmentation(request: ImgSegmentationRequest): Promise<void> {
 		const database = dbService.getConnection(request.projectPath);
 		const imData = await database.select()
 			.from(imgTbl)
 			.innerJoin(categoryTbl, eq(imgTbl.categoryId, categoryTbl.id))
 			.where(eq(imgTbl.id, request.imgId))
 			.then(takeUniqueOrThrow);
-		await imageService.extractImageFeatures(imData.img, imData.category);
+		imageService.registerImageFeatures(imData.img, imData.category);
+	}
+
+
+	private async segmentImage(request: ImgSegmentationRequest): Promise<string> {
+		const database = dbService.getConnection(request.projectPath);
+		const imData = await database.select()
+			.from(imgTbl)
+			.innerJoin(categoryTbl, eq(imgTbl.categoryId, categoryTbl.id))
+			.where(eq(imgTbl.id, request.imgId))
+			.then(takeUniqueOrThrow);
+		const embeddings = await imageService.getEmbedding(request.imgId);
+		const masks = await imageService.detectMask(embeddings, imData.img, request.points);
+		return imageService.tensorToBase64Img(masks, imData.img.width, imData.img.height);
 	}
 
 	private async unarchiveImage(request: ImageRequest): Promise<void> {

@@ -114,7 +114,7 @@ export class ProjectHandler extends BaseHandler {
 				if (oldImg.path.includes(rootDir) && rootDir !== '') {
 					await database.insert(imgTbl).values({
 						id: parseInt(key) + 1,
-						path: path.relative(rootDir, oldImg.path),
+						path: rootDir === "" ? oldImg.path : path.relative(rootDir, oldImg.path),
 						name: oldImg.name.split('.')[0],
 						thumbnail: path.relative(data.projPath, oldImg.thumbnails),
 						width: oldImg.width,
@@ -292,7 +292,7 @@ export class ProjectHandler extends BaseHandler {
 					}));
 					await database.insert(imgTbl).values({
 						...metadata,
-						path: path.relative(rootDir, images[i]),
+						path: rootDir === "" ? images[i] : path.relative(rootDir, images[i]),
 						name: path.basename(images[i]).split('.')[0],
 						thumbnail: path.relative(payload.path, thumbnailPath),
 						categoryId: category.insertedId

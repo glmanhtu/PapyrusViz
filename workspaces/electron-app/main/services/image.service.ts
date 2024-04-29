@@ -21,10 +21,31 @@ import path from 'node:path';
 import sharp from 'sharp';
 import { eq, like, or } from 'drizzle-orm';
 import { dbService } from './database.service';
-import { ImgDto } from 'shared-lib';
+import { ImgDto, SegmentationPoint } from 'shared-lib';
 import * as ort from 'onnxruntime-node';
 
 class ImageService {
+
+	private featureExtractor: ort.InferenceSession;
+	private maskDetector: ort.InferenceSession;
+
+	private embeddingMap = new Map<number, Promise<ort.Tensor>>
+
+	public async getEmbedding(imgId: number): Promise<ort.Tensor> {
+		return this.embeddingMap.get(imgId);
+	}
+
+	constructor() {
+		const options = { intraOpNumThreads: 1, enableCpuMemArena: false };
+		ort.InferenceSession.create(path.join(__dirname, 'ml-models', 'mobile_sam_preprocess.onnx'), options).then((session: ort.InferenceSession) => {
+			this.featureExtractor = session;
+			console.log("Mobile SAM preprocessor loaded");
+		});
+		ort.InferenceSession.create(path.join(__dirname, 'ml-models', 'mobile_sam.onnx'), options).then((session: ort.InferenceSession) => {
+			this.maskDetector = session;
+			console.log("Mobile SAM loaded");
+		});
+	}
 
 	public resolveImg(category: Category, img: Img | ImgDto): Img | ImgDto {
 		return {
@@ -33,19 +54,56 @@ class ImageService {
 		}
 	}
 
-	public async extractImageFeatures(img: Img, category: Category): Promise<void> {
+	public async registerImageFeatures(img: Img, category: Category): Promise<void> {
 		const scale = 1024.0 / Math.max(img.width, img.height);
 		const width = Math.round(img.width * scale);
 		const height = Math.round(img.height * scale);
-		const { data, info } = await sharp(path.join(category.path, img.path))
+		const data = await sharp(path.join(category.path, img.path))
 			.resize({ width: width, height: height })
 			.flatten({ background: { r: 255, g: 255, b: 255 } })
 			.raw()
-			.toBuffer({ resolveWithObject: true });
+			.toBuffer();
 
 		const pixelArray = new Uint8ClampedArray(data.buffer);
-		const imgTensor = new ort.Tensor('uint8', new Uint8Array(pixelArray.buffer), [1, 3, height, width]);
-		console.log("test")
+		const imgTensor = new ort.Tensor('uint8', new Uint8Array(pixelArray.buffer), [1, height, width, 3]);
+		const feed = { 'transformed_image': imgTensor };
+		const result = this.featureExtractor.run(feed).then((result) => result['output']);
+		this.embeddingMap.set(img.id, result);
+	}
+
+	public async tensorToBase64Img(masks: ort.Tensor, imgWidth: number, imgHeight: number): Promise<string> {
+		const maskImBuff = await sharp(masks.data as Uint8Array, {
+			raw: {
+				width: imgWidth, height: imgHeight, channels: 1
+			}})
+			.jpeg()
+			.toBuffer();
+		return `data:image/jpeg;base64,${maskImBuff.toString('base64')}`
+	}
+
+	public async detectMask(embedding: ort.Tensor, img: Img, points: SegmentationPoint[]): Promise<ort.Tensor> {
+		const scale = 1024.0 / Math.max(img.width, img.height);
+		const onnx_coord = new Float32Array(2 * points.length + 2);
+		const onnx_label = new Float32Array(points.length + 1);
+		points.forEach((point, index) => {
+			onnx_coord[index * 2] = point.x * scale;
+			onnx_coord[index * 2 + 1] = point.y * scale;
+			onnx_label[index] = point.type;
+		});
+		onnx_coord[points.length * 2] = 0;
+		onnx_coord[points.length * 2 + 1] = 0;
+		onnx_label[points.length] = -1;
+
+		const feed = {
+			'image_embeddings': embedding,
+			'point_coords': new ort.Tensor('float32', onnx_coord, [1, points.length + 1, 2]),
+			'point_labels': new ort.Tensor('float32', onnx_label, [1, points.length + 1]),
+			'mask_input': new ort.Tensor('float32', new Float32Array(256 * 256), [1, 1, 256, 256]),
+			'has_mask_input': new ort.Tensor('float32', new Float32Array([0]), [1]),
+			'orig_im_size': new ort.Tensor('float32', new Float32Array([img.height, img.width]), [2])
+		};
+		const result = await this.maskDetector.run(feed);
+		return result['im_masks'];
 	}
 
 	public async findBestMatchByName(projectPath: string, name: string): Promise<Img[]> {

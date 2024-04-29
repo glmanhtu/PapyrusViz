@@ -4,6 +4,6 @@
 	"include": [
 		"./main/**/*.ts",
 		"./renderer/**/*.ts",
-		"./@typings/index.d.ts"
+		"./@typings/*.d.ts"
 	]
 }
