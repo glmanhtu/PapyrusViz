@@ -24,6 +24,9 @@ import path from 'node:path';
 import { dbService } from '../services/database.service';
 import { ImageRequest, ImgDto, ImgSegmentationRequest, ThumbnailRequest, ThumbnailResponse } from 'shared-lib';
 import { imageService } from '../services/image.service';
+import { promises as fs } from 'fs';
+import * as pathUtils from '../utils/path.utils';
+
 
 
 export class ImageHandler extends BaseHandler {
@@ -34,7 +37,8 @@ export class ImageHandler extends BaseHandler {
 		this.addRoute('image:unarchive', this.unarchiveImage.bind(this));
 		this.addRoute('image:get-image', this.getImage.bind(this));
 		this.addRoute('image:register-image-segmentation', this.registerImageSegmentation.bind(this));
-		this.addRoute('image:segment-image', this.segmentImage.bind(this));
+		this.addRoute('image:detect-papyrus', this.detectPapyrus.bind(this));
+		this.addRoute('image:segment-papyrus', this.segmentPapyrus.bind(this));
 	}
 
 	private async archiveImage(request: ImageRequest): Promise<void> {
@@ -52,8 +56,7 @@ export class ImageHandler extends BaseHandler {
 		imageService.registerImageFeatures(imData.img, imData.category);
 	}
 
-
-	private async segmentImage(request: ImgSegmentationRequest): Promise<string> {
+	private async segmentPapyrus(request: ImgSegmentationRequest): Promise<ImgDto> {
 		const database = dbService.getConnection(request.projectPath);
 		const imData = await database.select()
 			.from(imgTbl)
@@ -61,8 +64,27 @@ export class ImageHandler extends BaseHandler {
 			.where(eq(imgTbl.id, request.imgId))
 			.then(takeUniqueOrThrow);
 		const embeddings = await imageService.getEmbedding(request.imgId);
-		const masks = await imageService.detectMask(embeddings, imData.img, request.points);
-		return imageService.tensorToBase64Img(masks, imData.img.width, imData.img.height);
+		const result = await imageService.detectMask(embeddings, imData.img, request.points);
+		const segmentation_dir = pathUtils.fromAppData('segmentation', path.dirname(imData.img.path));
+		await fs.mkdir(segmentation_dir, {recursive: true})
+		const segmentation_path = path.join(segmentation_dir, path.basename(imData.img.path).split('.')[0] + ".png");
+		await imageService.segmentImage(segmentation_path, result, imData.img, imData.category);
+		// await database.update(imgTbl).set({fragment: imData.img.path}).where(eq(imgTbl.id, imData.img.id));
+		// imData.img.fragment = imData.img.path
+		// Todo: Create the segmented image here
+		return imageService.resolveImg(imData.category, imData.img)
+	}
+
+	private async detectPapyrus(request: ImgSegmentationRequest): Promise<string> {
+		const database = dbService.getConnection(request.projectPath);
+		const imData = await database.select()
+			.from(imgTbl)
+			.innerJoin(categoryTbl, eq(imgTbl.categoryId, categoryTbl.id))
+			.where(eq(imgTbl.id, request.imgId))
+			.then(takeUniqueOrThrow);
+		const embeddings = await imageService.getEmbedding(request.imgId);
+		const result = await imageService.detectMask(embeddings, imData.img, request.points);
+		return imageService.tensorToBase64Img(result, imData.img.width, imData.img.height);
 	}
 
 	private async unarchiveImage(request: ImageRequest): Promise<void> {

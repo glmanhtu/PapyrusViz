@@ -72,14 +72,13 @@ export class SegmentationComponent implements OnInit {
     const scale = this.image.width / rect.width;
     const x = (event.clientX - rect.left) * scale;
     const y = (event.clientY - rect.top) * scale;
-    console.log(x, y);
     if (event.button === 0) {
       this.foregroundPoints.push({ x, y, type: 1 });
     } else if(event.button === 2) {
       this.backgroundPoints.push({ x, y, type: 0 });
     }
     const points = this.foregroundPoints.concat(this.backgroundPoints);
-    this.electronIpc.send<ImgSegmentationRequest, string>('image:segment-image', { imgId: this.image.id, projectPath: this.projectDto.path, points: points }).then(result => {
+    this.electronIpc.send<ImgSegmentationRequest, string>('image:detect-papyrus', { imgId: this.image.id, projectPath: this.projectDto.path, points: points }).then(result => {
        this.base64Img = result;
        this.showMask(false);
     })
@@ -99,7 +98,11 @@ export class SegmentationComponent implements OnInit {
   }
 
   onSave() {
-
+    const points = this.foregroundPoints.concat(this.backgroundPoints);
+    this.showMask();
+    this.electronIpc.send<ImgSegmentationRequest, ImgDto>('image:segment-papyrus', { imgId: this.image.id, projectPath: this.projectDto.path, points: points }).then(result => {
+      this.showMask(false);
+      this.modalRef!.close(result);
+    })
   }
-
 }

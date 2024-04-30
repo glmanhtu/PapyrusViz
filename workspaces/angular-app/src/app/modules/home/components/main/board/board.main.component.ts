@@ -205,7 +205,11 @@ export class BoardMainComponent implements OnInit {
           break
 
         case 'segment':
-          this.modalService.imageSegmentation(this.projectDto, assemblingImage.img.id);
+          this.modalService.imageSegmentation(this.projectDto, assemblingImage.img.id).result.then((res: ImgDto) => {
+            if (res) {
+              assemblingImage.img = res;
+            }
+          })
           break
       }
     })

@@ -28,6 +28,7 @@ export const imgTbl = sqliteTable('img', {
     id: integer('id').primaryKey({autoIncrement: true}),
     name: text('name'),
     path: text('path'),     // relative path with respect to dirId
+    fragment: text('fragment').default(''), // Segmented fragment
     thumbnail: text('thumbnail'),
     width: integer('width'),
     height: integer('height'),

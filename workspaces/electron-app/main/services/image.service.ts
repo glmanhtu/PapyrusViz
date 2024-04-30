@@ -23,6 +23,9 @@ import { eq, like, or } from 'drizzle-orm';
 import { dbService } from './database.service';
 import { ImgDto, SegmentationPoint } from 'shared-lib';
 import * as ort from 'onnxruntime-node';
+import { BBox } from '../models/utils';
+import * as pathUtils from '../utils/path.utils';
+import winston from 'winston';
 
 class ImageService {
 
@@ -50,7 +53,8 @@ class ImageService {
 	public resolveImg(category: Category, img: Img | ImgDto): Img | ImgDto {
 		return {
 			...img,
-			path: 'atom://' + path.join(category.path, img.path)
+			path: 'atom://' + path.join(category.path, img.path),
+			fragment: img.fragment !== '' ? 'atom://' + pathUtils.segmentationPath(img as Img) : ''
 		}
 	}
 
@@ -71,14 +75,44 @@ class ImageService {
 		this.embeddingMap.set(img.id, result);
 	}
 
-	public async tensorToBase64Img(masks: ort.Tensor, imgWidth: number, imgHeight: number): Promise<string> {
-		const maskImBuff = await sharp(masks.data as Uint8Array, {
+	public async tensorToBase64Img(mask: ort.Tensor, imgWidth: number, imgHeight: number): Promise<string> {
+		const maskImBuff = await sharp(mask.data as Uint8Array, {
 			raw: {
 				width: imgWidth, height: imgHeight, channels: 1
 			}})
 			.jpeg()
 			.toBuffer();
 		return `data:image/jpeg;base64,${maskImBuff.toString('base64')}`
+	}
+
+	public async segmentImage(outputPath: string, mask: ort.Tensor, img: Img, category: Category) {
+		const data = await sharp(path.join(category.path, img.path))
+			.raw()
+			.toBuffer();
+
+		const pixelArray = new Uint8ClampedArray(data.buffer);
+		const maskArray = mask.data as Uint8Array;
+
+
+		const outputImage = new Uint8ClampedArray(img.width * img.height * 4);
+
+		for (let i = 0; i < maskArray.length; i++) {
+			const rgbaIdx = i * 4
+			const rgbIdx = i * 3
+			outputImage[rgbaIdx] = pixelArray[rgbIdx];
+			outputImage[rgbaIdx + 1] = pixelArray[rgbIdx + 1];
+			outputImage[rgbaIdx + 2] = pixelArray[rgbIdx + 2];
+			outputImage[rgbaIdx + 3] = maskArray[i];
+		}
+
+		await sharp(outputImage, {
+			raw: {
+				width: img.width, height: img.height, channels: 4
+			}})
+			.trim({
+				threshold: 5
+			})
+			.toFile(outputPath)
 	}
 
 	public async detectMask(embedding: ort.Tensor, img: Img, points: SegmentationPoint[]): Promise<ort.Tensor> {
@@ -95,6 +129,7 @@ class ImageService {
 		onnx_label[points.length] = -1;
 
 		const feed = {
+			'extract_segmented_coords': new ort.Tensor('bool', new Uint8Array([0]), [1]),
 			'image_embeddings': embedding,
 			'point_coords': new ort.Tensor('float32', onnx_coord, [1, points.length + 1, 2]),
 			'point_labels': new ort.Tensor('float32', onnx_label, [1, points.length + 1]),
@@ -103,7 +138,7 @@ class ImageService {
 			'orig_im_size': new ort.Tensor('float32', new Float32Array([img.height, img.width]), [2])
 		};
 		const result = await this.maskDetector.run(feed);
-		return result['im_masks'];
+		return result['im_masks']
 	}
 
 	public async findBestMatchByName(projectPath: string, name: string): Promise<Img[]> {

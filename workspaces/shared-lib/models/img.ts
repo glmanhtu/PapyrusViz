@@ -47,6 +47,7 @@ export type ImgDto = {
 	id: number,
 	name: string,
 	path: string,
+	fragment: string,
 	width: number,
 	height: number,
 	categoryId: number

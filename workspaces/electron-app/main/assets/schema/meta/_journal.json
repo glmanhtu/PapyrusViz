@@ -15,6 +15,13 @@
       "when": 1713349283895,
       "tag": "0001_overrated_black_tom",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1714477351358,
+      "tag": "0002_medical_namor",
+      "breakpoints": true
     }
   ]
 }

@@ -21,7 +21,7 @@ import { promises as fs } from 'fs';
 
 
 export async function readAppData(): Promise<AppData> {
-	const dataFile = await pathUtils.fromAppData('data.json');
+	const dataFile = pathUtils.fromAppData('data.json');
 	if (!await pathUtils.isFile(dataFile)) {
 		await this.writeAppData({
 			'projects': []
@@ -31,7 +31,7 @@ export async function readAppData(): Promise<AppData> {
 }
 
 export async function writeAppData(appData: AppData): Promise<void> {
-	const dataFile = await pathUtils.fromAppData('data.json');
+	const dataFile = pathUtils.fromAppData('data.json');
 	await fs.writeFile(dataFile, JSON.stringify(appData));
 }
 

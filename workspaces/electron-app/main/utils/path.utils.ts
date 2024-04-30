@@ -17,7 +17,9 @@
 
 import {app} from 'electron';
 import * as path from 'node:path';
+import * as syncFs from 'fs';
 import { promises as fs } from 'fs';
+import { Img } from '../entities/img';
 
 
 
@@ -26,18 +28,23 @@ export function fromRoot(...paths: string[]) {
 }
 
 
-export async function fromAppData(...paths: string[]) {
+export function segmentationPath(img: Img) {
+    const segmentation_dir = fromAppData('segmentation', path.dirname(img.path));
+    return path.join(segmentation_dir, path.basename(img.path).split('.')[0] + ".png");
+}
+
+export function fromAppData(...paths: string[]) {
     const appDataPath = path.join(app.getPath('appData'), 'papyviz')
-    const isExists = await isDir(appDataPath);
+    const isExists = isDir(appDataPath);
     if (!isExists) {
-        await fs.mkdir(appDataPath);
+         syncFs.mkdirSync(appDataPath);
     }
     return path.join(appDataPath, ...paths);
 }
 
-export async function exists(f: string) {
+export function exists(f: string) {
     try {
-        await fs.access(f);
+        syncFs.accessSync(f);
         return true;
     } catch {
         return false;
@@ -45,11 +52,11 @@ export async function exists(f: string) {
 }
 
 export async function isDir(f: string) {
-    return await exists(f) && (await fs.lstat(f)).isDirectory();
+    return exists(f) && syncFs.lstatSync(f).isDirectory();
 }
 
 export async function isFile(f: string) {
-    return await exists(f) && (await fs.lstat(f)).isFile();
+    return exists(f) && syncFs.lstatSync(f).isFile();
 }
 
 export function projectFile(projectPath: string) {
