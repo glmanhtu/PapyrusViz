@@ -88,11 +88,18 @@ export class SegmentationComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  onSubmit() {
-  }
-
   cancel() {
     this.modalRef!.close();
+  }
+
+  reset() {
+    this.foregroundPoints.length = 0;
+    this.backgroundPoints.length = 0;
+    this.base64Img = null;
+  }
+
+  onSave() {
+
   }
 
 }
