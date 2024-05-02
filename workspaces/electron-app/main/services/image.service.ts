@@ -21,10 +21,13 @@ import path from 'node:path';
 import sharp from 'sharp';
 import { eq, like, or } from 'drizzle-orm';
 import { dbService } from './database.service';
-import { ImgDto, SegmentationPoint } from 'shared-lib';
+import { GlobalConfig, ImgDto, SegmentationPoint } from 'shared-lib';
 import * as ort from 'onnxruntime-node';
 import * as pathUtils from '../utils/path.utils';
 import { EmbeddingInfo } from '../models/utils';
+import { promises as fs } from 'fs';
+
+declare const global: GlobalConfig;
 
 class ImageService {
 
@@ -64,8 +67,22 @@ class ImageService {
 		return {
 			...img,
 			path: 'atom://' + path.join(category.path, img.path),
-			fragment: img.fragment !== '' ? 'atom://' + pathUtils.segmentationPath(img as Img) : ''
+			fragment: img.fragment !== '' ? 'atom://' + pathUtils.segmentationPath(img as Img) : '',
+			thumbnail: this.resolveThumbnail(category, img)
 		}
+	}
+
+	public resolveThumbnail(category: Category, img: Img | ImgDto): string {
+		let imgPath = path.join(category.path, img.path)
+		if (img.fragment !== '') {
+			imgPath = pathUtils.segmentationPath(img as Img)
+		}
+		return 'atom://' + this.resolveThumbnailFromImgPath(imgPath)
+	}
+
+	public resolveThumbnailFromImgPath(imgPath: string) {
+		const thumbnailName = path.basename(imgPath).split('.')[0] + '.jpg'
+		return  pathUtils.fromAppData('thumbnails', path.dirname(imgPath), thumbnailName);
 	}
 
 	public async registerImageFeatures(img: Img, category: Category): Promise<void> {
@@ -101,6 +118,17 @@ class ImageService {
 			.jpeg()
 			.toBuffer();
 		return `data:image/jpeg;base64,${maskImBuff.toString('base64')}`
+	}
+
+	public async generateThumbnail(imgPath: string, force = false) {
+		const thumbnailName = path.basename(imgPath).split('.')[0] + '.jpg'
+		const thumbnailPath = pathUtils.fromAppData('thumbnails', path.dirname(imgPath), thumbnailName);
+		if (!force && await pathUtils.isFile(thumbnailPath)) {
+			return thumbnailPath;
+		}
+		await fs.mkdir(path.dirname(thumbnailPath), { recursive: true });
+		await this.resize(imgPath, thumbnailPath, undefined, global.appConfig.thumbnailImgSize);
+		return thumbnailPath;
 	}
 
 	public async segmentImage(outputPath: string, mask: ort.Tensor, img: Img, category: Category) {

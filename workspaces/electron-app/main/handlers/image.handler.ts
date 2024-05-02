@@ -78,6 +78,7 @@ export class ImageHandler extends BaseHandler {
 		}).where(eq(imgTbl.id, imData.img.id));
 
 		const img = await database.select().from(imgTbl).where(eq(imgTbl.id, imData.img.id)).then(takeUniqueOrThrow);
+		await imageService.generateThumbnail(segmentation_path)
 		return imageService.resolveImg(imData.category, img)
 	}
 
@@ -119,14 +120,17 @@ export class ImageHandler extends BaseHandler {
 					? eq(imgTbl.status, ImgStatus.ARCHIVED)
 					: eq(imgTbl.status, ImgStatus.ONLINE)
 			))
+			.innerJoin(categoryTbl, eq(imgTbl.categoryId, categoryTbl.id))
 			.orderBy(imgTbl.name)
 			.limit(request.perPage)
 			.offset(request.page * request.perPage);
 
 		return images.then(items => ({
 			thumbnails: items.map(x => ({
-				imgId: x.id, path: "atom://" + path.join(request.projectPath, x.thumbnail), imgName: x.name,
-				orgImgWidth: x.width, orgImgHeight: x.height
+				imgId: x.img.id,
+				path: imageService.resolveThumbnail(x.category, x.img),
+				imgName: x.img.name,
+				orgImgWidth: x.img.width, orgImgHeight: x.img.height
 			}))
 		}));
 	}

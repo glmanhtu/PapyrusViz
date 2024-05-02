@@ -17,7 +17,6 @@
 
 import { BaseHandler } from './base.handler';
 import {
-	GlobalConfig,
 	IMessage,
 	MatchingMethod,
 	MatchingType,
@@ -45,8 +44,6 @@ import { assemblingService } from '../services/assembling.service';
 import { imageService } from '../services/image.service';
 import { matchingService } from '../services/matching.service';
 
-
-declare const global: GlobalConfig;
 
 export class ProjectHandler extends BaseHandler {
 	constructor() {
@@ -112,15 +109,17 @@ export class ProjectHandler extends BaseHandler {
 		for (const [key, oldImg] of images) {
 			await Promise.all([...categoryMap].map(async ([rootDir, rootDirID]) => {
 				if (oldImg.path.includes(rootDir) && rootDir !== '') {
+					const thumbnailPath = imageService.resolveThumbnailFromImgPath(oldImg.path);
+					await fs.copyFile(oldImg.thumbnails, thumbnailPath);
 					await database.insert(imgTbl).values({
 						id: parseInt(key) + 1,
 						path: rootDir === "" ? oldImg.path : path.relative(rootDir, oldImg.path),
 						name: oldImg.name.split('.')[0],
-						thumbnail: path.relative(data.projPath, oldImg.thumbnails),
 						width: oldImg.width,
 						height: oldImg.height,
 						format: oldImg.format,
-						categoryId: rootDirID
+						categoryId: rootDirID,
+						segmentationPoints: []
 					});
 				}
 			}));
@@ -280,9 +279,8 @@ export class ProjectHandler extends BaseHandler {
 			}).returning({insertedId: categoryTbl.id}).then(takeUniqueOrThrow)
 
 			for (let i = 0; i < images.length; i++) {
-				const thumbnailPath = path.join(payload.path, 'thumbnails', `${count}.jpg`)
 				try {
-					await imageService.resize(images[i], thumbnailPath, undefined, global.appConfig.thumbnailImgSize);
+					await imageService.generateThumbnail(images[i]);
 					const metadata = await imageService.metadata(images[i]);
 
 					const per = (count + 1) * 90 / nImages;
@@ -294,7 +292,7 @@ export class ProjectHandler extends BaseHandler {
 						...metadata,
 						path: rootDir === "" ? images[i] : path.relative(rootDir, images[i]),
 						name: path.basename(images[i]).split('.')[0],
-						thumbnail: path.relative(payload.path, thumbnailPath),
+						segmentationPoints: [],
 						categoryId: category.insertedId
 					});
 				} catch (e) {

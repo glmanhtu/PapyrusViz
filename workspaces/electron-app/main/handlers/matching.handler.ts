@@ -43,6 +43,7 @@ import { ImgStatus, imgTbl } from '../entities/img';
 import path from 'node:path';
 import { matchingService } from '../services/matching.service';
 import { JMatrix } from 'cmatrix';
+import { imageService } from '../services/image.service';
 
 export class MatchingHandler extends BaseHandler {
 	constructor() {
@@ -164,6 +165,7 @@ export class MatchingHandler extends BaseHandler {
 			.innerJoin(matchingRecordTbl, eq(matchingRecordScoreTbl.targetId, matchingRecordTbl.id))
 			.innerJoin(matchingImgRecordTbl, eq(matchingImgRecordTbl.matchingRecordId, matchingRecordTbl.id))
 			.innerJoin(imgTbl, eq(matchingImgRecordTbl.imgId, imgTbl.id))
+			.innerJoin(categoryTbl, eq(imgTbl.categoryId, categoryTbl.id))
 			.orderBy(matchingRecordScoreTbl.rank)
 			.limit(request.perPage)
 			.offset(request.page * request.perPage);
@@ -171,7 +173,8 @@ export class MatchingHandler extends BaseHandler {
 
 		return images.then(items => ({
 			thumbnails: items.map(x => ({
-				imgId: x.img.id, path: "atom://" + path.join(request.projectPath, x.img.thumbnail),
+				imgId: x.img.id,
+				path: imageService.resolveThumbnail(x.category, x.img),
 				imgName: x.img.name,
 				score: x['matching-record-score'].score,
 				rank: x['matching-record-score'].rank,
