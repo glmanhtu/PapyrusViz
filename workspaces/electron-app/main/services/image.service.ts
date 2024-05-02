@@ -23,19 +23,29 @@ import { eq, like, or } from 'drizzle-orm';
 import { dbService } from './database.service';
 import { ImgDto, SegmentationPoint } from 'shared-lib';
 import * as ort from 'onnxruntime-node';
-import { BBox } from '../models/utils';
 import * as pathUtils from '../utils/path.utils';
-import winston from 'winston';
+import { EmbeddingInfo } from '../models/utils';
 
 class ImageService {
 
 	private featureExtractor: ort.InferenceSession;
 	private maskDetector: ort.InferenceSession;
 
-	private embeddingMap = new Map<number, Promise<ort.Tensor>>
+	private embeddingMap = new Map<number, Promise<EmbeddingInfo>>();
+	private embeddingImIdx: number[] = [];
 
-	public async getEmbedding(imgId: number): Promise<ort.Tensor> {
+	public async getEmbedding(imgId: number): Promise<EmbeddingInfo> {
 		return this.embeddingMap.get(imgId);
+	}
+
+	private setEmbedding(imgId: number, embedding: Promise<EmbeddingInfo>) {
+		this.embeddingImIdx.push(imgId);
+		if (this.embeddingImIdx.length > 50) {
+			// We keep maximum of 50 images in memory to avoid out of memory
+			const toDelete = this.embeddingImIdx.shift();
+			this.embeddingMap.delete(toDelete);
+		}
+		this.embeddingMap.set(imgId, embedding);
 	}
 
 	constructor() {
@@ -59,10 +69,12 @@ class ImageService {
 	}
 
 	public async registerImageFeatures(img: Img, category: Category): Promise<void> {
-		const scale = 1024.0 / Math.max(img.width, img.height);
-		const width = Math.round(img.width * scale);
-		const height = Math.round(img.height * scale);
-		const data = await sharp(path.join(category.path, img.path))
+		const originalImg = sharp(path.join(category.path, img.path));
+		const metadata = await originalImg.metadata();
+		const scale = 1024.0 / Math.max(metadata.width, metadata.height);
+		const width = Math.round(metadata.width * scale);
+		const height = Math.round(metadata.height * scale);
+		const data = await originalImg
 			.resize({ width: width, height: height })
 			.flatten({ background: { r: 255, g: 255, b: 255 } })
 			.raw()
@@ -71,8 +83,14 @@ class ImageService {
 		const pixelArray = new Uint8ClampedArray(data.buffer);
 		const imgTensor = new ort.Tensor('uint8', new Uint8Array(pixelArray.buffer), [1, height, width, 3]);
 		const feed = { 'transformed_image': imgTensor };
-		const result = this.featureExtractor.run(feed).then((result) => result['output']);
-		this.embeddingMap.set(img.id, result);
+		const result = this.featureExtractor.run(feed)
+			.then((result) => ({
+				embedding: result['output'],
+				width: metadata.width,
+				height: metadata.height,
+				scale: scale
+			}));
+		this.setEmbedding(img.id, result);
 	}
 
 	public async tensorToBase64Img(mask: ort.Tensor, imgWidth: number, imgHeight: number): Promise<string> {
@@ -113,15 +131,16 @@ class ImageService {
 				threshold: 5
 			})
 			.toFile(outputPath)
+
+		return await sharp(outputPath).metadata();
 	}
 
-	public async detectMask(embedding: ort.Tensor, img: Img, points: SegmentationPoint[]): Promise<ort.Tensor> {
-		const scale = 1024.0 / Math.max(img.width, img.height);
+	public async detectMask(embedding: EmbeddingInfo, points: SegmentationPoint[]): Promise<ort.Tensor> {
 		const onnx_coord = new Float32Array(2 * points.length + 2);
 		const onnx_label = new Float32Array(points.length + 1);
 		points.forEach((point, index) => {
-			onnx_coord[index * 2] = point.x * scale;
-			onnx_coord[index * 2 + 1] = point.y * scale;
+			onnx_coord[index * 2] = point.x * embedding.scale;
+			onnx_coord[index * 2 + 1] = point.y * embedding.scale;
 			onnx_label[index] = point.type;
 		});
 		onnx_coord[points.length * 2] = 0;
@@ -129,13 +148,12 @@ class ImageService {
 		onnx_label[points.length] = -1;
 
 		const feed = {
-			'extract_segmented_coords': new ort.Tensor('bool', new Uint8Array([0]), [1]),
-			'image_embeddings': embedding,
+			'image_embeddings': embedding.embedding,
 			'point_coords': new ort.Tensor('float32', onnx_coord, [1, points.length + 1, 2]),
 			'point_labels': new ort.Tensor('float32', onnx_label, [1, points.length + 1]),
 			'mask_input': new ort.Tensor('float32', new Float32Array(256 * 256), [1, 1, 256, 256]),
 			'has_mask_input': new ort.Tensor('float32', new Float32Array([0]), [1]),
-			'orig_im_size': new ort.Tensor('float32', new Float32Array([img.height, img.width]), [2])
+			'orig_im_size': new ort.Tensor('float32', new Float32Array([embedding.height, embedding.width]), [2])
 		};
 		const result = await this.maskDetector.run(feed);
 		return result['im_masks']

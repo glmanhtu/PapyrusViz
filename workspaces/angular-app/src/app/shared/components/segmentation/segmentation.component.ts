@@ -55,12 +55,20 @@ export class SegmentationComponent implements OnInit {
   public loadImage(imageId: number, projectDto: ProjectDTO) {
     this.projectDto = projectDto;
     this.showMask();
-    this.electronIpc.send<ImgSegmentationRequest, string>('image:register-image-segmentation',
-      { imgId: imageId, projectPath: projectDto.path, points: [] }).then(() => {
-        this.showMask(false);
-    })
-    this.electronIpc.send<ImageRequest, ImgDto>('image:get-image', { imgId: imageId, projectPath: projectDto.path }).then(img => {
+    Promise.all([
+      this.electronIpc.send<ImgSegmentationRequest, string>('image:register-image-segmentation',
+        { imgId: imageId, projectPath: projectDto.path, points: [] }),
+      this.electronIpc.send<ImageRequest, ImgDto>('image:get-image', { imgId: imageId, projectPath: projectDto.path })
+    ]).then(([_, img]) => {
       this.image = img;
+      if (this.image.segmentationPoints.length > 0) {
+        this.foregroundPoints = this.image.segmentationPoints.filter(p => p.type === 1);
+        this.backgroundPoints = this.image.segmentationPoints.filter(p => p.type === 0);
+        this.segment();
+
+      } else {
+        this.showMask(false);
+      }
     });
   }
 
@@ -77,12 +85,17 @@ export class SegmentationComponent implements OnInit {
     } else if(event.button === 2) {
       this.backgroundPoints.push({ x, y, type: 0 });
     }
+    this.segment();
+  }
+
+  segment() {
     const points = this.foregroundPoints.concat(this.backgroundPoints);
     this.electronIpc.send<ImgSegmentationRequest, string>('image:detect-papyrus', { imgId: this.image.id, projectPath: this.projectDto.path, points: points }).then(result => {
-       this.base64Img = result;
-       this.showMask(false);
+      this.base64Img = result;
+      this.showMask(false);
     })
   }
+
 
   ngOnInit(): void {
   }

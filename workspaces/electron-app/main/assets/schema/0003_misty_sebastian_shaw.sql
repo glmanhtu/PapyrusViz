@@ -1,0 +1,1 @@
+ALTER TABLE img ADD `segmentation-points` text DEFAULT '[]';

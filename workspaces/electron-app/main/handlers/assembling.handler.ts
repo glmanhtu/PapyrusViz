@@ -92,13 +92,8 @@ export class AssemblingHandler extends BaseHandler {
 			const height = Math.round(scale * image.height);
 			const top = transforms.top;
 			const left = transforms.left;
-			let processedImage = await sharp(image.path.replace('atom://', ''), {
-				raw: {
-					width: image.width,
-					height: image.height,
-					channels: 4
-				},
-			})
+			const imgPath = image.fragment === '' ? image.path : image.fragment;
+			let processedImage = await sharp(imgPath.replace('atom://', ''))
 				.resize({ width: width, height: height })
 				.toBuffer();
 

@@ -50,7 +50,8 @@ export type ImgDto = {
 	fragment: string,
 	width: number,
 	height: number,
-	categoryId: number
+	categoryId: number,
+	segmentationPoints: SegmentationPoint[]
 }
 
 export type SegmentationPoint = {

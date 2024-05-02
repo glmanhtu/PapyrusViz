@@ -18,6 +18,7 @@
 import { sqliteTable, text, integer, index } from 'drizzle-orm/sqlite-core';
 import { categoryTbl } from './category';
 import { relations } from 'drizzle-orm';
+import { SegmentationPoint } from 'shared-lib';
 
 export enum ImgStatus {
   ONLINE = 1,
@@ -34,6 +35,7 @@ export const imgTbl = sqliteTable('img', {
     height: integer('height'),
     status: integer('status').default(ImgStatus.ONLINE),
     format: text('format'),
+    segmentationPoints: text('segmentation-points', { mode: 'json' }).default(JSON.stringify([])).$type<SegmentationPoint[]>(),
     categoryId: integer('dir_id').references(() => categoryTbl.id),
 }, (table) => {
   return {
