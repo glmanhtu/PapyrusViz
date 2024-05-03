@@ -21,7 +21,7 @@ import { dbService } from './database.service';
 import { Img } from '../entities/img';
 import { imgAssemblingTbl } from '../entities/img-assembling';
 import { takeUniqueOrThrow } from '../utils/data.utils';
-import { AssemblingDTO, AssemblingImage, Transforms } from 'shared-lib';
+import { AssemblingDTO, Transforms } from 'shared-lib';
 import { configService } from './config.service';
 import { projectService } from './project.service';
 import { assemblingTbl } from '../entities/assembling';
@@ -71,7 +71,7 @@ class AssemblingService {
 				.where(and(eq(imgAssemblingTbl.assemblingId, assemblingId), eq(imgAssemblingTbl.imgId, imgId)));
   }
 
-	public async swapAssembledImage(projectPath: string, assemblingId: number, fromImg: Img, toImg: Img) : Promise<AssemblingImage> {
+	public async swapAssembledImage(projectPath: string, assemblingId: number, fromImg: Img, toImg: Img) {
 		const database = dbService.getConnection(projectPath);
 		const imgAssembling = await database.select().from(imgAssemblingTbl)
 			.where(and(eq(imgAssemblingTbl.assemblingId, assemblingId), eq(imgAssemblingTbl.imgId, fromImg.id)))

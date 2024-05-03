@@ -69,6 +69,13 @@ export class MatchingPanelComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  handleImageChange(imgDto: ImgDto) {
+    const idx = this.thumbnails.findIndex(x => x.id === imgDto.id);
+    if (idx !== -1) {
+      this.thumbnails[idx] = imgDto;
+    }
+  }
+
   findMatching(img: {id: number}) {
     this.queryImgId = img.id
     this.getThumbnails();

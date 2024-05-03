@@ -63,7 +63,7 @@ class ImageService {
 		});
 	}
 
-	public resolveImg(category: Category, img: Img | ImgDto): Img | ImgDto {
+	public resolveImg(category: Category, img: Img | ImgDto): ImgDto {
 		return {
 			...img,
 			path: 'atom://' + path.join(category.path, img.path),
@@ -83,6 +83,10 @@ class ImageService {
 	public resolveThumbnailFromImgPath(imgPath: string) {
 		const thumbnailName = path.basename(imgPath).split('.')[0] + '.jpg'
 		return  pathUtils.fromAppData('thumbnails', path.dirname(imgPath), thumbnailName);
+	}
+
+	public resolveImgPath(category: Category, img: Img | ImgDto): string {
+		return path.join(category.path, img.path);
 	}
 
 	public async registerImageFeatures(img: Img, category: Category): Promise<void> {

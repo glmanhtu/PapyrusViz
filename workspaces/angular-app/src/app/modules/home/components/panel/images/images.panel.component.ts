@@ -61,6 +61,12 @@ export class ImagesPanelComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
   }
 
+  handleImageChange(imgDto: ImgDto) {
+    const idx = this.thumbnails.findIndex(x => x.id === imgDto.id);
+    if (idx !== -1) {
+      this.thumbnails[idx] = imgDto;
+    }
+  }
 
   ngAfterViewInit() {
     this.getThumbnails();

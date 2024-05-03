@@ -86,4 +86,9 @@ export class PanelComponent implements OnInit {
     this.active = 2;
     this.matchingPanel.findMatching(img);
   }
+
+  imgChange(img: ImgDto) {
+    this.thumbnailsPanel.handleImageChange(img);
+    this.matchingPanel.handleImageChange(img);
+  }
 }

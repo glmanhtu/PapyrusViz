@@ -54,6 +54,8 @@ export class BoardMainComponent implements OnInit {
   @Output() queryImage = new EventEmitter<ImgDto>();
   @ViewChild("boardContainer") boardContainer: ElementRef<HTMLDivElement>;
 
+  @Output() segmentImage = new EventEmitter<ImgDto>();
+
   assemblingImages: AssemblingImage[] = [];
   selectedFrames = new Map<number, FrameComponent>;
 
@@ -208,6 +210,7 @@ export class BoardMainComponent implements OnInit {
           this.modalService.imageSegmentation(this.projectDto, assemblingImage.img.id).result.then((res: ImgDto) => {
             if (res) {
               assemblingImage.img = res;
+              this.segmentImage.emit(res);
             }
           })
           break

@@ -65,20 +65,34 @@ export class ImageHandler extends BaseHandler {
 			.innerJoin(categoryTbl, eq(imgTbl.categoryId, categoryTbl.id))
 			.where(eq(imgTbl.id, request.imgId))
 			.then(takeUniqueOrThrow);
-		const embeddings = await imageService.getEmbedding(request.imgId);
-		const result = await imageService.detectMask(embeddings, request.points);
-		const segmentation_path = pathUtils.segmentationPath(imData.img);
-		await fs.mkdir(path.dirname(segmentation_path), {recursive: true})
-		const segmentedImgInfo = await imageService.segmentImage(segmentation_path, result, imData.img, imData.category);
-		await database.update(imgTbl).set({
-			fragment: imData.img.path,
-			width: segmentedImgInfo.width,
-			height: segmentedImgInfo.height,
-			segmentationPoints: request.points,
-		}).where(eq(imgTbl.id, imData.img.id));
 
-		const img = await database.select().from(imgTbl).where(eq(imgTbl.id, imData.img.id)).then(takeUniqueOrThrow);
-		await imageService.generateThumbnail(segmentation_path)
+		if (request.points.length === 0) {
+			const img = await imageService.metadata(imageService.resolveImgPath(imData.category, imData.img));
+			await database.update(imgTbl).set({
+				fragment: '',
+				width: img.width,
+				height: img.height,
+				segmentationPoints: request.points,
+			}).where(eq(imgTbl.id, imData.img.id));
+		} else {
+			const embeddings = await imageService.getEmbedding(request.imgId);
+			const result = await imageService.detectMask(embeddings, request.points);
+			const segmentation_path = pathUtils.segmentationPath(imData.img);
+			await fs.mkdir(path.dirname(segmentation_path), {recursive: true})
+			const segmentedImgInfo = await imageService.segmentImage(segmentation_path, result, imData.img, imData.category);
+			await database.update(imgTbl).set({
+				fragment: imData.img.path,
+				width: segmentedImgInfo.width,
+				height: segmentedImgInfo.height,
+				segmentationPoints: request.points,
+			}).where(eq(imgTbl.id, imData.img.id));
+			await imageService.generateThumbnail(segmentation_path)
+		}
+
+		const img = await database.select()
+			.from(imgTbl)
+			.where(eq(imgTbl.id, imData.img.id))
+			.then(takeUniqueOrThrow);
 		return imageService.resolveImg(imData.category, img)
 	}
 

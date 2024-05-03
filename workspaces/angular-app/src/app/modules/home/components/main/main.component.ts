@@ -121,4 +121,8 @@ export class MainComponent implements OnInit {
   findMatching(img: ImgDto) {
     this.panel.findMatching(img);
   }
+
+  imageChange(img: ImgDto) {
+    this.panel.imgChange(img);
+  }
 }

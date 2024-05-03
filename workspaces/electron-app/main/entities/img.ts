@@ -30,7 +30,6 @@ export const imgTbl = sqliteTable('img', {
     name: text('name'),
     path: text('path'),     // relative path with respect to dirId
     fragment: text('fragment').default(''), // Segmented fragment
-    thumbnail: text('thumbnail'),
     width: integer('width'),
     height: integer('height'),
     status: integer('status').default(ImgStatus.ONLINE),
