@@ -16,7 +16,7 @@
  */
 
 import { Component, Input, OnInit } from '@angular/core';
-import { MatchingRequest, MatchingResponse, ProjectDTO, Thumbnail } from 'shared-lib';
+import { MatchingRequest, MatchingResponse, ProjectDTO } from 'shared-lib';
 import { NgbDropdown, NgbNav } from '@ng-bootstrap/ng-bootstrap';
 import { ElectronIpcService } from '../../../services/electron-ipc.service';
 import { ModalService } from '../../../services/modal.service';
@@ -30,7 +30,6 @@ import { ModalService } from '../../../services/modal.service';
 export class MatchingButtonComponent implements OnInit {
 
   matchings: MatchingResponse[] = [];
-  thumbnails: Thumbnail[] = [];
   activatedMatching: MatchingResponse | undefined;
 
   @Input()
@@ -63,7 +62,6 @@ export class MatchingButtonComponent implements OnInit {
       matchingId: matching.id
     }).then(() => {
       this.activatedMatching = matching;
-      this.thumbnails = [];
     })
   }
 
@@ -80,7 +78,6 @@ export class MatchingButtonComponent implements OnInit {
       } else {
         this.activatedMatching = undefined;
       }
-      this.thumbnails = [];
     })
   }
 
@@ -92,7 +89,5 @@ export class MatchingButtonComponent implements OnInit {
     this.eIpc.send<string, MatchingResponse>('matching:get-activated-matching', this.projectDto!.path).then((matching) => {
       this.activatedMatching = matching;
     });
-
-    this.thumbnails.length = 0;
   }
 }

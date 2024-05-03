@@ -17,7 +17,7 @@
 
 import { Component, ElementRef, Inject, Input, OnInit, ViewChild } from '@angular/core';
 import { BroadcastService, PROJECT_BROADCAST_SERVICE_TOKEN } from '../../../../services/broadcast.service';
-import { CategoryDTO, ProjectDTO, Thumbnail } from 'shared-lib';
+import { CategoryDTO, ImgDto, ProjectDTO } from 'shared-lib';
 import { NgbDropdown, NgbNav } from '@ng-bootstrap/ng-bootstrap';
 import { ElectronIpcService } from '../../../../services/electron-ipc.service';
 import { SimilarityCreationComponent } from '../../../../shared/components/similarity/creation/similarity.creation.component';
@@ -66,7 +66,7 @@ export class PanelComponent implements OnInit {
     });
   }
 
-  openImage(thumbnail: Thumbnail) {
+  openImage(thumbnail: ImgDto) {
     this.mainComponent.addImage(thumbnail)
   }
 

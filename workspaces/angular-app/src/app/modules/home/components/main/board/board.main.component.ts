@@ -30,7 +30,7 @@ import {
   AssemblingImage,
   AssemblingImageChangeRequest, AssemblingImageRequest, ContextAction,
   GetAssemblingRequest, GlobalTransform, ImgDto, PRequest,
-  ProjectDTO, Thumbnail,
+  ProjectDTO,
   Transforms,
 } from 'shared-lib';
 import { ElectronIpcService } from '../../../../../services/electron-ipc.service';
@@ -99,14 +99,14 @@ export class BoardMainComponent implements OnInit {
     }
   }
 
-  addImage(thumbnail: Thumbnail) {
+  addImage(thumbnail: ImgDto) {
     const imgHeights = []
     if (this.frameComponents.length === 0) {
       const containerRect = this.boardContainer.nativeElement.getBoundingClientRect();
       imgHeights.push(containerRect.height);
     }
     for (const frame of this.frameComponents) {
-      if (frame.image.id === thumbnail.imgId) {
+      if (frame.image.id === thumbnail.id) {
         this.selectedFrames.forEach((x, key) => {
           x.showController = false;
           this.selectedFrames.delete(key);
@@ -119,7 +119,7 @@ export class BoardMainComponent implements OnInit {
       imgHeights.push(frame.image.height * frame.transforms.scale)
     }
     const avgHeight = imgHeights.reduce((p, c) => p + c, 0) / imgHeights.length;
-    let imgScale = (avgHeight / thumbnail.orgImgHeight);
+    let imgScale = (avgHeight / thumbnail.height);
     if (imgScale === 0) {
       imgScale = 1;
     }
@@ -127,7 +127,7 @@ export class BoardMainComponent implements OnInit {
     this.eIpc.send<AssemblingImageChangeRequest, AssemblingImage>('assembling:create-assembling-img', {
       projectPath: this.projectDto.path,
       assemblingId: this.assembling.id,
-      imageId: thumbnail.imgId,
+      imageId: thumbnail.id,
       transforms: {
         zIndex: 1 + this.assemblingImages.reduce((acc, x) => Math.max(acc, x.transforms.zIndex), 0),
         top: 10,

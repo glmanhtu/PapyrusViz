@@ -40,7 +40,6 @@ import { configService } from '../services/config.service';
 import { Config } from '../entities/user-config-tbl';
 import { categoryTbl, DefaultCategory } from '../entities/category';
 import { ImgStatus, imgTbl } from '../entities/img';
-import path from 'node:path';
 import { matchingService } from '../services/matching.service';
 import { JMatrix } from 'cmatrix';
 import { imageService } from '../services/image.service';
@@ -101,7 +100,7 @@ export class MatchingHandler extends BaseHandler {
 				name: x['matching-record'].name,
 				img: {
 					id: x.img.id,
-					path: "atom://" + path.join(request.projectPath, x.img.thumbnail),
+					path: imageService.resolveThumbnail(x.category, x.img),
 					width: x.img.width,
 					height: x.img.height
 				},
@@ -173,13 +172,9 @@ export class MatchingHandler extends BaseHandler {
 
 		return images.then(items => ({
 			thumbnails: items.map(x => ({
-				imgId: x.img.id,
-				path: imageService.resolveThumbnail(x.category, x.img),
-				imgName: x.img.name,
+				...imageService.resolveImg(x.category, x.img),
 				score: x['matching-record-score'].score,
 				rank: x['matching-record-score'].rank,
-				orgImgWidth: x.img.width,
-				orgImgHeight: x.img.height
 			}))
 		}));
 	}

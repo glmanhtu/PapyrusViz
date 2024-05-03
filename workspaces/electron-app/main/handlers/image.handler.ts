@@ -126,12 +126,7 @@ export class ImageHandler extends BaseHandler {
 			.offset(request.page * request.perPage);
 
 		return images.then(items => ({
-			thumbnails: items.map(x => ({
-				imgId: x.img.id,
-				path: imageService.resolveThumbnail(x.category, x.img),
-				imgName: x.img.name,
-				orgImgWidth: x.img.width, orgImgHeight: x.img.height
-			}))
+			thumbnails: items.map(x => imageService.resolveImg(x.category, x.img))
 		}));
 	}
 }

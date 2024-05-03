@@ -16,7 +16,7 @@
  */
 
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
-import { CategoryDTO, MatchingResponse, ProjectDTO, Thumbnail } from 'shared-lib';
+import { CategoryDTO, ImgDto, MatchingResponse, ProjectDTO } from 'shared-lib';
 import { NgbDropdown, NgbNav } from '@ng-bootstrap/ng-bootstrap';
 import { MatchingButtonComponent } from '../../../../shared/components/matching-button/matching-button.component';
 import { FormControl, FormGroup } from '@angular/forms';
@@ -33,7 +33,7 @@ export class PanelComponent implements OnInit {
   @ViewChild(MatchingButtonComponent) matchingButton: MatchingButtonComponent;
 
   matchings: MatchingResponse[] = [];
-  thumbnails: Thumbnail[] = [];
+  thumbnails: ImgDto[] = [];
 
   scrollTop = new Map<number, number>;
 

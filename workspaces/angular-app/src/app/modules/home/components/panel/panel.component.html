@@ -23,7 +23,7 @@
 					<a ngbNavLink>Images</a>
 					<ng-template ngbNavContent>
 						<app-images-panel #thumbnails (openImage)="openImage($event)" [projectDto]="projectDto"
-															[categories]="categories" (queryImage)="findMatching({id: $event.imgId})"></app-images-panel>
+															[categories]="categories" (queryImage)="findMatching({id: $event.id})"></app-images-panel>
 					</ng-template>
 				</li>
 				<li [ngbNavItem]="2" class="nav-item">
