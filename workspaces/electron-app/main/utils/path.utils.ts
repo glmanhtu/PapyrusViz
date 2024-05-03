@@ -22,9 +22,18 @@ import { promises as fs } from 'fs';
 import { Img } from '../entities/img';
 
 
+const currentEnvironment = process.env.X_NODE_ENV || process.env.NODE_ENV;
 
 export function fromRoot(...paths: string[]) {
     return path.join(app.getAppPath(), ...paths);
+}
+
+
+export function fromResource(...paths: string[]) {
+    if (currentEnvironment === 'production') {
+        return path.join(process.resourcesPath, 'resources', ...paths);
+    }
+    return fromRoot('resources', ...paths);
 }
 
 

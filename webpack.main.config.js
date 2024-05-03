@@ -33,7 +33,8 @@ module.exports = {
 		rules: require('./webpack.rules'),
 	},
 	externals: {
-		'sharp': 'commonjs sharp'
+		'sharp': 'commonjs sharp',
+		// 'onnxruntime-node': 'commonjs onnxruntime-node'
 	},
 	resolve: {
 		extensions: ['.js', '.ts', '.jsx', '.tsx', '.css', '.json'],

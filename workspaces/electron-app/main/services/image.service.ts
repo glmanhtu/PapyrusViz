@@ -53,11 +53,11 @@ class ImageService {
 
 	constructor() {
 		const options = { intraOpNumThreads: 1, enableCpuMemArena: false };
-		ort.InferenceSession.create(path.join(__dirname, 'ml-models', 'mobile_sam_preprocess.onnx'), options).then((session: ort.InferenceSession) => {
+		ort.InferenceSession.create(pathUtils.fromResource('ml-models', 'mobile_sam_preprocess.onnx'), options).then((session: ort.InferenceSession) => {
 			this.featureExtractor = session;
 			console.log("Mobile SAM preprocessor loaded");
 		});
-		ort.InferenceSession.create(path.join(__dirname, 'ml-models', 'mobile_sam.onnx'), options).then((session: ort.InferenceSession) => {
+		ort.InferenceSession.create(pathUtils.fromResource('ml-models', 'mobile_sam.onnx'), options).then((session: ort.InferenceSession) => {
 			this.maskDetector = session;
 			console.log("Mobile SAM loaded");
 		});

@@ -53,17 +53,18 @@ export class BoardMainComponent implements OnInit {
   @ViewChildren(FrameComponent) frameComponents!: QueryList<FrameComponent>;
   @Output() queryImage = new EventEmitter<ImgDto>();
   @ViewChild("boardContainer") boardContainer: ElementRef<HTMLDivElement>;
+  @ViewChild("panZoom") panZoom: ElementRef<HTMLDivElement>;
 
   @Output() segmentImage = new EventEmitter<ImgDto>();
 
   assemblingImages: AssemblingImage[] = [];
   selectedFrames = new Map<number, FrameComponent>;
 
-
   constructor(
     private modalService: ModalService,
     private eIpc: ElectronIpcService) {
   }
+
   ngOnInit(): void {
     this.eIpc.send<GetAssemblingRequest, AssemblingImage[]>('assembling:get-images',
       {projectPath: this.projectDto!.path, assemblingId: this.assembling.id}).then((items) => {
@@ -71,6 +72,14 @@ export class BoardMainComponent implements OnInit {
     });
   }
 
+  resetView() {
+    const elem = this.boardContainer.nativeElement;
+    const panZoomElem = this.panZoom.nativeElement;
+    // elem.style.transform = 'scale(1)';
+    elem.style.left = '0';
+    elem.style.top = '0';
+    panZoomElem.style.transformOrigin = '50% 50%';
+  }
 
   commandListener(command: string) {
     switch (command) {
