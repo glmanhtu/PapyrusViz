@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { MatchingRequest, MatchingResponse, ProjectDTO } from 'shared-lib';
 import { NgbDropdown, NgbNav } from '@ng-bootstrap/ng-bootstrap';
 import { ElectronIpcService } from '../../../services/electron-ipc.service';
@@ -34,6 +34,9 @@ export class MatchingButtonComponent implements OnInit {
 
   @Input()
   projectDto: ProjectDTO;
+
+  @Output()
+  matchingChanged = new EventEmitter<MatchingResponse>();
 
   constructor(
     private eIpc: ElectronIpcService,
@@ -62,6 +65,7 @@ export class MatchingButtonComponent implements OnInit {
       matchingId: matching.id
     }).then(() => {
       this.activatedMatching = matching;
+      this.matchingChanged.emit(matching);
     })
   }
 

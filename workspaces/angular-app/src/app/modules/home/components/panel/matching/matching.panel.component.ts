@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import {
   AssemblingImage,
   CategoryDTO, ContextAction, ImageRequest, ImgDto,
@@ -35,7 +35,7 @@ import { MatchingButtonComponent } from '../../../../../shared/components/matchi
   templateUrl: './matching.panel.component.html',
   styleUrls: ['./matching.panel.component.scss'],
 })
-export class MatchingPanelComponent implements OnInit {
+export class MatchingPanelComponent implements OnInit, AfterViewInit {
 
   @Input()
   projectDto: ProjectDTO;
@@ -65,6 +65,12 @@ export class MatchingPanelComponent implements OnInit {
   constructor(
     private eIpc: ElectronIpcService,
   ) {}
+
+  ngAfterViewInit(): void {
+    this.matchingComponent.matchingChanged.subscribe(() => {
+      this.getThumbnails();
+    });
+  }
 
   ngOnInit(): void {
   }
