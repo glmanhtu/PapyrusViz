@@ -19,9 +19,10 @@ import {
   AfterViewInit,
   Component,
   ElementRef,
-  Input,
+  Input, OnChanges,
   OnDestroy,
   OnInit,
+  SimpleChanges,
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
@@ -32,7 +33,7 @@ import {
 import { ElectronIpcService } from '../../../../../services/electron-ipc.service';
 import { NgbNav } from '@ng-bootstrap/ng-bootstrap';
 import { FormControl, FormGroup } from '@angular/forms';
-import * as d3 from 'd3'
+import * as d3 from 'd3';
 
 
 interface InfoPanelData {
@@ -65,7 +66,7 @@ function extractLeadingNumbers(inputString: string): number | null {
   templateUrl: './mds-graph.component.html',
   styleUrls: ['./mds-graph.component.scss'],
 })
-export class MdsGraphComponent implements OnInit, AfterViewInit, OnDestroy {
+export class MdsGraphComponent implements OnInit, AfterViewInit, OnDestroy, OnChanges {
 
   @ViewChild('chartContainer') chartContainer: ElementRef;
 
@@ -85,17 +86,23 @@ export class MdsGraphComponent implements OnInit, AfterViewInit, OnDestroy {
     minX: 9999,
     maxX: -9999,
     minY: 9999,
-    maxY: -9999
-  }
+    maxY: -9999,
+  };
 
   constructor(
     private eIpc: ElectronIpcService) {
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.matching && !changes.matching.firstChange) {
+      this.initData();
+    }
+  }
+
   ngOnDestroy(): void {
   }
 
-  ngAfterViewInit(): void {
+  initData() {
     this.eIpc.send<MatchingRequest, MdsResult[]>('matching:get-mds', {
       projectPath: this.projectDto.path,
       matchingId: this.matching.id
@@ -119,7 +126,10 @@ export class MdsGraphComponent implements OnInit, AfterViewInit, OnDestroy {
 
       this.updateGraph()
     })
+  }
 
+  ngAfterViewInit(): void {
+    this.initData();
     this.forceControl.valueChanges.subscribe((_) => {
       this.updateGraph();
       // console.log(this.graphObject.d3Force('charge')!.strength())
