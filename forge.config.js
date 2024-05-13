@@ -31,8 +31,13 @@ module.exports = {
 			if (platform === 'darwin') {
 				dest = path.join(buildPath, 'Electron.app', 'Contents', 'Frameworks');
 			}
-			// Todo: Verify the flow on Windows and Linux
-			fs.cpSync(src, dest, {recursive: true});
+
+			for (const file of fs.readdirSync(src)) {
+				if (!file.includes('_cuda')) {
+					// Todo: Verify the flow on Windows
+					fs.cpSync(path.join(src, file), path.join(dest, file));
+				}
+			}
 		}
 	},
 	rebuildConfig: {},
