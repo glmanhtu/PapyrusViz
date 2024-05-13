@@ -16,20 +16,27 @@
  */
 
 import {
-  Component, ElementRef,
+  Component,
+  ElementRef,
   EventEmitter,
   HostListener,
   Input,
   OnInit,
   Output,
-  QueryList, ViewChild,
+  QueryList,
+  ViewChild,
   ViewChildren,
 } from '@angular/core';
 import {
   AssemblingDTO,
   AssemblingImage,
-  AssemblingImageChangeRequest, AssemblingImageRequest, ContextAction,
-  GetAssemblingRequest, GlobalTransform, ImgDto, PRequest,
+  AssemblingImageChangeRequest,
+  AssemblingImageRequest,
+  ContextAction,
+  GetAssemblingRequest,
+  GlobalTransform,
+  ImgDto,
+  PRequest,
   ProjectDTO,
   Transforms,
 } from 'shared-lib';
@@ -215,10 +222,18 @@ export class BoardMainComponent implements OnInit {
           this.toBack(assemblingImage);
           break
 
+        case 'open_file_location':
+          const imgPath = assemblingImage.img.fragment === '' ? assemblingImage.img.path : assemblingImage.img.fragment;
+          this.eIpc.send<string, void>('dialogs:open-file-location', imgPath.replace('atom://', ''));
+          break
+
         case 'segment':
           this.modalService.imageSegmentation(this.projectDto, assemblingImage.img.id).result.then((res: ImgDto) => {
             if (res) {
+              const prevImgHeight = assemblingImage.img.height * assemblingImage.transforms.scale;
               assemblingImage.img = res;
+              assemblingImage.transforms.scale = prevImgHeight / res.height;
+              this.onTransform(assemblingImage, assemblingImage.transforms);
               this.segmentImage.emit(res);
             }
           })

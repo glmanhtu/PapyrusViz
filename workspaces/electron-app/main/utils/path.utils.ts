@@ -39,7 +39,11 @@ export function fromResource(...paths: string[]) {
 
 export function segmentationPath(img: Img) {
     const segmentation_dir = fromAppData('segmentation', path.dirname(img.path));
-    return path.join(segmentation_dir, path.basename(img.path).split('.')[0] + ".png");
+    return path.join(segmentation_dir, path.basename(img.path).split('.')[0] + ".webp");
+}
+
+export function deleteFile(filePath: string) {
+    return syncFs.rmSync(filePath);
 }
 
 export function fromAppData(...paths: string[]) {
