@@ -103,6 +103,13 @@ export class MdsGraphComponent implements OnInit, AfterViewInit, OnDestroy, OnCh
   }
 
   initData() {
+    this.domains = {
+      minX: 9999,
+      maxX: -9999,
+      minY: 9999,
+      maxY: -9999,
+    };
+
     this.eIpc.send<MatchingRequest, MdsResult[]>('matching:get-mds', {
       projectPath: this.projectDto.path,
       matchingId: this.matching.id
@@ -132,8 +139,6 @@ export class MdsGraphComponent implements OnInit, AfterViewInit, OnDestroy, OnCh
     this.initData();
     this.forceControl.valueChanges.subscribe((_) => {
       this.updateGraph();
-      // console.log(this.graphObject.d3Force('charge')!.strength())
-      // this.graphObject.d3ReheatSimulation()
     });
   }
 
