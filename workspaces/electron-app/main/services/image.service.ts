@@ -162,7 +162,7 @@ class ImageService {
 			.trim({
 				threshold: 5
 			})
-			.toFile(outputPath)
+			.toFile(outputPath);
 
 		return await sharp(outputPath).metadata();
 	}

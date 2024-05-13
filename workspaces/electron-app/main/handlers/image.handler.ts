@@ -68,6 +68,10 @@ export class ImageHandler extends BaseHandler {
 
 		if (request.points.length === 0) {
 			const img = await imageService.metadata(imageService.resolveImgPath(imData.category, imData.img));
+			const segmentationPath = pathUtils.segmentationPath(imData.img);
+			if (pathUtils.exists(segmentationPath)) {
+				pathUtils.deleteFile(segmentationPath)
+			}
 			await database.update(imgTbl).set({
 				fragment: '',
 				width: img.width,

@@ -252,6 +252,12 @@ export class MenuHandler extends BaseHandler {
 						resolve({ name: 'segment', data: null })
 					}
 				},
+				{
+					label: 'Open file location',
+					click: () => {
+						resolve({ name: 'open_file_location', data: null })
+					}
+				},
 				{ type: 'separator' },
 				{
 					label: 'Find similarities',
