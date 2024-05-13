@@ -18,6 +18,7 @@
 import { Category } from '../entities/category';
 import { Img, imgTbl } from '../entities/img';
 import path from 'node:path';
+import url from 'node:url';
 import sharp from 'sharp';
 import { eq, like, or } from 'drizzle-orm';
 import { dbService } from './database.service';
@@ -66,8 +67,8 @@ class ImageService {
 	public resolveImg(category: Category, img: Img | ImgDto): ImgDto {
 		return {
 			...img,
-			path: 'atom://' + path.join(category.path, img.path),
-			fragment: img.fragment !== '' ? 'atom://' + pathUtils.segmentationPath(img as Img) : '',
+			path: pathUtils.replaceProtocol(url.pathToFileURL(path.join(category.path, img.path)).toString(), 'file://', 'atom://'),
+			fragment: img.fragment !== '' ? pathUtils.replaceProtocol(url.pathToFileURL(pathUtils.segmentationPath(img as Img)).toString(), 'file://', 'atom://') : '',
 			thumbnail: this.resolveThumbnail(category, img)
 		}
 	}
@@ -77,12 +78,14 @@ class ImageService {
 		if (img.fragment !== '') {
 			imgPath = pathUtils.segmentationPath(img as Img)
 		}
-		return 'atom://' + this.resolveThumbnailFromImgPath(imgPath)
+		return pathUtils.replaceProtocol(url.pathToFileURL(this.resolveThumbnailFromImgPath(imgPath)).toString(), 'file://', 'atom://');
 	}
 
-	public resolveThumbnailFromImgPath(imgPath: string) {
-		const thumbnailName = path.basename(imgPath).split('.')[0] + '.jpg'
-		return  pathUtils.fromAppData('thumbnails', path.dirname(imgPath), thumbnailName);
+	public resolveThumbnailFromImgPath(imgPath: string, createDir = false) {
+		const components = path.parse(imgPath);
+		const thumbnailName = components.name + '.jpg';
+		const basePath = components.dir.replace(components.root, '');
+		return  pathUtils.fromAppData('thumbnails', basePath, thumbnailName);
 	}
 
 	public resolveImgPath(category: Category, img: Img | ImgDto): string {

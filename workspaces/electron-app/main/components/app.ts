@@ -20,6 +20,7 @@ import { Window } from './window';
 import { BaseHandler } from '../handlers/base.handler';
 import { IMessage, Message, WindowTask } from 'shared-lib';
 import { Logger } from '../utils/logger';
+import * as pathUtils from '../utils/path.utils';
 
 export class App {
 	private static _windows = new Map<number, Window>();
@@ -29,7 +30,7 @@ export class App {
 		app.on('window-all-closed', App.quit);
 		app.whenReady().then(() => {
 			protocol.handle('atom', (request) =>
-				net.fetch('file://' + request.url.slice('atom://'.length)))
+				net.fetch(pathUtils.replaceProtocol(request.url, 'atom://', 'file://')))
 			App.createWindow();
 		});
 

@@ -76,6 +76,10 @@ export function projectFile(projectPath: string) {
     return path.join(projectPath, 'project.db');
 }
 
+export function replaceProtocol(url: string, fromProtocol: string, toProtocol: string) {
+    return toProtocol + url.slice(fromProtocol.length);
+}
+
 export async function getFilesRecursively(directory: string, topLvDir = '', level = 0): Promise<Map<string, string[]>> {
     const imageMap = new Map<string, string[]>();
     const filesInDirectory = await fs.readdir(directory);

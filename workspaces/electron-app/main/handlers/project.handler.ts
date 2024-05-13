@@ -110,6 +110,7 @@ export class ProjectHandler extends BaseHandler {
 			await Promise.all([...categoryMap].map(async ([rootDir, rootDirID]) => {
 				if (oldImg.path.includes(rootDir) && rootDir !== '') {
 					const thumbnailPath = imageService.resolveThumbnailFromImgPath(oldImg.path);
+					await fs.mkdir(path.dirname(thumbnailPath), {recursive: true});
 					await fs.copyFile(oldImg.thumbnails, thumbnailPath);
 					await database.insert(imgTbl).values({
 						id: parseInt(key) + 1,
