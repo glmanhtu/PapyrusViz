@@ -38,8 +38,11 @@ export function fromResource(...paths: string[]) {
 
 
 export function segmentationPath(img: Img) {
-    const segmentation_dir = fromAppData('segmentation', path.dirname(img.path));
-    return path.join(segmentation_dir, path.basename(img.path).split('.')[0] + ".webp");
+    const components = path.parse(img.path);
+    const thumbnailName = components.name + '.webp';
+    const basePath = components.dir.replace(components.root, '');
+    const segmentation_dir = fromAppData('segmentation', basePath);
+    return path.join(segmentation_dir, thumbnailName);
 }
 
 export function deleteFile(filePath: string) {

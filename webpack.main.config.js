@@ -34,7 +34,7 @@ module.exports = {
 	},
 	externals: {
 		'sharp': 'commonjs sharp',
-		// 'onnxruntime-node': 'commonjs onnxruntime-node'
+		'onnxruntime-node': 'commonjs onnxruntime-node'
 	},
 	resolve: {
 		extensions: ['.js', '.ts', '.jsx', '.tsx', '.css', '.json'],
@@ -52,11 +52,7 @@ module.exports = {
 					from: 'workspaces/angular-app/.dist/angular-app',
 					to: '../renderer/angular_window',
 					noErrorOnMissing: true,
-				},
-				{
-					from: `node_modules/onnxruntime-node/bin/napi-v3/${platform}/${arch}/*`,
-					to: `../bin/napi-v3/${platform}/${arch}/[name][ext]`
-				},
+				}
 			],
 		}),
 		{

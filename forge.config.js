@@ -1,14 +1,18 @@
 const path = require('path');
 const fs = require('fs');
 
+const arch = process.arch;
+const platform = process.platform;
+
 module.exports = {
 	packagerConfig: {
-		name: "Papyrus Visualization",
+		name: "Papyviz",
 		executableName: "papyviz",
 		asar: {
 			unpack: [
 				"**/node_modules/sharp/**/*",
-				"**/node_modules/@img/**/*"
+				"**/node_modules/@img/**/*",
+				`**/node_modules/onnxruntime-node/bin/**/*`
 			]
 		},
 		extraResource: [
@@ -18,24 +22,13 @@ module.exports = {
 	},
 	hooks: {
 		packageAfterCopy: async (config, buildPath, electronVersion, platform, arch) => {
-			const src = path.join(buildPath, '.webpack', arch, 'bin', 'napi-v3', platform, arch)
+			const src = path.join(buildPath, 'node_modules', 'onnxruntime-node', 'bin', 'napi-v3')
 			for (const file of fs.readdirSync(src)) {
-				if (!file.endsWith('.node')) {
-					fs.rmSync(path.join(src, file), {recursive: true});
-				}
-			}
-		},
-		packageAfterExtract: async (config, buildPath, electronVersion, platform, arch) => {
-			const src = path.join(__dirname, 'node_modules', 'onnxruntime-node', 'bin', 'napi-v3', platform, arch)
-			let dest = buildPath
-			if (platform === 'darwin') {
-				dest = path.join(buildPath, 'Electron.app', 'Contents', 'Frameworks');
-			}
-
-			for (const file of fs.readdirSync(src)) {
-				if (!file.includes('_cuda')) {
-					// Todo: Verify the flow on Windows
-					fs.cpSync(path.join(src, file), path.join(dest, file));
+				const platformDir = path.join(src, file);
+				for (const archFile of fs.readdirSync(platformDir)) {
+					if (file !== platform || archFile !== arch) {
+						fs.rmSync(path.join(src, file, archFile), {recursive: true});
+					}
 				}
 			}
 		}
@@ -91,7 +84,8 @@ module.exports = {
 			name: "@timfish/forge-externals-plugin",
 			config: {
 				externals: [
-					"sharp"
+					"sharp",
+					"onnxruntime-node"
 				],
 				includeDeps: true
 			}

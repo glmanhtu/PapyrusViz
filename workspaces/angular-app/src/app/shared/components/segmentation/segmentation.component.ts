@@ -88,7 +88,7 @@ export class SegmentationComponent implements OnInit {
     this.segment();
   }
 
-  segment() {
+  async segment() {
     const points = this.foregroundPoints.concat(this.backgroundPoints);
     this.electronIpc.send<ImgSegmentationRequest, string>('image:detect-papyrus', { imgId: this.image.id, projectPath: this.projectDto.path, points: points }).then(result => {
       this.base64Img = result;
