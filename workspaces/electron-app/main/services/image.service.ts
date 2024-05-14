@@ -81,11 +81,11 @@ class ImageService {
 		return pathUtils.replaceProtocol(url.pathToFileURL(this.resolveThumbnailFromImgPath(imgPath)).toString(), 'file://', 'atom://');
 	}
 
-	public resolveThumbnailFromImgPath(imgPath: string, createDir = false) {
+	public resolveThumbnailFromImgPath(imgPath: string) {
 		const components = path.parse(imgPath);
 		const thumbnailName = components.name + '.jpg';
 		const basePath = components.dir.replace(components.root, '');
-		return  pathUtils.fromAppData('thumbnails', basePath, thumbnailName);
+		return pathUtils.fromAppData('thumbnails', basePath, thumbnailName);
 	}
 
 	public resolveImgPath(category: Category, img: Img | ImgDto): string {
@@ -128,8 +128,8 @@ class ImageService {
 	}
 
 	public async generateThumbnail(imgPath: string, force = false) {
-		const thumbnailName = path.basename(imgPath).split('.')[0] + '.jpg'
-		const thumbnailPath = pathUtils.fromAppData('thumbnails', path.dirname(imgPath), thumbnailName);
+		const thumbnailPath = this.resolveThumbnailFromImgPath(imgPath);
+
 		if (!force && await pathUtils.isFile(thumbnailPath)) {
 			return thumbnailPath;
 		}
