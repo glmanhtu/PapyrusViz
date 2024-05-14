@@ -1,9 +1,6 @@
 const path = require('path');
 const fs = require('fs');
 
-const arch = process.arch;
-const platform = process.platform;
-
 module.exports = {
 	packagerConfig: {
 		name: "Papyviz",
@@ -23,11 +20,23 @@ module.exports = {
 	hooks: {
 		packageAfterCopy: async (config, buildPath, electronVersion, platform, arch) => {
 			const src = path.join(buildPath, 'node_modules', 'onnxruntime-node', 'bin', 'napi-v3')
-			for (const file of fs.readdirSync(src)) {
-				const platformDir = path.join(src, file);
-				for (const archFile of fs.readdirSync(platformDir)) {
-					if (file !== platform || archFile !== arch) {
-						fs.rmSync(path.join(src, file, archFile), {recursive: true});
+
+			// Here we clean up prebuild files which is not related to this platform and arch
+			for (const platformName of fs.readdirSync(src)) {
+				const platformDir = path.join(src, platformName);
+				for (const archName of fs.readdirSync(platformDir)) {
+					const archDir = path.join(platformDir, archName);
+
+					// If the platform and arch of the folder doesn't match with current system, we remove it
+					if (platformName !== platform || archName !== arch) {
+						fs.rmSync(archDir, {recursive: true});
+					} else {
+						for (const fileName of fs.readdirSync(archDir)) {
+							if (fileName.includes('_cuda')) {
+								// We don't need CUDA library for this application
+								fs.rmSync(path.join(archDir, fileName));
+							}
+						}
 					}
 				}
 			}
