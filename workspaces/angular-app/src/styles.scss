@@ -15,11 +15,92 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+@import "bootstrap/scss/mixins/banner";
+@include bsBanner("");
+
+
+// scss-docs-start import-stack
+// Configuration
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/variables-dark";
+@import "bootstrap/scss/maps";
+@import "bootstrap/scss/mixins";
+@import "bootstrap/scss/utilities";
+@import "bootstrap/scss/root";
+
+
 $navbar-padding-y: 1rem * .2;
 $nav-link-padding-y: 0.4rem;
 $card-cap-padding-y:                1rem * .1;
+
+$papy-background-color: #2e3142;
+
+/* customize bg dark */
+$primary: #2e3142;
+
+:root {
+  --bs-primary: #{$primary};
+  --bs-primary-bg-subtle: #{$primary};
+  --bs-primary-bg-subtle-dark: #{$primary};
+
+  --bs-dark-rgb: #{to-rgb($primary)};
+  --bs-link-color: black;
+
+  .btn-primary {
+    --bs-btn-bg: #{$primary};
+  }
+}
+
 // Import all of Bootstrap's CSS
-@import "bootstrap/scss/bootstrap";
+// Layout & components
+@import "bootstrap/scss/reboot";
+@import "bootstrap/scss/type";
+@import "bootstrap/scss/images";
+@import "bootstrap/scss/containers";
+@import "bootstrap/scss/grid";
+@import "bootstrap/scss/tables";
+@import "bootstrap/scss/forms";
+@import "bootstrap/scss/buttons";
+@import "bootstrap/scss/transitions";
+@import "bootstrap/scss/dropdown";
+@import "bootstrap/scss/button-group";
+@import "bootstrap/scss/nav";
+@import "bootstrap/scss/navbar";
+@import "bootstrap/scss/card";
+//@import "bootstrap/scss/accordion";
+//@import "bootstrap/scss/breadcrumb";
+//@import "bootstrap/scss/pagination";
+//@import "bootstrap/scss/badge";
+//@import "bootstrap/scss/alert";
+@import "bootstrap/scss/progress";
+@import "bootstrap/scss/list-group";
+@import "bootstrap/scss/close";
+//@import "bootstrap/scss/toasts";
+@import "bootstrap/scss/modal";
+//@import "bootstrap/scss/tooltip";
+//@import "bootstrap/scss/popover";
+//@import "bootstrap/scss/carousel";
+@import "bootstrap/scss/spinners";
+//@import "bootstrap/scss/offcanvas";
+@import "bootstrap/scss/placeholders";
+
+// Helpers
+@import "bootstrap/scss/helpers";
+
+// Utilities
+@import "bootstrap/scss/utilities/api";
+// scss-docs-end import-stack
+
+
+
+.btn-papyrus {
+  @include button-variant(#e86950, #e86950, white, $active-color: white, $disabled-color: white, $hover-color: white);
+}
+
+.btn-outline-papyrus {
+    @include button-outline-variant(#e86950, white, $active-color: white);
+}
 
 /* You can add global styles to this file, and also import other style files */
 html, body {
