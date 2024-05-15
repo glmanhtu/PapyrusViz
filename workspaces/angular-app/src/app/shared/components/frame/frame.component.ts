@@ -74,7 +74,16 @@ export class FrameComponent {
     const positionX = this.transforms.left;
     const positionY = this.transforms.top;
 
+    let isDragging = false;
+    let dragTimeout: number | undefined = undefined;
+
+    const startDrag = () => {
+      isDragging = true;
+      this._document.addEventListener('mousemove', duringDrag);
+    };
+
     const duringDrag = (e: MouseEvent) => {
+      clearTimeout(dragTimeout);
       const dx = e.clientX - mouseX;
       const dy = e.clientY - mouseY;
       this.transforms.left = positionX + dx / this.globalTransform.scale;
@@ -82,12 +91,17 @@ export class FrameComponent {
     };
 
     const finishDrag = (_: MouseEvent) => {
-      this._document.removeEventListener('mousemove', duringDrag);
+      if (!isDragging) {
+        clearTimeout(dragTimeout);
+      } else {
+        this._document.removeEventListener('mousemove', duringDrag);
+        this.transformEvent.emit(this.transforms);
+      }
       this._document.removeEventListener('mouseup', finishDrag);
-      this.transformEvent.emit(this.transforms);
     };
 
-    this._document.addEventListener('mousemove', duringDrag);
+    // Start a timeout to distinguish between click and drag
+    dragTimeout = setTimeout(startDrag, 150); // 200ms delay to distinguish between click and drag
     this._document.addEventListener('mouseup', finishDrag);
   }
 

@@ -52,9 +52,9 @@ export class App {
 
 	public static registerHandlers(handlers: BaseHandler[]) {
 		const combinedRouteMap = this.combineRoutes(...handlers);
-		ipcMain.on('ipc-request', async (event, message: { type: string; payload: unknown; requestId: string }) => {
+		ipcMain.on('ipc-request',  async (event, message: { type: string; payload: unknown; requestId: string }) => {
 			const { type, payload, requestId } = message;
-			console.log(message)
+			Logger.info('Message received: ', message)
 			const handlerFunction = combinedRouteMap.get(type);
 			if (handlerFunction) {
 				handlerFunction(payload, event.sender.id)

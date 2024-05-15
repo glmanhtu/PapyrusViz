@@ -70,34 +70,44 @@ export class Logger {
 	}
 
 	private constructor() {
-		this._logger = winston.createLogger({
-			level: 'debug',
-			format: winston.format.combine(
-				winston.format.errors({stack: true}),
-				winston.format.timestamp({format: "YYYY-MM-DD HH:mm:ss.SSS"}),
-				winston.format.printf(({timestamp, level, message, stack}) => {
-					const text = `${timestamp} ${level.toUpperCase()} ${message}`;
-					return stack ? text + '\n' + stack : text;
-				}),
-			),
-			defaultMeta: { service: 'user-service' },
-			transports: [
-				new winston.transports.File({
-					filename: this.getLogFilename(),
-					level: global.appConfig.mainLogLevel,
-				}),
-			],
-		});
+		const formats = [
+			winston.format.errors({stack: true}),
+			winston.format.timestamp({format: "YYYY-MM-DD HH:mm:ss.SSS"}),
+			winston.format.metadata({ fillExcept: ['message', 'level', 'timestamp', 'label', 'service'] }),
+			winston.format.printf((info) => {
+				let text = `${info.timestamp} ${info.level.toUpperCase()} [${info.service}]: ${info.message}`;
+				if (info.metadata) {
+					text = `${text} ${JSON.stringify(info.metadata)}`;
+				}
+				return info.stack ? text + '\n' + info.stack : text;
+			}),
+		];
+
+		const transports: winston.transport[] = [
+			new winston.transports.File({
+				filename: this.getLogFilename(),
+				level: global.appConfig.mainLogLevel,
+			}),
+		]
 
 		// If we're not in production then log also to the `console` with the format:
-		// `${info.timestamp} ${info.level}: ${info.message} JSON.stringify({ ...rest }) `
 		if (global.appConfig.configId === 'development') {
-			this._logger.add(
+			formats.push(winston.format.colorize());
+
+			transports.push(
 				new winston.transports.Console({
 					stderrLevels: ['error', 'warn'],
 				})
 			);
 		}
+
+		this._logger = winston.createLogger({
+			level: 'debug',
+			format: winston.format.combine(...formats),
+			defaultMeta: { service: 'user-service' },
+			transports: transports,
+		});
+
 	}
 
 	/**

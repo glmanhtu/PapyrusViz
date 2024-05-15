@@ -79,6 +79,32 @@ export class BoardMainComponent implements OnInit {
     });
   }
 
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
+  }
+
+  onDrop(event: DragEvent) {
+    event.preventDefault();
+    const data = event.dataTransfer!.getData('text/plain');
+    const thumbnail: ImgDto = JSON.parse(data);
+    console.log(thumbnail);
+
+    // Get the bounding rectangle of the boardContainer element
+    const rect = this.panZoom.nativeElement.getBoundingClientRect();
+
+    // Calculate the drop position relative to the panZoom element
+    let x = event.clientX - rect.left;
+    let y = event.clientY - rect.top;
+
+    console.log(x, y);
+
+    const containerTransforms = this.assembling.transforms;
+    x = x - containerTransforms.last.x / containerTransforms.scale
+    y = y - containerTransforms.last.y / containerTransforms.scale
+
+    this.addImage(thumbnail, y, x);
+  }
+
   resetView() {
     const elem = this.boardContainer.nativeElement;
     const panZoomElem = this.panZoom.nativeElement;
@@ -117,7 +143,7 @@ export class BoardMainComponent implements OnInit {
     }
   }
 
-  addImage(thumbnail: ImgDto) {
+  addImage(thumbnail: ImgDto, top = 10, left= 10) {
     const imgHeights = []
     if (this.frameComponents.length === 0) {
       const containerRect = this.boardContainer.nativeElement.getBoundingClientRect();
@@ -142,14 +168,19 @@ export class BoardMainComponent implements OnInit {
       imgScale = 1;
     }
 
+    if (top !== 10 || left !== 10) {
+      top = top - (thumbnail.height * imgScale / 2);
+      left = left - (thumbnail.width * imgScale / 2);
+    }
+
     this.eIpc.send<AssemblingImageChangeRequest, AssemblingImage>('assembling:create-assembling-img', {
       projectPath: this.projectDto.path,
       assemblingId: this.assembling.id,
       imageId: thumbnail.id,
       transforms: {
         zIndex: 1 + this.assemblingImages.reduce((acc, x) => Math.max(acc, x.transforms.zIndex), 0),
-        top: 10,
-        left: 10,
+        top: top,
+        left: left,
         scale: imgScale,
         rotation: 0
       }
@@ -183,12 +214,12 @@ export class BoardMainComponent implements OnInit {
       }
     });
 
-    // Perform dragging
     this.selectedFrames.forEach((x, key) => {
       if (!hasSelected) {
         x.showController = false;
         this.selectedFrames.delete(key);
       } else {
+        // Perform dragging
         x.currentFrameDrag(event);
       }
     });
@@ -263,13 +294,15 @@ export class BoardMainComponent implements OnInit {
   }
 
   onGlobalTransform(globalTransform: GlobalTransform) {
-    return this.eIpc.debounce<PRequest<AssemblingDTO>>(1000, this.projectDto.path, this.assembling.id.toString())('assembling:update-assembling', {
+    this.eIpc.debounce<PRequest<AssemblingDTO>>(1000, this.projectDto.path, this.assembling.id.toString())('assembling:update-assembling', {
       projectPath: this.projectDto.path,
       payload: {
         ...this.assembling,
         transforms: globalTransform
       }
-    })
+    });
+
+    this.assembling.transforms = globalTransform;
   }
 
   onTransform(assemblingImage: AssemblingImage, transforms: Transforms) {

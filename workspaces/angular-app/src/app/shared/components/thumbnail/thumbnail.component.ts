@@ -35,6 +35,11 @@ export class ThumbnailComponent implements OnInit {
     this.openImage.emit(this.thumbnail)
   }
 
+  onDragStart(event: DragEvent) {
+    event.dataTransfer!.setData('text/plain', JSON.stringify(this.thumbnail));
+    console.log("Drag start", this.thumbnail)
+  }
+
   getSimilarityColor(score: number): string {
     // Ensure the score is between 0 and 1
     const clampedScore = Math.max(0, Math.min(score, 1));
