@@ -18,13 +18,15 @@
 import { Config } from '../entities/user-config-tbl';
 import { and, eq } from 'drizzle-orm';
 import { dbService } from './database.service';
-import { Img } from '../entities/img';
+import { Img, imgTbl } from '../entities/img';
 import { imgAssemblingTbl } from '../entities/img-assembling';
 import { takeUniqueOrThrow } from '../utils/data.utils';
 import { AssemblingDTO, Transforms } from 'shared-lib';
 import { configService } from './config.service';
 import { projectService } from './project.service';
 import { assemblingTbl } from '../entities/assembling';
+import { imageService } from './image.service';
+import { categoryTbl } from '../entities/category';
 
 class AssemblingService {
 
@@ -81,6 +83,15 @@ class AssemblingService {
 		await database.update(imgAssemblingTbl).set({imgId: toImg.id, transforms: transforms})
 			.where(and(eq(imgAssemblingTbl.assemblingId, assemblingId), eq(imgAssemblingTbl.imgId, fromImg.id)));
 		return { img: toImg, transforms: transforms }
+	}
+
+	public async getAssemblingImages(projectPath: string, assemblingId: number) {
+		const database = dbService.getConnection(projectPath);
+		return database.select()
+			.from(imgAssemblingTbl)
+			.leftJoin(imgTbl, eq(imgAssemblingTbl.imgId, imgTbl.id))
+			.leftJoin(categoryTbl, eq(imgTbl.categoryId, categoryTbl.id))
+			.where(eq(imgAssemblingTbl.assemblingId, assemblingId));
 	}
 }
 
