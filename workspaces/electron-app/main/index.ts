@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import * as fs from 'fs-extra';
+import * as fs from 'fs';
 import _ from 'lodash';
 import * as path from 'node:path';
 import { GlobalConfig } from 'shared-lib';
@@ -33,7 +33,7 @@ declare const global: GlobalConfig;
 
 // Load config
 const currentEnvironment = process.env.X_NODE_ENV || process.env.NODE_ENV;
-const appConfigs = fs.readJsonSync(path.join(__dirname, 'config.json'));
+const appConfigs = JSON.parse(fs.readFileSync(path.join(__dirname, 'config.json') , 'utf8'));
 const defaultConfig = appConfigs.development;
 const currentConfig = appConfigs[currentEnvironment];
 global.appConfig =

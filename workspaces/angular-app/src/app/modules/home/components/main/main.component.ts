@@ -24,7 +24,6 @@ import {
   IMessage,
   ImgDto,
   ProjectDTO,
-  Thumbnail,
 } from 'shared-lib';
 import { ElectronIpcService } from '../../../../services/electron-ipc.service';
 import { NgbNav, NgbNavChangeEvent } from '@ng-bootstrap/ng-bootstrap';
@@ -84,7 +83,7 @@ export class MainComponent implements OnInit {
     throw new Error('Board component not found!')
   }
 
-  addImage(thumbnail: Thumbnail) {
+  addImage(thumbnail: ImgDto) {
     this.getActivatedBoard().addImage(thumbnail)
   }
 
@@ -121,5 +120,9 @@ export class MainComponent implements OnInit {
 
   findMatching(img: ImgDto) {
     this.panel.findMatching(img);
+  }
+
+  imageChange(img: ImgDto) {
+    this.panel.imgChange(img);
   }
 }

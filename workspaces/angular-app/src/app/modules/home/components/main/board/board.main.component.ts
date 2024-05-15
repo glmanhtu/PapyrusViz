@@ -17,20 +17,27 @@
 
 import {
   Component,
+  ElementRef,
   EventEmitter,
   HostListener,
   Input,
   OnInit,
   Output,
   QueryList,
+  ViewChild,
   ViewChildren,
 } from '@angular/core';
 import {
   AssemblingDTO,
   AssemblingImage,
-  AssemblingImageChangeRequest, AssemblingImageRequest, ContextAction,
-  GetAssemblingRequest, GlobalTransform, ImgDto, PRequest,
-  ProjectDTO, Thumbnail,
+  AssemblingImageChangeRequest,
+  AssemblingImageRequest,
+  ContextAction,
+  GetAssemblingRequest,
+  GlobalTransform,
+  ImgDto,
+  PRequest,
+  ProjectDTO,
   Transforms,
 } from 'shared-lib';
 import { ElectronIpcService } from '../../../../../services/electron-ipc.service';
@@ -52,15 +59,19 @@ export class BoardMainComponent implements OnInit {
 
   @ViewChildren(FrameComponent) frameComponents!: QueryList<FrameComponent>;
   @Output() queryImage = new EventEmitter<ImgDto>();
+  @ViewChild("boardContainer") boardContainer: ElementRef<HTMLDivElement>;
+  @ViewChild("panZoom") panZoom: ElementRef<HTMLDivElement>;
+
+  @Output() segmentImage = new EventEmitter<ImgDto>();
 
   assemblingImages: AssemblingImage[] = [];
   selectedFrames = new Map<number, FrameComponent>;
-
 
   constructor(
     private modalService: ModalService,
     private eIpc: ElectronIpcService) {
   }
+
   ngOnInit(): void {
     this.eIpc.send<GetAssemblingRequest, AssemblingImage[]>('assembling:get-images',
       {projectPath: this.projectDto!.path, assemblingId: this.assembling.id}).then((items) => {
@@ -68,6 +79,14 @@ export class BoardMainComponent implements OnInit {
     });
   }
 
+  resetView() {
+    const elem = this.boardContainer.nativeElement;
+    const panZoomElem = this.panZoom.nativeElement;
+    // elem.style.transform = 'scale(1)';
+    elem.style.left = '0';
+    elem.style.top = '0';
+    panZoomElem.style.transformOrigin = '50% 50%';
+  }
 
   commandListener(command: string) {
     switch (command) {
@@ -98,10 +117,14 @@ export class BoardMainComponent implements OnInit {
     }
   }
 
-  addImage(thumbnail: Thumbnail) {
+  addImage(thumbnail: ImgDto) {
     const imgHeights = []
+    if (this.frameComponents.length === 0) {
+      const containerRect = this.boardContainer.nativeElement.getBoundingClientRect();
+      imgHeights.push(containerRect.height);
+    }
     for (const frame of this.frameComponents) {
-      if (frame.image.id === thumbnail.imgId) {
+      if (frame.image.id === thumbnail.id) {
         this.selectedFrames.forEach((x, key) => {
           x.showController = false;
           this.selectedFrames.delete(key);
@@ -114,7 +137,7 @@ export class BoardMainComponent implements OnInit {
       imgHeights.push(frame.image.height * frame.transforms.scale)
     }
     const avgHeight = imgHeights.reduce((p, c) => p + c, 0) / imgHeights.length;
-    let imgScale = (avgHeight / thumbnail.orgImgHeight);
+    let imgScale = (avgHeight / thumbnail.height);
     if (imgScale === 0) {
       imgScale = 1;
     }
@@ -122,7 +145,7 @@ export class BoardMainComponent implements OnInit {
     this.eIpc.send<AssemblingImageChangeRequest, AssemblingImage>('assembling:create-assembling-img', {
       projectPath: this.projectDto.path,
       assemblingId: this.assembling.id,
-      imageId: thumbnail.imgId,
+      imageId: thumbnail.id,
       transforms: {
         zIndex: 1 + this.assemblingImages.reduce((acc, x) => Math.max(acc, x.transforms.zIndex), 0),
         top: 10,
@@ -197,6 +220,24 @@ export class BoardMainComponent implements OnInit {
 
         case 'to_back':
           this.toBack(assemblingImage);
+          break
+
+        case 'open_file_location':
+          const imgPath = assemblingImage.img.fragment === '' ? assemblingImage.img.path : assemblingImage.img.fragment;
+          this.eIpc.send<string, void>('dialogs:open-file-location', imgPath.replace('atom://', ''));
+          break
+
+        case 'segment':
+          this.modalService.imageSegmentation(this.projectDto, assemblingImage.img.id).result.then((res: ImgDto) => {
+            if (res) {
+              const prevImgHeight = assemblingImage.img.height * assemblingImage.transforms.scale;
+              assemblingImage.img = res;
+              assemblingImage.transforms.scale = prevImgHeight / res.height;
+              this.onTransform(assemblingImage, assemblingImage.transforms);
+              this.segmentImage.emit(res);
+            }
+          })
+          break
       }
     })
   }

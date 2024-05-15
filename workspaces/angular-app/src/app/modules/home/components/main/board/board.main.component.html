@@ -15,7 +15,7 @@
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<div id="board" class="h-100 w-100" appPanZoom [container]="boardContainer"
+<div #panZoom class="h-100 w-100 position-relative" appPanZoom [container]="boardContainer"
 		 [hasFrameSelected]="selectedFrames.size > 0" [globalTransform]="assembling.transforms" (changes)="onGlobalTransform($event)">
 	<div class="h-100 w-100" style="position: absolute" #boardContainer>
 		<app-frame *ngFor="let img of assemblingImages; index as i"

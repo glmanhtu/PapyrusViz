@@ -33,7 +33,9 @@ import { assemblingService } from '../services/assembling.service';
 import { takeUniqueOrThrow } from '../utils/data.utils';
 import { imageService } from '../services/image.service';
 import sharp from 'sharp';
+import path from 'node:path';
 import * as dataUtils from '../utils/data.utils';
+import * as pathUtils from '../utils/path.utils';
 
 
 
@@ -76,15 +78,25 @@ export class AssemblingHandler extends BaseHandler {
 	}
 
 	private async exportImg(payload: AssemblingExportRequest,  reply: (message: IMessage<string | Progress>) => Promise<void>) {
-		const assemblingImages = await this.getAssemblingImages({
-			projectPath: payload.projectPath,
-			assemblingId: payload.assemblingId
+		const assemblingImages = await assemblingService.getAssemblingImages(payload.projectPath, payload.assemblingId);
+		
+		const imgPathComponents = path.parse(payload.outputFile);
+		const outputFile = path.format({
+			dir: imgPathComponents.dir,
+			name: imgPathComponents.name,
+			ext: '.png'
 		});
 
 		const images = [];
 		for (const assemblingImg of assemblingImages) {
 			const image = assemblingImg.img
-			const transforms = assemblingImg.transforms
+			const transforms = {
+				zIndex: (assemblingImg.img_assembling.transforms as Transforms).zIndex || 1,
+				top: (assemblingImg.img_assembling.transforms as Transforms).top || 10,
+				left: (assemblingImg.img_assembling.transforms as Transforms).left || 10,
+				scale: (assemblingImg.img_assembling.transforms as Transforms).scale || 1,
+				rotation: (assemblingImg.img_assembling.transforms as Transforms).rotation || 0
+			}
 			const zIndex = transforms.zIndex;
 			const rotation = transforms.rotation || 0;
 			const scale = transforms.scale || 1;
@@ -92,14 +104,10 @@ export class AssemblingHandler extends BaseHandler {
 			const height = Math.round(scale * image.height);
 			const top = transforms.top;
 			const left = transforms.left;
-			let processedImage = await sharp(image.path.replace('atom://', ''), {
-				raw: {
-					width: image.width,
-					height: image.height,
-					channels: 4
-				},
-			})
+			const imgPath = image.fragment === '' ? path.join(assemblingImg.category.path, assemblingImg.img.path) : pathUtils.segmentationPath(image);
+			let processedImage = await sharp(imgPath)
 				.resize({ width: width, height: height })
+				.png()
 				.toBuffer();
 
 			const metaData1 = await sharp(processedImage).metadata();
@@ -161,7 +169,7 @@ export class AssemblingHandler extends BaseHandler {
 				background: { r: 255, g: 255, b: 255, alpha: 1 }
 			}})
 			.composite(composites)
-			.toFile(payload.outputFile);
+			.toFile(outputFile);
 
 		await reply(Message.success({
 			percentage: 100,
@@ -226,12 +234,7 @@ export class AssemblingHandler extends BaseHandler {
 	}
 
 	private async getAssemblingImages(request: GetAssemblingRequest): Promise<AssemblingImage[]> {
-		const database = dbService.getConnection(request.projectPath);
-		return database.select()
-			.from(imgAssemblingTbl)
-			.leftJoin(imgTbl, eq(imgAssemblingTbl.imgId, imgTbl.id))
-			.leftJoin(categoryTbl, eq(imgTbl.categoryId, categoryTbl.id))
-			.where(eq(imgAssemblingTbl.assemblingId, request.assemblingId))
+		return assemblingService.getAssemblingImages(request.projectPath, request.assemblingId)
 			.then(items => items.map((x) => ({
 				img: imageService.resolveImg(x.category, x.img),
 				transforms: {

@@ -40,9 +40,9 @@ import { configService } from '../services/config.service';
 import { Config } from '../entities/user-config-tbl';
 import { categoryTbl, DefaultCategory } from '../entities/category';
 import { ImgStatus, imgTbl } from '../entities/img';
-import path from 'node:path';
 import { matchingService } from '../services/matching.service';
 import { JMatrix } from 'cmatrix';
+import { imageService } from '../services/image.service';
 
 export class MatchingHandler extends BaseHandler {
 	constructor() {
@@ -100,7 +100,7 @@ export class MatchingHandler extends BaseHandler {
 				name: x['matching-record'].name,
 				img: {
 					id: x.img.id,
-					path: "atom://" + path.join(request.projectPath, x.img.thumbnail),
+					path: imageService.resolveThumbnail(x.category, x.img),
 					width: x.img.width,
 					height: x.img.height
 				},
@@ -164,6 +164,7 @@ export class MatchingHandler extends BaseHandler {
 			.innerJoin(matchingRecordTbl, eq(matchingRecordScoreTbl.targetId, matchingRecordTbl.id))
 			.innerJoin(matchingImgRecordTbl, eq(matchingImgRecordTbl.matchingRecordId, matchingRecordTbl.id))
 			.innerJoin(imgTbl, eq(matchingImgRecordTbl.imgId, imgTbl.id))
+			.innerJoin(categoryTbl, eq(imgTbl.categoryId, categoryTbl.id))
 			.orderBy(matchingRecordScoreTbl.rank)
 			.limit(request.perPage)
 			.offset(request.page * request.perPage);
@@ -171,12 +172,9 @@ export class MatchingHandler extends BaseHandler {
 
 		return images.then(items => ({
 			thumbnails: items.map(x => ({
-				imgId: x.img.id, path: "atom://" + path.join(request.projectPath, x.img.thumbnail),
-				imgName: x.img.name,
+				...imageService.resolveImg(x.category, x.img),
 				score: x['matching-record-score'].score,
 				rank: x['matching-record-score'].rank,
-				orgImgWidth: x.img.width,
-				orgImgHeight: x.img.height
 			}))
 		}));
 	}

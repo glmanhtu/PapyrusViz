@@ -40,5 +40,5 @@
 			 [style.transform]="'rotate(' + transforms.rotation + 'deg)'"
 			 [alt]="image.name"
 			 [title]="image.name"
-			 [src]="image.path">
+			 [src]="image.fragment !== '' ? image.fragment : image.path">
 </div>

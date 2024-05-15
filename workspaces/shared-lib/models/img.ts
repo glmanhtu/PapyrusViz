@@ -15,6 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+
 export type ThumbnailRequest = {
 	projectPath: string,
 	filter: string,
@@ -29,25 +30,32 @@ export type ImageRequest = {
 	imgId: number
 }
 
-export type Thumbnail = {
-	imgId: number,
-	path: string,
-	imgName: string,
-	score?: number,
-	rank?: number,
-	orgImgWidth: number,
-	orgImgHeight: number
-}
-
 export type ThumbnailResponse = {
-	thumbnails: Thumbnail[]
+	thumbnails: ImgDto[]
 }
 
 export type ImgDto = {
 	id: number,
 	name: string,
 	path: string,
+	fragment: string,
+	thumbnail: string,
 	width: number,
 	height: number,
-	categoryId: number
+	categoryId: number,
+	score?: number,
+	rank?: number,
+	segmentationPoints: SegmentationPoint[]
+}
+
+export type SegmentationPoint = {
+	x: number,
+	y: number,
+	type: number
+}
+
+export type ImgSegmentationRequest = {
+	imgId: number,
+	projectPath: string,
+	points: SegmentationPoint[]
 }

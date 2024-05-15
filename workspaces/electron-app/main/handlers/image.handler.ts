@@ -22,7 +22,11 @@ import { categoryTbl, DefaultCategory } from '../entities/category';
 import { takeUniqueOrThrow } from '../utils/data.utils';
 import path from 'node:path';
 import { dbService } from '../services/database.service';
-import { ImageRequest, ThumbnailRequest, ThumbnailResponse } from 'shared-lib';
+import { ImageRequest, ImgDto, ImgSegmentationRequest, ThumbnailRequest, ThumbnailResponse } from 'shared-lib';
+import { imageService } from '../services/image.service';
+import { promises as fs } from 'fs';
+import * as pathUtils from '../utils/path.utils';
+
 
 
 export class ImageHandler extends BaseHandler {
@@ -31,17 +35,90 @@ export class ImageHandler extends BaseHandler {
 		this.addRoute('image:get-thumbnails', this.getImages.bind(this));
 		this.addRoute('image:archive', this.archiveImage.bind(this));
 		this.addRoute('image:unarchive', this.unarchiveImage.bind(this));
+		this.addRoute('image:get-image', this.getImage.bind(this));
+		this.addRoute('image:register-image-segmentation', this.registerImageSegmentation.bind(this));
+		this.addRoute('image:detect-papyrus', this.detectPapyrus.bind(this));
+		this.addRoute('image:segment-papyrus', this.segmentPapyrus.bind(this));
 	}
-
 
 	private async archiveImage(request: ImageRequest): Promise<void> {
 		const database = dbService.getConnection(request.projectPath);
 		await database.update(imgTbl).set({status: ImgStatus.ARCHIVED}).where(eq(imgTbl.id, request.imgId));
 	}
 
+	private async registerImageSegmentation(request: ImgSegmentationRequest): Promise<void> {
+		const database = dbService.getConnection(request.projectPath);
+		const imData = await database.select()
+			.from(imgTbl)
+			.innerJoin(categoryTbl, eq(imgTbl.categoryId, categoryTbl.id))
+			.where(eq(imgTbl.id, request.imgId))
+			.then(takeUniqueOrThrow);
+		if (await imageService.getEmbedding(imData.img.id) === undefined) {
+			await imageService.registerImageFeatures(imData.img, imData.category);
+		}
+	}
+
+	private async segmentPapyrus(request: ImgSegmentationRequest): Promise<ImgDto> {
+		const database = dbService.getConnection(request.projectPath);
+		const imData = await database.select()
+			.from(imgTbl)
+			.innerJoin(categoryTbl, eq(imgTbl.categoryId, categoryTbl.id))
+			.where(eq(imgTbl.id, request.imgId))
+			.then(takeUniqueOrThrow);
+
+		if (request.points.length === 0) {
+			const img = await imageService.metadata(imageService.resolveImgPath(imData.category, imData.img));
+			const segmentationPath = pathUtils.segmentationPath(imData.img);
+			if (pathUtils.exists(segmentationPath)) {
+				pathUtils.deleteFile(segmentationPath)
+			}
+			await database.update(imgTbl).set({
+				fragment: '',
+				width: img.width,
+				height: img.height,
+				segmentationPoints: request.points,
+			}).where(eq(imgTbl.id, imData.img.id));
+		} else {
+			const embeddings = await imageService.getEmbedding(request.imgId);
+			const result = await imageService.detectMask(embeddings, request.points);
+			const segmentation_path = pathUtils.segmentationPath(imData.img);
+			await fs.mkdir(path.dirname(segmentation_path), {recursive: true})
+			const segmentedImgInfo = await imageService.segmentImage(segmentation_path, result, imData.img, imData.category);
+			await database.update(imgTbl).set({
+				fragment: imData.img.path,
+				width: segmentedImgInfo.width,
+				height: segmentedImgInfo.height,
+				segmentationPoints: request.points,
+			}).where(eq(imgTbl.id, imData.img.id));
+			await imageService.generateThumbnail(segmentation_path)
+		}
+
+		const img = await database.select()
+			.from(imgTbl)
+			.where(eq(imgTbl.id, imData.img.id))
+			.then(takeUniqueOrThrow);
+		return imageService.resolveImg(imData.category, img)
+	}
+
+	private async detectPapyrus(request: ImgSegmentationRequest): Promise<string> {
+		const embeddings = await imageService.getEmbedding(request.imgId);
+		const result = await imageService.detectMask(embeddings, request.points);
+		return imageService.tensorToBase64Img(result, embeddings.width, embeddings.height);
+	}
+
 	private async unarchiveImage(request: ImageRequest): Promise<void> {
 		const database = dbService.getConnection(request.projectPath);
 		await database.update(imgTbl).set({status: ImgStatus.ONLINE}).where(eq(imgTbl.id, request.imgId));
+	}
+
+	private async getImage(request: ImageRequest): Promise<ImgDto> {
+		const database = dbService.getConnection(request.projectPath);
+		return database.select()
+			.from(imgTbl)
+			.innerJoin(categoryTbl, eq(imgTbl.categoryId, categoryTbl.id))
+			.where(eq(imgTbl.id, request.imgId))
+			.then(takeUniqueOrThrow)
+			.then(x => imageService.resolveImg(x.category, x.img));
 	}
 
 	private async getImages(request: ThumbnailRequest): Promise<ThumbnailResponse> {
@@ -61,15 +138,13 @@ export class ImageHandler extends BaseHandler {
 					? eq(imgTbl.status, ImgStatus.ARCHIVED)
 					: eq(imgTbl.status, ImgStatus.ONLINE)
 			))
+			.innerJoin(categoryTbl, eq(imgTbl.categoryId, categoryTbl.id))
 			.orderBy(imgTbl.name)
 			.limit(request.perPage)
 			.offset(request.page * request.perPage);
 
 		return images.then(items => ({
-			thumbnails: items.map(x => ({
-				imgId: x.id, path: "atom://" + path.join(request.projectPath, x.thumbnail), imgName: x.name,
-				orgImgWidth: x.width, orgImgHeight: x.height
-			}))
+			thumbnails: items.map(x => imageService.resolveImg(x.category, x.img))
 		}));
 	}
 }

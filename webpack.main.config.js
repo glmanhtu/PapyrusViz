@@ -19,6 +19,9 @@ const path = require('path');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const relocateLoader = require('@vercel/webpack-asset-relocator-loader');
 
+const arch = process.arch;
+const platform = process.platform;
+
 module.exports = {
 	/**
 	 * This is the main entry point for your application, it's the first file
@@ -30,7 +33,8 @@ module.exports = {
 		rules: require('./webpack.rules'),
 	},
 	externals: {
-		'sharp': 'commonjs sharp'
+		'sharp': 'commonjs sharp',
+		'onnxruntime-node': 'commonjs onnxruntime-node'
 	},
 	resolve: {
 		extensions: ['.js', '.ts', '.jsx', '.tsx', '.css', '.json'],
@@ -48,7 +52,7 @@ module.exports = {
 					from: 'workspaces/angular-app/.dist/angular-app',
 					to: '../renderer/angular_window',
 					noErrorOnMissing: true,
-				},
+				}
 			],
 		}),
 		{

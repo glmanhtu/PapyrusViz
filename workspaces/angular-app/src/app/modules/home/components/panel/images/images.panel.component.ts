@@ -18,9 +18,8 @@
 import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import {
   AssemblingImage,
-  CategoryDTO, ContextAction, ImageRequest,
+  CategoryDTO, ContextAction, ImageRequest, ImgDto,
   ProjectDTO,
-  Thumbnail,
   ThumbnailRequest,
   ThumbnailResponse,
 } from 'shared-lib';
@@ -43,15 +42,15 @@ export class ImagesPanelComponent implements OnInit, AfterViewInit {
   categories: CategoryDTO[] = [];
 
   @Output()
-  openImage = new EventEmitter<Thumbnail>();
+  openImage = new EventEmitter<ImgDto>();
 
   @Output()
-  queryImage = new EventEmitter<Thumbnail>();
+  queryImage = new EventEmitter<ImgDto>();
 
   category = new FormControl(1);
   filter = new FormControl('');
   currentPage = 0;
-  thumbnails: Thumbnail[] = [];
+  thumbnails: ImgDto[] = [];
   isLoading: boolean = false; // is a boolean flag to track whether new items are being loaded.
   isCompleted = false;  // a boolean flag to check whether all items are loaded.
 
@@ -62,6 +61,12 @@ export class ImagesPanelComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
   }
 
+  handleImageChange(imgDto: ImgDto) {
+    const idx = this.thumbnails.findIndex(x => x.id === imgDto.id);
+    if (idx !== -1) {
+      this.thumbnails[idx] = imgDto;
+    }
+  }
 
   ngAfterViewInit() {
     this.getThumbnails();
@@ -102,10 +107,10 @@ export class ImagesPanelComponent implements OnInit, AfterViewInit {
     })
   }
 
-  contextMenu(thumbnail: Thumbnail, idx: number) {
+  contextMenu(thumbnail: ImgDto, idx: number) {
     this.eIpc.send<ImageRequest, ContextAction<AssemblingImage>>('menu:context:get-thumbnail-context', {
       projectPath: this.projectDto!.path,
-      imgId: thumbnail.imgId
+      imgId: thumbnail.id
     }).then(x => {
       switch (x.name) {
         case 'similarity':
@@ -117,13 +122,13 @@ export class ImagesPanelComponent implements OnInit, AfterViewInit {
           break
 
         case 'archive':
-          this.eIpc.send<ImageRequest, void>('image:archive', { projectPath: this.projectDto!.path, imgId: thumbnail.imgId}).then(() => {
+          this.eIpc.send<ImageRequest, void>('image:archive', { projectPath: this.projectDto!.path, imgId: thumbnail.id}).then(() => {
             this.thumbnails.splice(idx, 1);
           })
           break;
 
         case 'unarchive':
-          this.eIpc.send<ImageRequest, void>('image:unarchive', { projectPath: this.projectDto!.path, imgId: thumbnail.imgId}).then(() => {
+          this.eIpc.send<ImageRequest, void>('image:unarchive', { projectPath: this.projectDto!.path, imgId: thumbnail.id}).then(() => {
             this.thumbnails.splice(idx, 1);
           })
           break;

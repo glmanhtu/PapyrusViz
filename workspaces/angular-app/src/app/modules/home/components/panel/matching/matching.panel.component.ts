@@ -15,12 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import {
   AssemblingImage,
-  CategoryDTO, ContextAction, ImageRequest,
+  CategoryDTO, ContextAction, ImageRequest, ImgDto,
   MatchingImgRequest,
-  ProjectDTO, Thumbnail,
+  ProjectDTO,
   ThumbnailResponse,
 } from 'shared-lib';
 import { NgbDropdown, NgbNav } from '@ng-bootstrap/ng-bootstrap';
@@ -35,7 +35,7 @@ import { MatchingButtonComponent } from '../../../../../shared/components/matchi
   templateUrl: './matching.panel.component.html',
   styleUrls: ['./matching.panel.component.scss'],
 })
-export class MatchingPanelComponent implements OnInit {
+export class MatchingPanelComponent implements OnInit, AfterViewInit {
 
   @Input()
   projectDto: ProjectDTO;
@@ -47,13 +47,13 @@ export class MatchingPanelComponent implements OnInit {
   similarityCreationComponent: SimilarityCreationComponent;
 
   @Output()
-  openImage = new EventEmitter<Thumbnail>();
+  openImage = new EventEmitter<ImgDto>();
 
   @Input()
   categories: CategoryDTO[] = [];
   category = new FormControl(1);
 
-  thumbnails: Thumbnail[] = [];
+  thumbnails: ImgDto[] = [];
 
   queryImgId: number | undefined = undefined;
 
@@ -66,7 +66,20 @@ export class MatchingPanelComponent implements OnInit {
     private eIpc: ElectronIpcService,
   ) {}
 
+  ngAfterViewInit(): void {
+    this.matchingComponent.matchingChanged.subscribe(() => {
+      this.getThumbnails();
+    });
+  }
+
   ngOnInit(): void {
+  }
+
+  handleImageChange(imgDto: ImgDto) {
+    const idx = this.thumbnails.findIndex(x => x.id === imgDto.id);
+    if (idx !== -1) {
+      this.thumbnails[idx] = imgDto;
+    }
   }
 
   findMatching(img: {id: number}) {
@@ -78,14 +91,14 @@ export class MatchingPanelComponent implements OnInit {
     this.getThumbnails(this.currentPage + 1, false);
   }
 
-  contextMenu(thumbnail: Thumbnail, idx: number) {
+  contextMenu(thumbnail: ImgDto, idx: number) {
     this.eIpc.send<ImageRequest, ContextAction<AssemblingImage>>('menu:context:get-thumbnail-context', {
       projectPath: this.projectDto!.path,
-      imgId: thumbnail.imgId
+      imgId: thumbnail.id
     }).then(x => {
       switch (x.name) {
         case 'similarity':
-          this.findMatching({id: thumbnail.imgId})
+          this.findMatching({id: thumbnail.id})
           break;
 
         case 'open':
@@ -93,13 +106,13 @@ export class MatchingPanelComponent implements OnInit {
           break
 
         case 'archive':
-          this.eIpc.send<ImageRequest, void>('image:archive', { projectPath: this.projectDto!.path, imgId: thumbnail.imgId}).then(() => {
+          this.eIpc.send<ImageRequest, void>('image:archive', { projectPath: this.projectDto!.path, imgId: thumbnail.id}).then(() => {
             this.thumbnails.splice(idx, 1);
           })
           break;
 
         case 'unarchive':
-          this.eIpc.send<ImageRequest, void>('image:unarchive', { projectPath: this.projectDto!.path, imgId: thumbnail.imgId}).then(() => {
+          this.eIpc.send<ImageRequest, void>('image:unarchive', { projectPath: this.projectDto!.path, imgId: thumbnail.id}).then(() => {
             this.thumbnails.splice(idx, 1);
           })
           break;

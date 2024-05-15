@@ -56,6 +56,11 @@ export class NavComponent implements OnInit {
     this.eIpc.send<string, void>('app:open-similarity', this.projectDto.path);
   }
 
+  resetView()  {
+    const currentBoard = this.mainComponent.getActivatedBoard();
+    currentBoard.resetView();
+  }
+
   exportImg() {
     const currentBoard = this.mainComponent.getActivatedBoard();
     const assembling = currentBoard.assembling;

@@ -7,6 +7,7 @@ import { ProgressComponent } from '../shared/components/progress/progress.compon
 import { SimilarityCreationComponent } from '../shared/components/similarity/creation/similarity.creation.component';
 import { ProjectDTO } from 'shared-lib';
 import { ConfirmModalComponent } from '../shared/components/confirm-modal/confirm-modal.component';
+import { SegmentationComponent } from '../shared/components/segmentation/segmentation.component';
 
 @Injectable({
 	providedIn: 'root'
@@ -49,6 +50,15 @@ export class ModalService {
 			size: 'lg', centered: true, backdrop: 'static', keyboard: false
 		});
 		modalRef.componentInstance.projectDto = projectDto;
+		modalRef.componentInstance.modalRef = modalRef;
+		return modalRef;
+	}
+
+	imageSegmentation(projectDto: ProjectDTO, imageId: number) {
+		const modalRef = this.modalService.open(SegmentationComponent, {
+			size: 'xl', centered: true, backdrop: 'static', keyboard: false
+		});
+		modalRef.componentInstance.loadImage(imageId, projectDto);
 		modalRef.componentInstance.modalRef = modalRef;
 		return modalRef;
 	}

@@ -16,7 +16,7 @@
  */
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { Thumbnail } from 'shared-lib';
+import { ImgDto } from 'shared-lib';
 
 @Component({
   selector: 'app-thumbnail',
@@ -25,8 +25,8 @@ import { Thumbnail } from 'shared-lib';
 })
 export class ThumbnailComponent implements OnInit {
 
-  @Input() thumbnail: Thumbnail;
-  @Output() openImage = new EventEmitter<Thumbnail>();
+  @Input() thumbnail: ImgDto;
+  @Output() openImage = new EventEmitter<ImgDto>();
 
   ngOnInit(): void {
   }

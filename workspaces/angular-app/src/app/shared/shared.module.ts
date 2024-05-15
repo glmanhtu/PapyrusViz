@@ -27,6 +27,8 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { CommonModule } from '@angular/common';
 import { MatchingButtonComponent } from './components/matching-button/matching-button.component';
 import { PanZoomDirective } from './directives/pan-zoom.directive';
+import { SegmentationComponent } from './components/segmentation/segmentation.component';
+import { NoCommaPipe } from './directives/no-comma.directive';
 
 @NgModule({
 	declarations: [
@@ -37,7 +39,9 @@ import { PanZoomDirective } from './directives/pan-zoom.directive';
 		InfoModalComponent,
 		ConfirmModalComponent,
 		MatchingButtonComponent,
-		PanZoomDirective
+		PanZoomDirective,
+		NoCommaPipe,
+		SegmentationComponent
   ],
 	imports: [
 		ReactiveFormsModule,
@@ -52,7 +56,9 @@ import { PanZoomDirective } from './directives/pan-zoom.directive';
 		InfoModalComponent,
 		ConfirmModalComponent,
 		MatchingButtonComponent,
-		PanZoomDirective
+		PanZoomDirective,
+		NoCommaPipe,
+		SegmentationComponent
 	]
 })
 export class SharedModule {}

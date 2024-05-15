@@ -18,6 +18,7 @@
 import { sqliteTable, text, integer, index } from 'drizzle-orm/sqlite-core';
 import { categoryTbl } from './category';
 import { relations } from 'drizzle-orm';
+import { SegmentationPoint } from 'shared-lib';
 
 export enum ImgStatus {
   ONLINE = 1,
@@ -28,11 +29,12 @@ export const imgTbl = sqliteTable('img', {
     id: integer('id').primaryKey({autoIncrement: true}),
     name: text('name'),
     path: text('path'),     // relative path with respect to dirId
-    thumbnail: text('thumbnail'),
+    fragment: text('fragment').default(''), // Segmented fragment
     width: integer('width'),
     height: integer('height'),
     status: integer('status').default(ImgStatus.ONLINE),
     format: text('format'),
+    segmentationPoints: text('segmentation-points', { mode: 'json' }).default(JSON.stringify([])).$type<SegmentationPoint[]>(),
     categoryId: integer('dir_id').references(() => categoryTbl.id),
 }, (table) => {
   return {
