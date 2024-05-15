@@ -25,7 +25,8 @@
 	<div class="modal-body">
 		<div class="container mt-4">
 			<div class="d-flex justify-content-center">
-				<button type="button" class="btn btn-success btn-sm btn-create me-2" (click)="createProject()"><i
+				<input type="text" autofocus="autofocus" style="display:none" />
+				<button type="button" class="btn btn-papyrus btn-sm btn-create me-2" (click)="createProject()"><i
 					class="fas fa-plus-circle mr-2"></i> Create a New
 					Project</button>
 				<button type="button" (click)="selectProject()" class="btn btn-primary btn-sm btn-open me-2"><i class="fas fa-folder-open mr-2"></i>
@@ -44,7 +45,7 @@
 						<td colspan="2" class="proj-path">{{project.projPath}}</td>
 						<td>
 							<div class="text-right d-flex justify-content-end">
-								<button type="button" class="btn btn-outline-success btn-sm me-1 proj-open"
+								<button type="button" class="btn btn-outline-papyrus btn-sm me-1 proj-open"
 												(click)="openProject(project.projPath)">Open</button>
 								<button type="button" class="btn btn-outline-danger btn-sm proj-del" (click)="deleteProject(project)">X</button>
 							</div>
