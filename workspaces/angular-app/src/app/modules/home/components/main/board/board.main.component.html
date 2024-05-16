@@ -18,7 +18,8 @@
 <div #panZoom class="h-100 w-100 position-relative" appPanZoom [container]="boardContainer"
 		 (dragover)="onDragOver($event)" (drop)="onDrop($event)"
 		 [hasFrameSelected]="selectedFrames.size > 0" [globalTransform]="assembling.transforms" (changes)="onGlobalTransform($event)">
-	<div class="h-100 w-100" style="position: absolute" #boardContainer>
+	<div class="h-100 w-100" style="position: absolute;" #boardContainer>
+		<div class="frame-anchor" #frameAnchor></div>
 		<app-frame *ngFor="let img of assemblingImages; index as i"
 							 [globalTransform]="assembling.transforms"
 							 [transforms]="img.transforms" [image]="img.img"

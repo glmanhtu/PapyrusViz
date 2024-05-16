@@ -61,6 +61,7 @@ export class BoardMainComponent implements OnInit {
   @Output() queryImage = new EventEmitter<ImgDto>();
   @ViewChild("boardContainer") boardContainer: ElementRef<HTMLDivElement>;
   @ViewChild("panZoom") panZoom: ElementRef<HTMLDivElement>;
+  @ViewChild("frameAnchor") frameAnchor: ElementRef<HTMLDivElement>;
 
   @Output() segmentImage = new EventEmitter<ImgDto>();
 
@@ -87,20 +88,20 @@ export class BoardMainComponent implements OnInit {
     event.preventDefault();
     const data = event.dataTransfer!.getData('text/plain');
     const thumbnail: ImgDto = JSON.parse(data);
-    console.log(thumbnail);
 
     // Get the bounding rectangle of the boardContainer element
     const rect = this.panZoom.nativeElement.getBoundingClientRect();
+    const anchorRect = this.frameAnchor.nativeElement.getBoundingClientRect();
 
     // Calculate the drop position relative to the panZoom element
     let x = event.clientX - rect.left;
     let y = event.clientY - rect.top;
 
-    console.log(x, y);
-
     const containerTransforms = this.assembling.transforms;
-    x = x - containerTransforms.last.x / containerTransforms.scale
-    y = y - containerTransforms.last.y / containerTransforms.scale
+    const deltaX = anchorRect.x - rect.left
+    const deltaY = anchorRect.y - rect.top
+    x = (x - deltaX) / containerTransforms.scale
+    y = (y - deltaY) / containerTransforms.scale
 
     this.addImage(thumbnail, y, x);
   }
