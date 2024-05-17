@@ -77,9 +77,9 @@ export class Logger {
 			winston.format.printf((info) => {
 				let text = `${info.timestamp} ${info.level.toUpperCase()} [${info.service}]: ${info.message}`;
 				if (info.metadata) {
-					text = `${text} ${JSON.stringify(info.metadata)}`;
+					text = `${text} ${JSON.stringify(info.metadata, null, 2)}`;
 				}
-				return info.stack ? text + '\n' + info.stack : text;
+				return info.stack ? text + '\n' + JSON.stringify(info.stack, null, 2) : text;
 			}),
 		];
 

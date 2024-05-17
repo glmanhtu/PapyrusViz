@@ -61,7 +61,7 @@ export class App {
 					.then((response) => {
 						event.reply(`ipc-response:${requestId}`, Message.success(response));
 					}).catch((err) => {
-					Logger.error(err)
+					Logger.error('Error occurred', message, err, err.stack)
 					event.reply(`ipc-response:${requestId}`, Message.error(err.message));
 				});
 			} else {

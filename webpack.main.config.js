@@ -19,9 +19,6 @@ const path = require('path');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const relocateLoader = require('@vercel/webpack-asset-relocator-loader');
 
-const arch = process.arch;
-const platform = process.platform;
-
 module.exports = {
 	/**
 	 * This is the main entry point for your application, it's the first file
@@ -32,6 +29,7 @@ module.exports = {
 	module: {
 		rules: require('./webpack.rules'),
 	},
+	devtool: 'source-map',
 	externals: {
 		'sharp': 'commonjs sharp',
 		'onnxruntime-node': 'commonjs onnxruntime-node'

@@ -29,7 +29,11 @@ import { MenuHandler } from './handlers/menu.handler';
 import { MatchingHandler } from './handlers/matching.handler';
 import { AppHandler } from './handlers/app.handler';
 
+import sourceMapSupport from 'source-map-support'
+sourceMapSupport.install();
+
 declare const global: GlobalConfig;
+
 
 // Load config
 const currentEnvironment = process.env.X_NODE_ENV || process.env.NODE_ENV;

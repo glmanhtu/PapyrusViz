@@ -1,6 +1,7 @@
 const path = require('path');
 const fs = require('fs');
 
+
 module.exports = {
 	packagerConfig: {
 		name: "Papyviz",
@@ -69,6 +70,7 @@ module.exports = {
 		{
 			name: "@electron-forge/plugin-webpack",
 			config: {
+				packageSourceMaps: true,
 				mainConfig: "./webpack.main.config.js",
 				renderer: {
 					config: "./webpack.renderer.config.js",
