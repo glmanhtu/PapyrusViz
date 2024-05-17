@@ -46,6 +46,8 @@ $primary: #2e3142;
 
   --bs-dark-rgb: #{to-rgb($primary)};
   --bs-link-color: black;
+  --bs-form-valid-color: #{$papy-background-color};
+  --bs-form-valid-border-color: #{$papy-background-color};
 
   .btn-primary {
     --bs-btn-bg: #{$primary};
