@@ -25,7 +25,6 @@ import { AssemblingDTO, Transforms } from 'shared-lib';
 import { configService } from './config.service';
 import { projectService } from './project.service';
 import { assemblingTbl } from '../entities/assembling';
-import { imageService } from './image.service';
 import { categoryTbl } from '../entities/category';
 
 class AssemblingService {
@@ -69,8 +68,9 @@ class AssemblingService {
 
 	public async deleteAssembledImage(projectPath: string, assemblingId: number, imgId: number): Promise<void> {
 		const database = dbService.getConnection(projectPath);
-		await database.delete(imgAssemblingTbl)
-				.where(and(eq(imgAssemblingTbl.assemblingId, assemblingId), eq(imgAssemblingTbl.imgId, imgId)));
+		return database.delete(imgAssemblingTbl)
+				.where(and(eq(imgAssemblingTbl.assemblingId, assemblingId), eq(imgAssemblingTbl.imgId, imgId)))
+				.then(() => {});
   }
 
 	public async swapAssembledImage(projectPath: string, assemblingId: number, fromImg: Img, toImg: Img) {

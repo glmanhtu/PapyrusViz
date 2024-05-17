@@ -79,15 +79,21 @@ export class PanZoomDirective implements OnInit{
 		event.preventDefault();
 	  // Start panning
 	  this.last = { x: event.clientX, y: event.clientY };
+		let shoulUpdate = false;
 	  const mouseMoveListener = (moveEvent: MouseEvent) => {
 	    const dx = moveEvent.clientX - this.last.x;
 	    const dy = moveEvent.clientY - this.last.y;
+			if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+				shoulUpdate = true;
+			}
 	    this.last = { x: moveEvent.clientX, y: moveEvent.clientY };
 	    this.pan(dx, dy);
 	  };
 	  document.addEventListener('mousemove', mouseMoveListener);
 	  document.addEventListener('mouseup', () => {
-			this.changes.emit(this.globalTransform);
+			if (shoulUpdate) {
+				this.changes.emit(this.globalTransform);
+			}
 	    document.removeEventListener('mousemove', mouseMoveListener);
 	  }, { once: true });
 	}

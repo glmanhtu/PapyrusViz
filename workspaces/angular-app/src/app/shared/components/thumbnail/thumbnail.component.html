@@ -15,7 +15,7 @@
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<div class="row" (dblclick)="addImage()">
+<div class="row" (dblclick)="addImage()" draggable="true" (dragstart)="onDragStart($event)">
 	<figure class="figure">
 		<img [src]="thumbnail.thumbnail" class="figure-img img-fluid"
 				 [alt]="thumbnail.name"
