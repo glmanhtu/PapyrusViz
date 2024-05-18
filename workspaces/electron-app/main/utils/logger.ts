@@ -73,32 +73,37 @@ export class Logger {
 		const formats = [
 			winston.format.errors({stack: true}),
 			winston.format.timestamp({format: "YYYY-MM-DD HH:mm:ss.SSS"}),
-			winston.format.metadata({ fillExcept: ['message', 'level', 'timestamp', 'label', 'service'] }),
+			winston.format.metadata({ fillExcept: ['message', 'level', 'timestamp', 'label', 'service', 'stack'] }),
 			winston.format.printf((info) => {
 				let text = `${info.timestamp} ${info.level.toUpperCase()} [${info.service}]: ${info.message}`;
 				if (info.metadata) {
-					text = `${text} ${JSON.stringify(info.metadata, null, 2)}`;
+					for (const key in info.metadata) {
+						const obj = info.metadata[key];
+						if (obj.stack)  {
+							text = `${text} ${obj.stack}\n`;
+						} else {
+					 		text = `${text} ${JSON.stringify(obj, null, 2)} \n`;
+						}
+					}
 				}
-				return info.stack ? text + '\n' + JSON.stringify(info.stack, null, 2) : text;
+				return text;
 			}),
 		];
 
-		const transports: winston.transport[] = [
-			new winston.transports.File({
-				filename: this.getLogFilename(),
-				level: global.appConfig.mainLogLevel,
-			}),
-		]
+		const transports: winston.transport[] = [];
 
 		// If we're not in production then log also to the `console` with the format:
 		if (global.appConfig.configId === 'development') {
 			formats.push(winston.format.colorize());
 
-			transports.push(
-				new winston.transports.Console({
+			transports.push(new winston.transports.Console({
 					stderrLevels: ['error', 'warn'],
-				})
-			);
+			}));
+		} else if (global.appConfig.configId === 'production') {
+			transports.push(new winston.transports.File({
+				filename: this.getLogFilename(),
+				level: global.appConfig.mainLogLevel,
+			}));
 		}
 
 		this._logger = winston.createLogger({

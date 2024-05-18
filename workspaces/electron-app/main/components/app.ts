@@ -61,7 +61,7 @@ export class App {
 					.then((response) => {
 						event.reply(`ipc-response:${requestId}`, Message.success(response));
 					}).catch((err) => {
-					Logger.error('Error occurred', message, err, err.stack)
+					Logger.error('Error occurred, request: ', message, err)
 					event.reply(`ipc-response:${requestId}`, Message.error(err.message));
 				});
 			} else {
@@ -80,7 +80,7 @@ export class App {
 				}, event.sender.id).then(() => {
 					event.reply(`ipc-continuous-response:${requestId}`, Message.complete(''));
 				}).catch((err) => {
-					Logger.error(err)
+					Logger.error('Error occurred, request: ', message, err);
 					event.reply(`ipc-continuous-response:${requestId}`, Message.error(err.message));
 				});
 			} else {
