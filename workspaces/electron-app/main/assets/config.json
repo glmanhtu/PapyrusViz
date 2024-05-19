@@ -1,7 +1,7 @@
 {
 	"development": {
 		"configId": "development",
-		"mainLogFile": "dist/dev-main.log",
+		"mainLogFile": "dev-main.log",
 		"mainLogLevel": "debug",
 		"isIconAvailable": true,
 		"isNodeIntegration": false,
@@ -13,7 +13,7 @@
 	},
 	"e2e-test": {
 		"configId": "e2e-test",
-		"mainLogFile": "dist/e2e-main.log",
+		"mainLogFile": "e2e-main.log",
 		"mainLogLevel": "error",
 		"isSandbox": true,
 		"isOpenDevTools": false

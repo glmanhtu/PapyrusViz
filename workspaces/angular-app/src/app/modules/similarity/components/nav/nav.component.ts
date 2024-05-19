@@ -34,7 +34,6 @@ export class NavComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log('NavComponent INIT');
   }
 
   exportImg() {

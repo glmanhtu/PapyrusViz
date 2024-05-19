@@ -98,7 +98,7 @@ export class App {
 			App._windows.delete(clientId);
 			App._tasks.delete(clientId);
 		})
-		console.log(`Windows ${clientId} is created!`)
+		Logger.info(`Windows ${clientId} is created!`)
 		return clientId
 	}
 

@@ -27,6 +27,7 @@ import * as ort from 'onnxruntime-node';
 import * as pathUtils from '../utils/path.utils';
 import { EmbeddingInfo } from '../models/utils';
 import { promises as fs } from 'fs';
+import { Logger } from '../utils/logger';
 
 declare const global: GlobalConfig;
 
@@ -56,11 +57,11 @@ class ImageService {
 		const options = { intraOpNumThreads: 1, enableCpuMemArena: false };
 		ort.InferenceSession.create(pathUtils.fromResource('ml-models', 'mobile_sam_preprocess.onnx'), options).then((session: ort.InferenceSession) => {
 			this.featureExtractor = session;
-			console.log("Mobile SAM preprocessor loaded");
+			Logger.info("Mobile SAM preprocessor loaded");
 		});
 		ort.InferenceSession.create(pathUtils.fromResource('ml-models', 'mobile_sam.onnx'), options).then((session: ort.InferenceSession) => {
 			this.maskDetector = session;
-			console.log("Mobile SAM loaded");
+			Logger.info("Mobile SAM loaded");
 		});
 	}
 

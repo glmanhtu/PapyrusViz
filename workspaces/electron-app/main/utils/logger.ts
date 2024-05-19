@@ -20,6 +20,8 @@ import * as os from 'node:os';
 import * as path from 'node:path';
 import * as winston from 'winston';
 import { GlobalConfig } from 'shared-lib';
+import * as pathUtils from '../utils/path.utils';
+
 
 declare const global: GlobalConfig;
 
@@ -91,6 +93,10 @@ export class Logger {
 		];
 
 		const transports: winston.transport[] = [];
+		transports.push(new winston.transports.File({
+			filename: this.getLogFilename(),
+			level: global.appConfig.mainLogLevel,
+		}));
 
 		// If we're not in production then log also to the `console` with the format:
 		if (global.appConfig.configId === 'development') {
@@ -98,11 +104,6 @@ export class Logger {
 
 			transports.push(new winston.transports.Console({
 					stderrLevels: ['error', 'warn'],
-			}));
-		} else if (global.appConfig.configId === 'production') {
-			transports.push(new winston.transports.File({
-				filename: this.getLogFilename(),
-				level: global.appConfig.mainLogLevel,
 			}));
 		}
 
@@ -130,8 +131,9 @@ export class Logger {
 			} else if (process.platform == 'win32') {
 				filename = `AppData\\Roaming\\${appName}\\${filename}`;
 			}
+			return path.join(os.homedir(), filename);
 		}
-		return path.join(os.homedir(), filename);
+		return pathUtils.fromRoot('logs', filename);
 	}
 
 }
