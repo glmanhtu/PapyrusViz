@@ -141,6 +141,15 @@ export class BoardMainComponent implements OnInit {
           item.showController = true;
           this.selectedFrames.set(item.image.id, item);
         });
+        break;
+
+      case "main:menu:view-logs":
+        this.modalService.viewLogs();
+        break;
+
+      case "main:menu:about":
+        this.modalService.about();
+        break;
     }
   }
 

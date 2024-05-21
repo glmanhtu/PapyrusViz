@@ -19,20 +19,10 @@ import * as fs from 'fs';
 import _ from 'lodash';
 import * as path from 'node:path';
 import { GlobalConfig } from 'shared-lib';
-import { App } from './components/app';
-import { DialogHandler } from './handlers/dialog.handler';
-import { ProjectHandler } from './handlers/project.handler';
-import { CategoryHandler } from './handlers/category.handler';
-import { ImageHandler } from './handlers/image.handler';
-import { AssemblingHandler } from './handlers/assembling.handler';
-import { MenuHandler } from './handlers/menu.handler';
-import { MatchingHandler } from './handlers/matching.handler';
-import { AppHandler } from './handlers/app.handler';
-
-import sourceMapSupport from 'source-map-support'
-sourceMapSupport.install();
 
 declare const global: GlobalConfig;
+import sourceMapSupport from 'source-map-support'
+sourceMapSupport.install();
 
 
 // Load config
@@ -44,6 +34,16 @@ global.appConfig =
 	currentEnvironment === 'development'
 		? defaultConfig
 		: _.merge(defaultConfig, currentConfig);
+
+import { App } from './components/app';
+import { DialogHandler } from './handlers/dialog.handler';
+import { ProjectHandler } from './handlers/project.handler';
+import { CategoryHandler } from './handlers/category.handler';
+import { ImageHandler } from './handlers/image.handler';
+import { AssemblingHandler } from './handlers/assembling.handler';
+import { MenuHandler } from './handlers/menu.handler';
+import { MatchingHandler } from './handlers/matching.handler';
+import { AppHandler } from './handlers/app.handler';
 
 
 const handlers = [

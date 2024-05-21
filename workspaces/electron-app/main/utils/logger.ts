@@ -26,6 +26,27 @@ import * as pathUtils from '../utils/path.utils';
 declare const global: GlobalConfig;
 
 
+/**
+ * Returns log filename with standard path
+ * In production, returns absolute standard path depending on platform
+ */
+function getLogFilename() {
+	let filename = global.appConfig.mainLogFile;
+	if (global.appConfig.configId === 'production') {
+		const appName = app.getName();
+		const appVersion = app.getVersion();
+		if (process.platform == 'linux') {
+			filename = `.config/${appName}/${appVersion}/${filename}`;
+		} else if (process.platform == 'darwin') {
+			filename = `Library/Logs/${appName}/${appVersion}/${filename}`;
+		} else if (process.platform == 'win32') {
+			filename = `AppData\\Roaming\\${appName}\\${appVersion}\\${filename}`;
+		}
+		return path.join(os.homedir(), filename);
+	}
+	return pathUtils.fromRoot('logs', filename);
+}
+
 export class Logger {
 	private static singleton: Logger;
 	private _logger: winston.Logger;
@@ -65,6 +86,10 @@ export class Logger {
 		Logger.singleton._logger.silly(message, meta);
 	}
 
+	public static getLogFile(): string {
+		return getLogFilename();
+	}
+
 	private static initSingleton(): void {
 		if (!Logger.singleton) {
 			Logger.singleton = new Logger();
@@ -94,7 +119,7 @@ export class Logger {
 
 		const transports: winston.transport[] = [];
 		transports.push(new winston.transports.File({
-			filename: this.getLogFilename(),
+			filename: getLogFilename(),
 			level: global.appConfig.mainLogLevel,
 		}));
 
@@ -115,25 +140,4 @@ export class Logger {
 		});
 
 	}
-
-	/**
-	 * Returns log filename with standard path
-	 * In production, returns absolute standard path depending on platform
-	 */
-	private getLogFilename() {
-		let filename = global.appConfig.mainLogFile;
-		if (global.appConfig.configId === 'production') {
-			const appName = app.getName();
-			if (process.platform == 'linux') {
-				filename = `.config/${appName}/${filename}`;
-			} else if (process.platform == 'darwin') {
-				filename = `Library/Logs/${appName}/${filename}`;
-			} else if (process.platform == 'win32') {
-				filename = `AppData\\Roaming\\${appName}\\${filename}`;
-			}
-			return path.join(os.homedir(), filename);
-		}
-		return pathUtils.fromRoot('logs', filename);
-	}
-
 }

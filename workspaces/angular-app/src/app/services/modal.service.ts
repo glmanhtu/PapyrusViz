@@ -5,20 +5,32 @@ import { ProjectManagementComponent } from '../modules/home/components/project/m
 import { ProjectCreationComponent } from '../modules/home/components/project/creation/project.creation.component';
 import { ProgressComponent } from '../shared/components/progress/progress.component';
 import { SimilarityCreationComponent } from '../shared/components/similarity/creation/similarity.creation.component';
-import { ProjectDTO } from 'shared-lib';
+import { AppInfo, ProjectDTO } from 'shared-lib';
 import { ConfirmModalComponent } from '../shared/components/confirm-modal/confirm-modal.component';
 import { SegmentationComponent } from '../shared/components/segmentation/segmentation.component';
+import { ViewLogsComponent } from '../shared/components/view-logs/view-logs.component';
+import { ElectronIpcService } from './electron-ipc.service';
+import { AboutModalComponent } from '../shared/components/about-modal/about-modal.component';
 
 @Injectable({
 	providedIn: 'root'
 })
 export class ModalService {
 
-	constructor(private modalService: NgbModal) { }
+	constructor(private modalService: NgbModal, private electronIpc: ElectronIpcService) { }
 
 	info(message: string) {
 		const modalRef = this.modalService.open(InfoModalComponent);
 		modalRef.componentInstance.message = message; // Assuming your InfoModalComponent has a 'message' property
+	}
+
+	about() {
+		const modalRef = this.modalService.open(AboutModalComponent, {
+			size: 'sm', centered: true
+		});
+		this.electronIpc.send<void, AppInfo>('app:info', undefined).then((result) => {
+			modalRef.componentInstance.appInfo = result;
+		});
 	}
 
 	warning(title: string, headline: string, description: string) {
@@ -73,5 +85,13 @@ export class ModalService {
 			modalRef.close();
 		})
 		return modalRef.componentInstance;
+	}
+
+	viewLogs() {
+		const modalRef = this.modalService.open(ViewLogsComponent, {
+			size: 'xl', centered: true, backdrop: 'static', keyboard: false
+		});
+		modalRef.componentInstance.modalRef = modalRef;
+		return modalRef;
 	}
 }

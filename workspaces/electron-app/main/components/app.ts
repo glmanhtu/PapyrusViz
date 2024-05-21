@@ -54,7 +54,7 @@ export class App {
 		const combinedRouteMap = this.combineRoutes(...handlers);
 		ipcMain.on('ipc-request',  async (event, message: { type: string; payload: unknown; requestId: string }) => {
 			const { type, payload, requestId } = message;
-			Logger.info('Message received: ', message)
+			Logger.debug('Message received: ', message)
 			const handlerFunction = combinedRouteMap.get(type);
 			if (handlerFunction) {
 				handlerFunction(payload, event.sender.id)
@@ -74,6 +74,7 @@ export class App {
 		ipcMain.on('ipc-continuous-request', async (event,  message: { type: string; payload: unknown; requestId: string }) => {
 			const { type, payload, requestId } = message;
 			const handlerFunction = combinedContinuousMap.get(type);
+			Logger.debug('Continuous message received: ', message)
 			if (handlerFunction) {
 				handlerFunction(payload, async (message) => {
 					event.reply(`ipc-continuous-response:${requestId}`, message);

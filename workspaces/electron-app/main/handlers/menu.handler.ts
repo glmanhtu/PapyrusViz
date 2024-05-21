@@ -73,8 +73,6 @@ export class MenuHandler extends BaseHandler {
 		const template: MenuItemConstructorOptions[] = isMac ? [{
 			label: app.name,
 			submenu: [
-				{ role: 'about' },
-				{ type: 'separator' },
 				{ role: 'services' },
 				{ type: 'separator' },
 				{ role: 'hide' },
@@ -133,6 +131,19 @@ export class MenuHandler extends BaseHandler {
 					{ role: 'togglefullscreen' }
 				]
 			},
+			{
+				label: 'Help',
+				submenu: [
+					{
+						label: 'View logs',
+						click: () => { this.sendHotKeyCommandToRenderer('main:menu:view-logs') }
+					},
+					{
+						label: 'About',
+						click: () => { this.sendHotKeyCommandToRenderer('main:menu:about') }
+					}
+				]
+			}
 		];
 		template.push(...menu)
 		Menu.setApplicationMenu(Menu.buildFromTemplate(template));

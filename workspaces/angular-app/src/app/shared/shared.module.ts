@@ -29,6 +29,8 @@ import { MatchingButtonComponent } from './components/matching-button/matching-b
 import { PanZoomDirective } from './directives/pan-zoom.directive';
 import { SegmentationComponent } from './components/segmentation/segmentation.component';
 import { NoCommaPipe } from './directives/no-comma.directive';
+import { ViewLogsComponent } from './components/view-logs/view-logs.component';
+import { AboutModalComponent } from './components/about-modal/about-modal.component';
 
 @NgModule({
 	declarations: [
@@ -41,7 +43,9 @@ import { NoCommaPipe } from './directives/no-comma.directive';
 		MatchingButtonComponent,
 		PanZoomDirective,
 		NoCommaPipe,
-		SegmentationComponent
+		SegmentationComponent,
+		ViewLogsComponent,
+		AboutModalComponent
   ],
 	imports: [
 		ReactiveFormsModule,
@@ -58,7 +62,9 @@ import { NoCommaPipe } from './directives/no-comma.directive';
 		MatchingButtonComponent,
 		PanZoomDirective,
 		NoCommaPipe,
-		SegmentationComponent
+		SegmentationComponent,
+		ViewLogsComponent,
+		AboutModalComponent
 	]
 })
 export class SharedModule {}

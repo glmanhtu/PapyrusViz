@@ -17,7 +17,11 @@
 
 import { BaseHandler } from "./base.handler";
 import { App } from '../components/app';
-import { WindowTask } from 'shared-lib';
+import { AppInfo, WindowTask } from 'shared-lib';
+import { Logger } from '../utils/logger';
+import { promises as fs } from 'fs';
+import { app } from 'electron';
+
 
 export class AppHandler extends BaseHandler {
 	constructor() {
@@ -25,11 +29,24 @@ export class AppHandler extends BaseHandler {
 		this.addRoute('app:quit', this.quit.bind(this));
 		this.addRoute('app:open-similarity', this.openSimilarityPage.bind(this));
 		this.addRoute('app:get-task', this.getTask.bind(this));
+		this.addRoute('app:get-logs', this.getLogs.bind(this));
+		this.addRoute('app:info', this.getAppInfo.bind(this));
 	}
 
 	private async quit(): Promise<void> {
 		for (const win of App.getWindows()) {
 			win.electronWindow.close();
+		}
+	}
+
+	private async getLogs(): Promise<string> {
+		const logFile = Logger.getLogFile();
+		return fs.readFile(logFile, 'utf-8');
+	}
+
+	private async getAppInfo(): Promise<AppInfo> {
+		return {
+			version: app.getVersion()
 		}
 	}
 
