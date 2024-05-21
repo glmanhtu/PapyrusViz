@@ -20,6 +20,7 @@ import * as path from 'node:path';
 import * as syncFs from 'fs';
 import { promises as fs } from 'fs';
 import { Img } from '../entities/img';
+import { Category } from '../entities/category';
 
 
 const currentEnvironment = process.env.X_NODE_ENV || process.env.NODE_ENV;
@@ -36,9 +37,19 @@ export function fromResource(...paths: string[]) {
     return fromRoot('resources', ...paths);
 }
 
+export function convertPath(currentPath: string, fromPlatform: string): string {
+    if (fromPlatform == 'win32') {
+        const components = currentPath.split(`\\`);
+        return components.join(path.sep);
+    } else {
+        const components = currentPath.split('/');
+        return components.join(path.sep);
+    }
+}
 
-export function segmentationPath(img: Img) {
-    const components = path.parse(img.path);
+
+export function segmentationPath(category: Category, img: Img) {
+    const components = path.parse(path.join(category.path, img.path));
     const thumbnailName = components.name + '.webp';
     const basePath = components.dir.replace(components.root, '');
     const segmentation_dir = fromAppData('segmentation', basePath);

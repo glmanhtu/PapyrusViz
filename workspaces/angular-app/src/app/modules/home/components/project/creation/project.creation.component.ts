@@ -37,6 +37,8 @@ export class ProjectCreationComponent implements OnInit {
   @ViewChild(ProgressComponent) progressComponent: ProgressComponent;
 
   private modalRef: NgbModalRef | null = null;
+  message = '';
+  isUpdate = false;
 
   projectForm = new FormGroup({
     name: new FormControl(''),
@@ -71,9 +73,12 @@ export class ProjectCreationComponent implements OnInit {
     this.modalService.projectManagement();
   }
 
-  folderSelection(event: MouseEvent, allowCreation=false): void {
+  folderSelection(event: MouseEvent, allowCreation=false, disable=false): void {
     event.preventDefault();
     event.stopPropagation();
+    if (disable) {
+      return;
+    }
     const formControlName = (event.target as Element).getAttribute('formControlName');
     this.electronIpc.send<FileDialogRequest, FileDialogResponse>(
       'dialogs:open-file-folder',
@@ -88,6 +93,19 @@ export class ProjectCreationComponent implements OnInit {
     this.electronIpc.send<string, ProjectDTO>('project:load-project', projectPath).then((project) => {
       this.projectBroadcastService.publish(project);
       this.modalRef!.close();
+    });
+  }
+
+  updateProject() {
+    const formValue = this.projectForm.value;
+    const projectRequest: ProjectDTO = {
+      name: formValue.name!,
+      path: formValue.path!,
+      dataPath: formValue.dataPath!
+    }
+    this.progressComponent.show();
+    this.electronIpc.sendAndListen<ProjectDTO, Progress>('project::reconfigure-project', projectRequest, (message) => {
+      this.progressComponent.onMessage(message);
     });
   }
 }

@@ -100,6 +100,9 @@ export class ProjectManagementComponent implements OnInit {
     }).catch((err) => {
       if (err.message === 'Project does not exists!' && retryWithMigrate) {
         this.migrateProject(projectPath);
+      } else if (err.message === 'Project data is invalid!') {
+        this.modalRef!.close();
+        this.modalService.projectReconfiguration(projectPath);
       }
     })
   }

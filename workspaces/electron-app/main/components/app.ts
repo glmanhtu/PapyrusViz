@@ -61,9 +61,11 @@ export class App {
 					.then((response) => {
 						event.reply(`ipc-response:${requestId}`, Message.success(response));
 					}).catch((err) => {
-					Logger.error('Error occurred, request: ', message, err)
-					event.reply(`ipc-response:${requestId}`, Message.error(err.message));
-				});
+						Logger.error('Error occurred, request: ', message, err)
+						event.reply(`ipc-response:${requestId}`, Message.error(err.message));
+					}).finally(() => {
+						event.reply(`ipc-response:${requestId}`, Message.complete(''));
+					});
 			} else {
 				event.reply(`ipc-response:${requestId}`, Message.error('Handler not found'));
 			}

@@ -69,7 +69,9 @@ class ImageService {
 		return {
 			...img,
 			path: pathUtils.replaceProtocol(url.pathToFileURL(path.join(category.path, img.path)).toString(), 'file://', 'atom://'),
-			fragment: img.fragment !== '' ? pathUtils.replaceProtocol(url.pathToFileURL(pathUtils.segmentationPath(img as Img)).toString(), 'file://', 'atom://') : '',
+			fragment: img.fragment !== ''
+				? pathUtils.replaceProtocol(url.pathToFileURL(pathUtils.segmentationPath(category, img as Img)).toString(), 'file://', 'atom://')
+				: '',
 			thumbnail: this.resolveThumbnail(category, img)
 		}
 	}
@@ -77,7 +79,7 @@ class ImageService {
 	public resolveThumbnail(category: Category, img: Img | ImgDto): string {
 		let imgPath = path.join(category.path, img.path)
 		if (img.fragment !== '') {
-			imgPath = pathUtils.segmentationPath(img as Img)
+			imgPath = pathUtils.segmentationPath(category, img as Img)
 		}
 		return pathUtils.replaceProtocol(url.pathToFileURL(this.resolveThumbnailFromImgPath(imgPath)).toString(), 'file://', 'atom://');
 	}
@@ -87,6 +89,51 @@ class ImageService {
 		const thumbnailName = components.name + '.jpg';
 		const basePath = components.dir.replace(components.root, '');
 		return pathUtils.fromAppData('thumbnails', basePath, thumbnailName);
+	}
+
+	public async updateThumbnail(img: Img, category: Category, newImgPath: string) {
+		const oldThumbnailPath = imageService.resolveThumbnailFromImgPath(path.join(category.path, img.path));
+		if (pathUtils.exists(oldThumbnailPath)) {
+			const newThumbnailPath = imageService.resolveThumbnailFromImgPath(newImgPath);
+			if (!pathUtils.exists(path.dirname(newThumbnailPath))) {
+				await fs.mkdir(path.dirname(newThumbnailPath), {recursive: true})
+			}
+			await fs.rename(oldThumbnailPath, newThumbnailPath)
+		} else {
+			await imageService.generateThumbnail(newImgPath);
+		}
+	}
+
+	public async updateSegmentedImg(img: Img, category: Category, oldSegmentationImg: string) {
+		if (img.fragment === '') {
+			return;
+		}
+		const segmentationPath = pathUtils.segmentationPath(category, img);
+		if (pathUtils.exists(oldSegmentationImg)) {
+			if (!pathUtils.exists(path.dirname(segmentationPath))) {
+				await fs.mkdir(path.dirname(segmentationPath), {recursive: true})
+			}
+			await fs.rename(oldSegmentationImg, segmentationPath);
+		} else {
+			await this.registerImageFeatures(img, category);
+			const embeddings = await this.getEmbedding(img.id);
+			const result = await this.detectMask(embeddings, img.segmentationPoints);
+			await fs.mkdir(path.dirname(segmentationPath), {recursive: true})
+			img.width = embeddings.width;
+			img.height = embeddings.height;
+			await this.segmentImage(segmentationPath, result, img, category);
+		}
+
+		const oldThumbnailPath = this.resolveThumbnailFromImgPath(oldSegmentationImg);
+		const thumbnailPath = this.resolveThumbnailFromImgPath(segmentationPath);
+		if (pathUtils.exists(oldThumbnailPath)) {
+			if (!pathUtils.exists(path.dirname(thumbnailPath))) {
+				await fs.mkdir(path.dirname(thumbnailPath), {recursive: true})
+			}
+			await fs.rename(oldThumbnailPath, thumbnailPath);
+		} else {
+			await imageService.generateThumbnail(segmentationPath)
+		}
 	}
 
 	public resolveImgPath(category: Category, img: Img | ImgDto): string {

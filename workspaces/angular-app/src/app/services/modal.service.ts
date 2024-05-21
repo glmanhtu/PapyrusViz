@@ -54,8 +54,20 @@ export class ModalService {
 			size: 'lg', centered: true, backdrop: 'static', keyboard: false
 		});
 		modalRef.componentInstance.modalRef = modalRef;
+		return modalRef;
 	}
 
+	projectReconfiguration(projectPath: string) {
+		const modalCreation = this.projectCreation();
+		modalCreation.componentInstance.message = 'It seems that some directories are mis-configured, please check again!';
+		modalCreation.componentInstance.title = 'Project Configuration';
+		modalCreation.componentInstance.isUpdate = true;
+		this.electronIpc.send<string, ProjectDTO>('project:project-info', projectPath).then((result) => {
+			modalCreation.componentInstance.projectForm.get('name').setValue(result.name);
+			modalCreation.componentInstance.projectForm.get('path').setValue(result.path);
+			modalCreation.componentInstance.projectForm.get('dataPath').setValue(result.dataPath);
+		});
+	}
 
 	similarityCreation(projectDto: ProjectDTO) {
 		const modalRef = this.modalService.open(SimilarityCreationComponent, {

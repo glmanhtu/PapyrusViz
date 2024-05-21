@@ -29,9 +29,9 @@ import { promises as fs } from 'fs';
 
 import { projectTbl } from '../entities/project';
 import path from 'node:path';
-import { categoryTbl, DefaultCategory } from '../entities/category';
+import { Category, categoryTbl, DefaultCategory } from '../entities/category';
 import { eq } from 'drizzle-orm';
-import { imgTbl } from '../entities/img';
+import { Img, imgTbl } from '../entities/img';
 import * as dataUtils from '../utils/data.utils';
 import { takeUniqueOrThrow } from '../utils/data.utils';
 import * as pathUtils from '../utils/path.utils';
@@ -43,6 +43,7 @@ import { projectService } from '../services/project.service';
 import { assemblingService } from '../services/assembling.service';
 import { imageService } from '../services/image.service';
 import { matchingService } from '../services/matching.service';
+import { Logger } from '../utils/logger';
 
 
 export class ProjectHandler extends BaseHandler {
@@ -50,9 +51,11 @@ export class ProjectHandler extends BaseHandler {
 		super();
 		this.addContinuousRoute('project::create-project', this.creteProject.bind(this));
 		this.addContinuousRoute('project::migrate-project', this.migrateOldProject.bind(this));
+		this.addContinuousRoute('project::reconfigure-project', this.reconfigureProject.bind(this))
 		this.addRoute('project:get-projects', this.getProjects.bind(this));
 		this.addRoute('project:delete-project', this.deleteProject.bind(this));
 		this.addRoute('project:load-project', this.loadProject.bind(this))
+		this.addRoute('project:project-info', this.getProjectInfo.bind(this))
 	}
 
 	private async getProjects(): Promise<ProjectInfo[]> {
@@ -200,6 +203,21 @@ export class ProjectHandler extends BaseHandler {
 		}
 	}
 
+	private async getProjectInfo(projectPath: string): Promise<ProjectDTO> {
+		if (!await projectService.projectExists(projectPath)) {
+			throw new Error('Project does not exists!');
+		}
+		const projectFile = pathUtils.projectFile(projectPath);
+		const database = dbService.createConnection(projectFile);
+
+		const projects = await database.select()
+			.from(projectTbl);
+
+		// We assume that there will be only one project in this table
+		const project = projects[0];
+		return project as ProjectDTO;
+	}
+
 	private async loadProject(projectPath: string): Promise<ProjectDTO> {
 		if (!await projectService.projectExists(projectPath)) {
 			throw new Error('Project does not exists!');
@@ -209,11 +227,8 @@ export class ProjectHandler extends BaseHandler {
 		dbService.migrateDatabase(database, path.join(__dirname, 'schema'));
 		dbService.addConnection(projectPath, database);
 
-		const projects = await database.select()
-			.from(projectTbl);
-
 		// We assume that there will be only one project in this table
-		const project = projects[0];
+		const project = await projectService.getProjectByPath(projectPath);
 		if (project.path !== projectPath) {
 			// This is likely the case when user import existing project
 			project.path = projectPath
@@ -227,7 +242,123 @@ export class ProjectHandler extends BaseHandler {
 		if (!await this.getProjects().then((ps) => ps.some(x => x.projPath === projectPath))) {
 			await this.addProjectToAppData({projName: project.name, projPath: project.path, datasetPath: project.dataPath});
 		}
+
+		if (! await projectService.projectDataValid(projectPath)) {
+			throw new Error('Project data is invalid!')	;
+		}
 		return project as ProjectDTO
+	}
+
+
+	private async reconfigureProject(payload: ProjectDTO, reply: (message: IMessage<string | Progress>) => Promise<void> ): Promise<void> {
+		const isDSPathExists = await pathUtils.isDir(payload.dataPath);
+		if (!isDSPathExists) {
+			throw new Error(`Dataset location: ${payload.dataPath} doesn't exists!`)
+		}
+
+		Logger.info('Trying to reconfigure project ', payload);
+
+		await reply(Message.success({
+			percentage: 0, title: 'Step 1/3 - Verifying project', description: ''
+		}));
+
+		const databaseFile = pathUtils.projectFile(payload.path)
+		const database = dbService.createConnection(databaseFile);
+		dbService.migrateDatabase(database, path.join(__dirname, 'schema'));
+		dbService.addConnection(payload.path, database)
+
+		await reply(Message.success({
+			percentage: 5, title: 'Step 2/3 - Collecting images', description: 'Scanning images in the provided dataset...'
+		}));
+
+		const project = await projectService.getProjectByPath(payload.path);
+
+		const imageMap = await pathUtils.getFilesRecursively(payload.dataPath);
+		const dirNameMap = new Map<string, string>();
+		for (const [rootDir, _] of imageMap) {
+			if (rootDir !== '') {
+				dirNameMap.set(path.basename(rootDir), rootDir);
+			}
+		}
+
+		const images = await database.select().from(imgTbl)
+			.innerJoin(categoryTbl, eq(imgTbl.categoryId, categoryTbl.id));
+
+		const updateImgInfo = async (img: Img, category: Category, newCategoryPath: string, newImgPath: string) => {
+			await imageService.updateThumbnail(img, category, newImgPath);
+			const oldSegmentationImg = pathUtils.segmentationPath(category, img);
+			img.path = newCategoryPath === '' ? newImgPath : path.relative(newCategoryPath, newImgPath);
+			category.path = newCategoryPath
+			await database.update(categoryTbl).set({path: newCategoryPath}).where(eq(categoryTbl.id, category.id));
+			await database.update(imgTbl).set({path: img.path}).where(eq(imgTbl.id, img.id));
+			await imageService.updateSegmentedImg(img, category, oldSegmentationImg);
+		}
+
+		const imgMatched = [];
+		const imgUnMatched = [];
+		let count = 0;
+		for (const imgInfo of images) {
+			if (imgInfo.category.path === '') {
+				const imgDisk = imageMap.get('');
+				if (imgDisk) {
+					const rootPath = path.dirname(imgDisk[0]);
+					const newImgPath = path.join(rootPath, path.basename(imgInfo.img.path));
+					if (pathUtils.exists(newImgPath)) {
+						await updateImgInfo(imgInfo.img, imgInfo.category, '', newImgPath);
+						imgMatched.push(imgInfo);
+					} else {
+						Logger.error("Unable to remap " + imgInfo.img.path + ', Ignoring...')
+						imgUnMatched.push(imgInfo);
+						await reply(Message.warning("Unable to remap " + imgInfo.img.path + ', Ignoring...'));
+					}
+				} else {
+					throw new Error('The chosen image dataset doesn\'t seems to match with the one in the project! ');
+				}
+			} else {
+				const rootName = path.basename(imgInfo.category.path);
+				const newPath = dirNameMap.get(rootName);
+				if (!newPath) {
+					throw new Error('The chosen image dataset doesn\'t seems to match with the one in the project! ');
+				}
+				const newImgPath = path.join(newPath, pathUtils.convertPath(imgInfo.img.path, project.os));
+				if (pathUtils.exists(newImgPath)) {
+					await updateImgInfo(imgInfo.img, imgInfo.category, newPath, newImgPath);
+					imgMatched.push(imgInfo);
+				} else {
+					Logger.error("Unable to remap " + imgInfo.img.path + ', Ignoring...')
+					imgUnMatched.push(imgInfo);
+					await reply(Message.warning("Unable to remap " + imgInfo.img.path + ', Ignoring...'));
+				}
+			}
+
+			if (imgUnMatched.length / images.length > 0.5) {
+				throw new Error('Too many error occurred. Stopping...');
+			}
+
+			const per = (count + 1) * 95 / images.length;
+			await reply(Message.success({
+				percentage: 5 + per, title: 'Step 3/3 - Update images...',
+				description: `Reconfigured ${imgMatched.length}/${images.length} images...`
+			}));
+			count += 1;
+		}
+
+		const appData = await dataUtils.readAppData();
+		let found = false;
+		for (let i = 0; i < appData.projects.length; i++) {
+			if (appData.projects[i].projPath === payload.path) {
+				appData.projects[i].datasetPath = payload.dataPath;
+				appData.projects[i].projName = payload.name;
+				found = true;
+				break;
+			}
+		}
+		if (!found) {
+			appData.projects.push({projName: payload.name, projPath: payload.path, datasetPath: payload.dataPath});
+		}
+
+		Logger.info('Project is reconfigured!');
+		await dataUtils.writeAppData(appData);
 	}
 
 	private async creteProject(payload: ProjectDTO, reply: (message: IMessage<string | Progress>) => Promise<void> ): Promise<void> {

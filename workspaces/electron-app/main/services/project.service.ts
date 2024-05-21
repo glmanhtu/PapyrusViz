@@ -20,6 +20,10 @@ import { Project, projectTbl } from '../entities/project';
 import { dbService } from './database.service';
 import { eq } from 'drizzle-orm';
 import { takeUniqueOrThrow } from '../utils/data.utils';
+import { imgTbl } from '../entities/img';
+import { categoryTbl } from '../entities/category';
+import path from 'node:path';
+import { imageService } from './image.service';
 
 class ProjectService {
 
@@ -28,8 +32,26 @@ class ProjectService {
 		return await pathUtils.isFile(projectFile);
 	}
 
+	public async projectDataValid(projectPath: string): Promise<boolean> {
+		const database = dbService.getConnection(projectPath);
+		const images = await database.select().from(imgTbl)
+			.innerJoin(categoryTbl, eq(imgTbl.categoryId, categoryTbl.id))
+			.orderBy(imgTbl.name)
+			.limit(10)
+		const imagePaths = images.map(x => path.join(x.category.path, x.img.path));
+
+		const checks = imagePaths.map(x => {
+			const thumbnail = imageService.resolveThumbnailFromImgPath(x);
+			return pathUtils.exists(x) && pathUtils.exists(thumbnail);
+		})
+
+		return checks.reduce((acc, val) => acc && val, true);
+	}
+
 	public async getProjectByPath(projectPath: string): Promise<Project> {
 		const database = dbService.getConnection(projectPath);
+
+		// We assume that there will be only one project in this table
 		return database.select()
 			.from(projectTbl).where(eq(projectTbl.path, projectPath)).then(takeUniqueOrThrow);
 	}

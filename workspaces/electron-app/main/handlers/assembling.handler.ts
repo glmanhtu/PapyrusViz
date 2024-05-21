@@ -104,7 +104,9 @@ export class AssemblingHandler extends BaseHandler {
 			const height = Math.round(scale * image.height);
 			const top = transforms.top;
 			const left = transforms.left;
-			const imgPath = image.fragment === '' ? path.join(assemblingImg.category.path, assemblingImg.img.path) : pathUtils.segmentationPath(image);
+			const imgPath = image.fragment === ''
+				? path.join(assemblingImg.category.path, assemblingImg.img.path)
+				: pathUtils.segmentationPath(assemblingImg.category, image);
 			let processedImage = await sharp(imgPath)
 				.resize({ width: width, height: height })
 				.png()

@@ -23,6 +23,7 @@ import { dbService } from '../services/database.service';
 import { eq } from 'drizzle-orm';
 import { takeUniqueOrThrow } from '../utils/data.utils';
 import path from 'node:path';
+import { categoryService } from '../services/category.service';
 
 export class CategoryHandler extends BaseHandler {
 	constructor() {
@@ -32,8 +33,7 @@ export class CategoryHandler extends BaseHandler {
 	}
 
 	private async getCategories(projectPath: string): Promise<CategoryDTO[]> {
-		const database = dbService.getConnection(projectPath);
-		return database.select().from(categoryTbl);
+		return categoryService.getCategories(projectPath)
 	}
 
 	private async getCategory(payload: CategoryRequest): Promise<CategoryDTO> {
