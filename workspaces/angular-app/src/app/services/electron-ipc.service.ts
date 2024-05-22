@@ -22,6 +22,8 @@ import { ExtrasChannels, IMessage, WindowApi } from 'shared-lib';
 	providedIn: 'root',
 })
 export class ElectronIpcService {
+
+	// See workspaces/electron-app/renderer/preload.ts for the implementation of WindowApi
 	private _api!: WindowApi;
 	private debounceTimeouts = new Map<string, number>();
 

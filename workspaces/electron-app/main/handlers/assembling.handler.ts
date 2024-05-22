@@ -207,7 +207,7 @@ export class AssemblingHandler extends BaseHandler {
 			.where(and(eq(imgAssemblingTbl.assemblingId, request.assemblingId), eq(imgAssemblingTbl.imgId, request.imageId)))
 			.then(takeUniqueOrThrow)
 			.then(x => ({
-				img: imageService.resolveImg(x.category, x.img),
+				img: imageService.resolveImgUri(x.category, x.img),
 				transforms: {
 					zIndex: (x.img_assembling.transforms as Transforms).zIndex || 1,
 					top: (x.img_assembling.transforms as Transforms).top || 10,
@@ -238,7 +238,7 @@ export class AssemblingHandler extends BaseHandler {
 	private async getAssemblingImages(request: GetAssemblingRequest): Promise<AssemblingImage[]> {
 		return assemblingService.getAssemblingImages(request.projectPath, request.assemblingId)
 			.then(items => items.map((x) => ({
-				img: imageService.resolveImg(x.category, x.img),
+				img: imageService.resolveImgUri(x.category, x.img),
 				transforms: {
 					zIndex: (x.img_assembling.transforms as Transforms).zIndex || 1,
 					top: (x.img_assembling.transforms as Transforms).top || 10,

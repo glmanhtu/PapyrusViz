@@ -65,18 +65,18 @@ class ImageService {
 		});
 	}
 
-	public resolveImg(category: Category, img: Img | ImgDto): ImgDto {
+	public resolveImgUri(category: Category, img: Img | ImgDto): ImgDto {
 		return {
 			...img,
 			path: pathUtils.replaceProtocol(url.pathToFileURL(path.join(category.path, img.path)).toString(), 'file://', 'atom://'),
 			fragment: img.fragment !== ''
 				? pathUtils.replaceProtocol(url.pathToFileURL(pathUtils.segmentationPath(category, img as Img)).toString(), 'file://', 'atom://')
 				: '',
-			thumbnail: this.resolveThumbnail(category, img)
+			thumbnail: this.resolveThumbnailUri(category, img)
 		}
 	}
 
-	public resolveThumbnail(category: Category, img: Img | ImgDto): string {
+	public resolveThumbnailUri(category: Category, img: Img | ImgDto): string {
 		let imgPath = path.join(category.path, img.path)
 		if (img.fragment !== '') {
 			imgPath = pathUtils.segmentationPath(category, img as Img)

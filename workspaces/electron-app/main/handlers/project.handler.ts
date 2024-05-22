@@ -111,7 +111,7 @@ export class ProjectHandler extends BaseHandler {
 
 		const categories = Array.from(categoryMap, ([name, value]) => ({ name, value }));
 		const sortedCategories = categories.sort(function(a, b) {
-			var x = a["name"]; var y = b["name"];
+			const x = a["name"]; const y = b["name"];
 			return ((x > y) ? -1 : ((x < y) ? 1 : 0));
 		})
 
@@ -240,6 +240,14 @@ export class ProjectHandler extends BaseHandler {
 
 		// We assume that there will be only one project in this table
 		const project = await projectService.getProjectByPath(projectPath);
+		if (!await this.getProjects().then((ps) => ps.some(x => x.projPath === projectPath))) {
+			await this.addProjectToAppData({projName: project.name, projPath: project.path, datasetPath: project.dataPath});
+		}
+
+		if (! await projectService.projectDataValid(projectPath)) {
+			throw new Error('Project data is invalid!')	;
+		}
+
 		if (project.path !== projectPath) {
 			// This is likely the case when user import existing project
 			project.path = projectPath
@@ -249,13 +257,6 @@ export class ProjectHandler extends BaseHandler {
 					path: projectPath
 				})
 				.where(eq(projectTbl.id, project.id));
-		}
-		if (!await this.getProjects().then((ps) => ps.some(x => x.projPath === projectPath))) {
-			await this.addProjectToAppData({projName: project.name, projPath: project.path, datasetPath: project.dataPath});
-		}
-
-		if (! await projectService.projectDataValid(projectPath)) {
-			throw new Error('Project data is invalid!')	;
 		}
 		return project as ProjectDTO
 	}
@@ -309,11 +310,12 @@ export class ProjectHandler extends BaseHandler {
 		const imgUnMatched = [];
 		let count = 0;
 		for (const imgInfo of images) {
+			const platformImgPath = pathUtils.convertPath(imgInfo.img.path, project.os);
 			if (imgInfo.category.path === '') {
 				const imgDisk = imageMap.get('');
 				if (imgDisk) {
 					const rootPath = path.dirname(imgDisk[0]);
-					const newImgPath = path.join(rootPath, path.basename(imgInfo.img.path));
+					const newImgPath = path.join(rootPath, path.basename(platformImgPath));
 					if (pathUtils.exists(newImgPath)) {
 						await updateImgInfo(imgInfo.img, imgInfo.category, '', newImgPath);
 						imgMatched.push(imgInfo);
@@ -326,12 +328,12 @@ export class ProjectHandler extends BaseHandler {
 					throw new Error('The chosen image dataset doesn\'t seems to match with the one in the project! ');
 				}
 			} else {
-				const rootName = path.basename(imgInfo.category.path);
+				const rootName = path.basename(pathUtils.convertPath(imgInfo.category.path, project.os));
 				const newPath = dirNameMap.get(rootName);
 				if (!newPath) {
 					throw new Error('The chosen image dataset doesn\'t seems to match with the one in the project! ');
 				}
-				const newImgPath = path.join(newPath, pathUtils.convertPath(imgInfo.img.path, project.os));
+				const newImgPath = path.join(newPath, platformImgPath);
 				if (pathUtils.exists(newImgPath)) {
 					await updateImgInfo(imgInfo.img, imgInfo.category, newPath, newImgPath);
 					imgMatched.push(imgInfo);
@@ -353,6 +355,8 @@ export class ProjectHandler extends BaseHandler {
 			}));
 			count += 1;
 		}
+
+		database.update(projectTbl).set({os: process.platform}).where(eq(projectTbl.id, project.id));
 
 		const appData = await dataUtils.readAppData();
 		let found = false;

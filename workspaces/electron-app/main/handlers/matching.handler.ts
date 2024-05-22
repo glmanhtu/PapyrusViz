@@ -100,7 +100,7 @@ export class MatchingHandler extends BaseHandler {
 				name: x['matching-record'].name,
 				img: {
 					id: x.img.id,
-					path: imageService.resolveThumbnail(x.category, x.img),
+					path: imageService.resolveThumbnailUri(x.category, x.img),
 					width: x.img.width,
 					height: x.img.height
 				},
@@ -172,7 +172,7 @@ export class MatchingHandler extends BaseHandler {
 
 		return images.then(items => ({
 			thumbnails: items.map(x => ({
-				...imageService.resolveImg(x.category, x.img),
+				...imageService.resolveImgUri(x.category, x.img),
 				score: x['matching-record-score'].score,
 				rank: x['matching-record-score'].rank,
 			}))

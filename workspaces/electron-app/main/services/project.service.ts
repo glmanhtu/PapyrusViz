@@ -53,7 +53,7 @@ class ProjectService {
 
 		// We assume that there will be only one project in this table
 		return database.select()
-			.from(projectTbl).where(eq(projectTbl.path, projectPath)).then(takeUniqueOrThrow);
+			.from(projectTbl).then(takeUniqueOrThrow);
 	}
 }
 

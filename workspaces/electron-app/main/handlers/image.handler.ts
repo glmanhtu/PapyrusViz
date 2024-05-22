@@ -97,7 +97,7 @@ export class ImageHandler extends BaseHandler {
 			.from(imgTbl)
 			.where(eq(imgTbl.id, imData.img.id))
 			.then(takeUniqueOrThrow);
-		return imageService.resolveImg(imData.category, img)
+		return imageService.resolveImgUri(imData.category, img)
 	}
 
 	private async detectPapyrus(request: ImgSegmentationRequest): Promise<string> {
@@ -118,7 +118,7 @@ export class ImageHandler extends BaseHandler {
 			.innerJoin(categoryTbl, eq(imgTbl.categoryId, categoryTbl.id))
 			.where(eq(imgTbl.id, request.imgId))
 			.then(takeUniqueOrThrow)
-			.then(x => imageService.resolveImg(x.category, x.img));
+			.then(x => imageService.resolveImgUri(x.category, x.img));
 	}
 
 	private async getImages(request: ThumbnailRequest): Promise<ThumbnailResponse> {
@@ -144,7 +144,7 @@ export class ImageHandler extends BaseHandler {
 			.offset(request.page * request.perPage);
 
 		return images.then(items => ({
-			thumbnails: items.map(x => imageService.resolveImg(x.category, x.img))
+			thumbnails: items.map(x => imageService.resolveImgUri(x.category, x.img))
 		}));
 	}
 }
