@@ -104,14 +104,24 @@ export class ProjectHandler extends BaseHandler {
 				projectId: project.insertedId,
 				isActivated: data.rootDirs.selected === rootDir.path
 			}).returning({insertedId: categoryTbl.id}).then(takeUniqueOrThrow)
-			categoryMap.set(rootDir.path, category.insertedId);
+			if (rootDir.name !== DefaultCategory.ARCHIVED) {
+				categoryMap.set(rootDir.path, category.insertedId);
+			}
 		}));
+
+		const categories = Array.from(categoryMap, ([name, value]) => ({ name, value }));
+		const sortedCategories = categories.sort(function(a, b) {
+			var x = a["name"]; var y = b["name"];
+			return ((x > y) ? -1 : ((x < y) ? 1 : 0));
+		})
 
 		let count = 0;
 		const images = Object.entries(data.images);
 		for (const [key, oldImg] of images) {
-			await Promise.all([...categoryMap].map(async ([rootDir, rootDirID]) => {
-				if (oldImg.path.includes(rootDir) && rootDir !== '') {
+			for (const item of sortedCategories) {
+				const rootDir = item["name"];
+				const rootDirID = item["value"];
+				if (oldImg.path.includes(rootDir)) {
 					const thumbnailPath = imageService.resolveThumbnailFromImgPath(oldImg.path);
 					await fs.mkdir(path.dirname(thumbnailPath), {recursive: true});
 					await fs.copyFile(oldImg.thumbnails, thumbnailPath);
@@ -125,13 +135,14 @@ export class ProjectHandler extends BaseHandler {
 						categoryId: rootDirID,
 						segmentationPoints: []
 					});
+					break;
 				}
-			}));
-			await reply(Message.success({
-				percentage: (count + 1) * 50 / images.length, title: 'Step 2/4 - Migrate project...',
-				description: `Updating image files...`
-			}));
+			}
 			count += 1;
+			await reply(Message.success({
+				percentage: count * 50 / images.length, title: 'Step 2/4 - Migrate project...',
+				description: `Updating image files ${count}/${images.length}...`
+			}));
 		}
 
 		count = 0;
@@ -168,11 +179,11 @@ export class ProjectHandler extends BaseHandler {
 
 			}));
 
-			await reply(Message.success({
-				percentage: 50 + (count + 1) * 30 / assemblings.length, title: 'Step 3/4 - Migrate project...',
-				description: `Updating assembled files...`
-			}));
 			count += 1;
+			await reply(Message.success({
+				percentage: 50 + count * 30 / assemblings.length, title: 'Step 3/4 - Migrate project...',
+				description: `Updating assembled files ${count}/${assemblings.length}...`
+			}));
 		}
 
 		if (data.matching) {
@@ -186,7 +197,7 @@ export class ProjectHandler extends BaseHandler {
 			const nonMappingCols = await matchingService.processSimilarity(projectPath, matching, async (current, total) => {
 				await reply(Message.success({
 					percentage: 80 + (current) * 20 / total, title: 'Step 4/4 - Migrate project...',
-					description: `Updating similarity matrix...`
+					description: `Updating similarity matrix ${current}/${total}...`
 				}));
 
 			})
