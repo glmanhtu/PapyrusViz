@@ -57,6 +57,10 @@ jobs:
         env:
           ARCH: ${{matrix.arch}}
 
+      - name: Install npm_modules
+        run: |
+          npm ci
+
       - name: Build packages without signing
         run: npm run make
 
@@ -111,17 +115,16 @@ jobs:
       - name: Build packages without signing
         run: npm run make
 
-      - uses: actions/upload-artifact@master
-        name: Upload DEB (${{matrix.arch}})
-        with:
-          name: Linux DEB (${{matrix.arch}})
-          path: out/make/deb/${{matrix.arch}}/*.deb
+      - name: Package artifacts
+        run: |
+          mkdir artifact-portable
+          mv out/make/zip/linux/${{matrix.arch}}/*.zip artifact-zip/
 
       - uses: actions/upload-artifact@master
         name: Upload Linux zip (${{matrix.arch}})
         with:
           name: Linux zip (${{matrix.arch}})
-          path: out/make/zip/linux/${{matrix.arch}}/*.zip
+          path: artifact-zip
 
 
   Windows-Build:
@@ -148,6 +151,10 @@ jobs:
         run: |
           npm install --global node-gyp@8.4.1
           npm prefix -g | % {npm config set node_gyp "$_\node_modules\node-gyp\bin\node-gyp.js"}
+
+      - name: Install npm_modules
+        run: |
+          npm ci
 
       - name: Build packages without signing
         run: npm run make
