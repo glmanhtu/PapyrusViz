@@ -141,6 +141,7 @@ class ImageService {
 	}
 
 	public async registerImageFeatures(img: Img, category: Category): Promise<void> {
+		Logger.debug("Extracting image features for " + img.path);
 		const originalImg = sharp(path.join(category.path, img.path));
 		const metadata = await originalImg.metadata();
 		const scale = 1024.0 / Math.max(metadata.width, metadata.height);
@@ -187,6 +188,7 @@ class ImageService {
 	}
 
 	public async segmentImage(outputPath: string, mask: ort.Tensor, img: Img, category: Category) {
+		Logger.debug("Segmenting image " + img.path);
 		const data = await sharp(path.join(category.path, img.path))
 			.raw()
 			.toBuffer();
@@ -261,6 +263,7 @@ class ImageService {
 	}
 
 	public async resize(inputFile: string, outputFile: string, width: number, height: number) {
+		Logger.debug("Starting to resize image " + inputFile);
 		return sharp(inputFile)
 			.resize({ height: height, width: width })
 			.flatten({ background: { r: 255, g: 255, b: 255 } })

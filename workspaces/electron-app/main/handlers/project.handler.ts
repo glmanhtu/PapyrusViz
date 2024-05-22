@@ -297,13 +297,21 @@ export class ProjectHandler extends BaseHandler {
 		const images = await database.select().from(imgTbl)
 			.innerJoin(categoryTbl, eq(imgTbl.categoryId, categoryTbl.id));
 
+		const updatedCategories = new Map<number, string>();
+
 		const updateImgInfo = async (img: Img, category: Category, newCategoryPath: string, newImgPath: string) => {
 			await imageService.updateThumbnail(img, category, newImgPath);
 			const oldSegmentationImg = pathUtils.segmentationPath(category, img);
-			img.path = newCategoryPath === '' ? newImgPath : path.relative(newCategoryPath, newImgPath);
-			category.path = newCategoryPath
-			await database.update(categoryTbl).set({path: newCategoryPath}).where(eq(categoryTbl.id, category.id));
-			await database.update(imgTbl).set({path: img.path}).where(eq(imgTbl.id, img.id));
+			const relativeImgPath = newCategoryPath === '' ? newImgPath : path.relative(newCategoryPath, newImgPath);
+			category.path = newCategoryPath;
+			if (!updatedCategories.has(category.id) || updatedCategories.get(category.id) !== newCategoryPath) {
+				await database.update(categoryTbl).set({path: newCategoryPath}).where(eq(categoryTbl.id, category.id));
+				updatedCategories.set(category.id, newCategoryPath);
+			}
+			if (img.path !== relativeImgPath) {
+				img.path = relativeImgPath;
+				await database.update(imgTbl).set({path: img.path}).where(eq(imgTbl.id, img.id));
+			}
 			await imageService.updateSegmentedImg(img, category, oldSegmentationImg);
 		}
 
