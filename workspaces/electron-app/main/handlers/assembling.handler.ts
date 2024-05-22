@@ -104,7 +104,9 @@ export class AssemblingHandler extends BaseHandler {
 			const height = Math.round(scale * image.height);
 			const top = transforms.top;
 			const left = transforms.left;
-			const imgPath = image.fragment === '' ? path.join(assemblingImg.category.path, assemblingImg.img.path) : pathUtils.segmentationPath(image);
+			const imgPath = image.fragment === ''
+				? path.join(assemblingImg.category.path, assemblingImg.img.path)
+				: pathUtils.segmentationPath(assemblingImg.category, image);
 			let processedImage = await sharp(imgPath)
 				.resize({ width: width, height: height })
 				.png()
@@ -205,7 +207,7 @@ export class AssemblingHandler extends BaseHandler {
 			.where(and(eq(imgAssemblingTbl.assemblingId, request.assemblingId), eq(imgAssemblingTbl.imgId, request.imageId)))
 			.then(takeUniqueOrThrow)
 			.then(x => ({
-				img: imageService.resolveImg(x.category, x.img),
+				img: imageService.resolveImgUri(x.category, x.img),
 				transforms: {
 					zIndex: (x.img_assembling.transforms as Transforms).zIndex || 1,
 					top: (x.img_assembling.transforms as Transforms).top || 10,
@@ -236,7 +238,7 @@ export class AssemblingHandler extends BaseHandler {
 	private async getAssemblingImages(request: GetAssemblingRequest): Promise<AssemblingImage[]> {
 		return assemblingService.getAssemblingImages(request.projectPath, request.assemblingId)
 			.then(items => items.map((x) => ({
-				img: imageService.resolveImg(x.category, x.img),
+				img: imageService.resolveImgUri(x.category, x.img),
 				transforms: {
 					zIndex: (x.img_assembling.transforms as Transforms).zIndex || 1,
 					top: (x.img_assembling.transforms as Transforms).top || 10,

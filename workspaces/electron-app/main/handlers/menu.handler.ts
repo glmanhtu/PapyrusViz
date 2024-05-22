@@ -230,7 +230,7 @@ export class MenuHandler extends BaseHandler {
 					assemblingService.swapAssembledImage(payload.projectPath, payload.assemblingId, img, x.img)
 						.then(res => resolve({
 							name: 'replace',
-							data: {...res, img: imageService.resolveImg(x.category, res.img)}
+							data: {...res, img: imageService.resolveImgUri(x.category, res.img)}
 						}))
 						.catch(reject);
 				}

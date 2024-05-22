@@ -43,6 +43,7 @@ import { ImgStatus, imgTbl } from '../entities/img';
 import { matchingService } from '../services/matching.service';
 import { JMatrix } from 'cmatrix';
 import { imageService } from '../services/image.service';
+import { categoryService } from '../services/category.service';
 
 export class MatchingHandler extends BaseHandler {
 	constructor() {
@@ -100,7 +101,7 @@ export class MatchingHandler extends BaseHandler {
 				name: x['matching-record'].name,
 				img: {
 					id: x.img.id,
-					path: imageService.resolveThumbnail(x.category, x.img),
+					path: imageService.resolveThumbnailUri(x.category, x.img),
 					width: x.img.width,
 					height: x.img.height
 				},
@@ -142,6 +143,10 @@ export class MatchingHandler extends BaseHandler {
 		const category = await database.select().from(categoryTbl)
 			.where(eq(categoryTbl.id, request.categoryId)).then(takeUniqueOrThrow);
 
+		if (!category.isActivated) {
+			await categoryService.setActiveCategory(request.projectPath, request.categoryId);
+		}
+
 		const sourceRecord = await database.select().from(matchingImgRecordTbl)
 			.where(
 				and(
@@ -172,7 +177,7 @@ export class MatchingHandler extends BaseHandler {
 
 		return images.then(items => ({
 			thumbnails: items.map(x => ({
-				...imageService.resolveImg(x.category, x.img),
+				...imageService.resolveImgUri(x.category, x.img),
 				score: x['matching-record-score'].score,
 				rank: x['matching-record-score'].rank,
 			}))

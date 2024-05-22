@@ -21,6 +21,7 @@
 		<h4 class="modal-title w-100">{{title}}</h4>
 	</div>
 	<div class="modal-body">
+		<div *ngIf="message" class="text-danger">{{message}}</div>
 			<div class="form-group row mt-3">
 				<label for="name" class="col-sm-3 col-form-label">Name</label>
 				<div class="col-sm-9">
@@ -43,15 +44,16 @@
 				<label for="path" class="col-sm-3 col-form-label">Project location</label>
 				<div class="col-sm-9">
 						<div class="input-group input-group-sm custom-file-button">
-							<input type="text" class="form-control form-control-sm disabled-input" id="path" (click)="folderSelection($event, true)"
-										 formControlName="path" required>
+							<input type="text" class="form-control form-control-sm disabled-input" id="path" (click)="folderSelection($event, true, isUpdate)"
+										 formControlName="path" required [readOnly]="isUpdate">
 							<label class="input-group-text" for="path">Choose folder</label>
 						</div>
 				</div>
 			</div>
 	</div>
 	<div class="modal-footer">
-		<button type="submit" class="btn btn-papyrus btn-sm" [disabled]="!projectForm.valid">Create</button>
+		<button type="submit" class="btn btn-papyrus btn-sm" *ngIf="!isUpdate" [disabled]="!projectForm.valid">Create</button>
+		<button type="button" (click)="updateProject()" class="btn btn-papyrus btn-sm" *ngIf="isUpdate" [disabled]="!projectForm.valid">Update</button>
 		<button type="button" class="btn btn-secondary btn-sm" (click)="cancel()">Cancel</button>
 	</div>
 </form>

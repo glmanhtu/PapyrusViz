@@ -26,6 +26,7 @@ import { ImageRequest, ImgDto, ImgSegmentationRequest, ThumbnailRequest, Thumbna
 import { imageService } from '../services/image.service';
 import { promises as fs } from 'fs';
 import * as pathUtils from '../utils/path.utils';
+import { categoryService } from '../services/category.service';
 
 
 
@@ -68,7 +69,7 @@ export class ImageHandler extends BaseHandler {
 
 		if (request.points.length === 0) {
 			const img = await imageService.metadata(imageService.resolveImgPath(imData.category, imData.img));
-			const segmentationPath = pathUtils.segmentationPath(imData.img);
+			const segmentationPath = pathUtils.segmentationPath(imData.category, imData.img);
 			if (pathUtils.exists(segmentationPath)) {
 				pathUtils.deleteFile(segmentationPath)
 			}
@@ -81,23 +82,23 @@ export class ImageHandler extends BaseHandler {
 		} else {
 			const embeddings = await imageService.getEmbedding(request.imgId);
 			const result = await imageService.detectMask(embeddings, request.points);
-			const segmentation_path = pathUtils.segmentationPath(imData.img);
-			await fs.mkdir(path.dirname(segmentation_path), {recursive: true})
-			const segmentedImgInfo = await imageService.segmentImage(segmentation_path, result, imData.img, imData.category);
+			const segmentationPath = pathUtils.segmentationPath(imData.category, imData.img);
+			await fs.mkdir(path.dirname(segmentationPath), {recursive: true})
+			const segmentedImgInfo = await imageService.segmentImage(segmentationPath, result, imData.img, imData.category);
 			await database.update(imgTbl).set({
 				fragment: imData.img.path,
 				width: segmentedImgInfo.width,
 				height: segmentedImgInfo.height,
 				segmentationPoints: request.points,
 			}).where(eq(imgTbl.id, imData.img.id));
-			await imageService.generateThumbnail(segmentation_path)
+			await imageService.generateThumbnail(segmentationPath)
 		}
 
 		const img = await database.select()
 			.from(imgTbl)
 			.where(eq(imgTbl.id, imData.img.id))
 			.then(takeUniqueOrThrow);
-		return imageService.resolveImg(imData.category, img)
+		return imageService.resolveImgUri(imData.category, img)
 	}
 
 	private async detectPapyrus(request: ImgSegmentationRequest): Promise<string> {
@@ -118,13 +119,16 @@ export class ImageHandler extends BaseHandler {
 			.innerJoin(categoryTbl, eq(imgTbl.categoryId, categoryTbl.id))
 			.where(eq(imgTbl.id, request.imgId))
 			.then(takeUniqueOrThrow)
-			.then(x => imageService.resolveImg(x.category, x.img));
+			.then(x => imageService.resolveImgUri(x.category, x.img));
 	}
 
 	private async getImages(request: ThumbnailRequest): Promise<ThumbnailResponse> {
 		const database = dbService.getConnection(request.projectPath);
 		const category = await database.select().from(categoryTbl)
 			.where(eq(categoryTbl.id, request.categoryId)).then(takeUniqueOrThrow);
+		if (!category.isActivated) {
+			await categoryService.setActiveCategory(request.projectPath, request.categoryId);
+		}
 
 		const images = database.select().from(imgTbl)
 			.where(and(
@@ -144,7 +148,7 @@ export class ImageHandler extends BaseHandler {
 			.offset(request.page * request.perPage);
 
 		return images.then(items => ({
-			thumbnails: items.map(x => imageService.resolveImg(x.category, x.img))
+			thumbnails: items.map(x => imageService.resolveImgUri(x.category, x.img))
 		}));
 	}
 }
