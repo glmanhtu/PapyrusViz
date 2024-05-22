@@ -45,7 +45,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - name: Install dependencies
-        run: python3 -m pip install setuptools && npm ci
+        run: python3 -m pip install setuptools --user && npm ci
       - name: Check lint
         run: npm run lint
       - name: Make app distributables
