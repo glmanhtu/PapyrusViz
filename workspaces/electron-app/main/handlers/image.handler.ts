@@ -26,6 +26,7 @@ import { ImageRequest, ImgDto, ImgSegmentationRequest, ThumbnailRequest, Thumbna
 import { imageService } from '../services/image.service';
 import { promises as fs } from 'fs';
 import * as pathUtils from '../utils/path.utils';
+import { categoryService } from '../services/category.service';
 
 
 
@@ -125,6 +126,9 @@ export class ImageHandler extends BaseHandler {
 		const database = dbService.getConnection(request.projectPath);
 		const category = await database.select().from(categoryTbl)
 			.where(eq(categoryTbl.id, request.categoryId)).then(takeUniqueOrThrow);
+		if (!category.isActivated) {
+			await categoryService.setActiveCategory(request.projectPath, request.categoryId);
+		}
 
 		const images = database.select().from(imgTbl)
 			.where(and(

@@ -43,6 +43,7 @@ import { ImgStatus, imgTbl } from '../entities/img';
 import { matchingService } from '../services/matching.service';
 import { JMatrix } from 'cmatrix';
 import { imageService } from '../services/image.service';
+import { categoryService } from '../services/category.service';
 
 export class MatchingHandler extends BaseHandler {
 	constructor() {
@@ -141,6 +142,10 @@ export class MatchingHandler extends BaseHandler {
 		const database = dbService.getConnection(request.projectPath);
 		const category = await database.select().from(categoryTbl)
 			.where(eq(categoryTbl.id, request.categoryId)).then(takeUniqueOrThrow);
+
+		if (!category.isActivated) {
+			await categoryService.setActiveCategory(request.projectPath, request.categoryId);
+		}
 
 		const sourceRecord = await database.select().from(matchingImgRecordTbl)
 			.where(

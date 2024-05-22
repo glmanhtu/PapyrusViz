@@ -69,6 +69,7 @@ export class ImagesPanelComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
+    this.category.setValue(this.categories.filter(x => x.isActivated)[0].id);
     this.getThumbnails();
   }
 

@@ -50,7 +50,7 @@ export class PanelComponent implements OnInit {
 
   active = 1;
   projectDto: ProjectDTO;
-  categories: CategoryDTO[] = [];
+  categories: CategoryDTO[];
 
   constructor(
     @Inject(PROJECT_BROADCAST_SERVICE_TOKEN) private projectBroadcastService: BroadcastService<ProjectDTO>,

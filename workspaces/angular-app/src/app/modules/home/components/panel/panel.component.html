@@ -15,7 +15,7 @@
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<div class="card text-center sidebar-content h-100" id="thumbnail-container" *ngIf="projectDto">
+<div class="card text-center sidebar-content h-100" id="thumbnail-container" *ngIf="projectDto && categories">
 		<div class="card-header">
 			<ul ngbNav #nav="ngbNav" [(activeId)]="active" class="nav nav-tabs card-header-tabs thumbnail-tabs"
 					[destroyOnHide]="false">

@@ -18,7 +18,7 @@
 <app-matching-button #matchingButton [projectDto]="projectDto"></app-matching-button>
 
 <select *ngIf="matchingButton.activatedMatching" class="form-control form-control-sm mb-1" [formControl]="category" (change)="getThumbnails()">
-	<option *ngFor="let category of categories" [selected]="category.isActivated" value="{{category.id}}">{{category.name}}</option>
+	<option *ngFor="let category of categories" value="{{category.id}}">{{category.name}}</option>
 </select>
 
 <div class="container" *ngIf="matchingButton.activatedMatching">

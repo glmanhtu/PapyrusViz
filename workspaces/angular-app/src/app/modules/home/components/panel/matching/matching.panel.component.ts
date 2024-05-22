@@ -67,6 +67,7 @@ export class MatchingPanelComponent implements OnInit, AfterViewInit {
   ) {}
 
   ngAfterViewInit(): void {
+    this.category.setValue(this.categories.filter(x => x.isActivated)[0].id);
     this.matchingComponent.matchingChanged.subscribe(() => {
       this.getThumbnails();
     });

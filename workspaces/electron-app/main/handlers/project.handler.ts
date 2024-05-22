@@ -102,7 +102,7 @@ export class ProjectHandler extends BaseHandler {
 				name: rootDir.name,
 				path: rootDir.path,
 				projectId: project.insertedId,
-				isActivated: data.rootDirs.selected === rootDir.path
+				isActivated: data.rootDirs.selected === rootDir.path && rootDir.name !== DefaultCategory.ARCHIVED
 			}).returning({insertedId: categoryTbl.id}).then(takeUniqueOrThrow)
 			if (rootDir.name !== DefaultCategory.ARCHIVED) {
 				categoryMap.set(rootDir.path, category.insertedId);
