@@ -44,8 +44,16 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
+      - name: Cache Python dependencies
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+      - name: Install Python setup tools
+        run: |
+          pip install setuptools
       - name: Install dependencies
-        run: python3 -m pip install setuptools --user && npm ci
+        run: npm ci
       - name: Check lint
         run: npm run lint
       - name: Make app distributables
