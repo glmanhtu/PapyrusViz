@@ -1,8 +1,16 @@
 name: Package-Build
-on: [push, pull_request]
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches:
+      - main
+      - 'feat/**'
+  pull_request:
+    branches:
+      - main
 jobs:
   Lint:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout
@@ -13,7 +21,7 @@ jobs:
       - name: Installing Node
         uses: actions/setup-node@v3.7.0
         with:
-          node-version: 16
+          node-version: 20
 
       - name: Install deps
         run: |
