@@ -69,7 +69,7 @@ jobs:
           mkdir artifact-dmg
           mv out/make/*.dmg artifact-dmg/
           mkdir artifact-zip
-          mv out/make/zip/darwin/${{matrix.arch}}/*.zip artifact-zip/
+          find /out/make/zip -type f -name '*.zip' -exec mv -i {} artifact-zip/  \;
 
       - uses: actions/upload-artifact@master
         name: Upload DMG
@@ -118,7 +118,7 @@ jobs:
       - name: Package artifacts
         run: |
           mkdir artifact-portable
-          mv out/make/zip/linux/${{matrix.arch}}/*.zip artifact-zip/
+          find /out/make/zip -type f -name '*.zip' -exec mv -i {} artifact-zip/  \;
 
       - uses: actions/upload-artifact@master
         name: Upload Linux zip (${{matrix.arch}})
@@ -162,10 +162,10 @@ jobs:
       - name: Package artifacts
         run: |
           mkdir artifact-portable
-          mv out/make/zip/win32/${{matrix.arch}}/*.zip artifact-portable/
+          find /out/make/zip -type f -name '*.zip' -exec mv -i {} artifact-zip/  \;
 
       - uses: actions/upload-artifact@master
         name: Upload portable build
         with:
           name: Windows portable build (${{matrix.arch}})
-          path: artifact-portable
+          path: artifact-zip
