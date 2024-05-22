@@ -55,7 +55,7 @@ export class ProjectCreationComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  onSubmit() {
+  async onSubmit() {
     const formValue = this.projectForm.value;
     const projectRequest: ProjectDTO = {
       name: formValue.name!,
@@ -96,7 +96,7 @@ export class ProjectCreationComponent implements OnInit {
     });
   }
 
-  updateProject() {
+  async updateProject() {
     const formValue = this.projectForm.value;
     const projectRequest: ProjectDTO = {
       name: formValue.name!,
