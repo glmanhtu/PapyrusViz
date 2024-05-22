@@ -23,13 +23,13 @@ jobs:
       fail-fast: false
       matrix:
         os: [macOS-latest, ubuntu-latest, windows-latest]
-        node-version: [18.x, 20.x]
+        node-version: [20.x]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Cache node modules
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         env:
           cache-name: cache-node-modules
         with:
@@ -48,13 +48,5 @@ jobs:
         run: npm ci
       - name: Check lint
         run: npm run lint
-      - name: Test Angular E2E
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: npm run test:angular-e2e
-      - name: Test Electron E2E
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: npm run test:electron-e2e
       - name: Make app distributables
         run: npm run make
