@@ -226,6 +226,7 @@ export class ProjectHandler extends BaseHandler {
 
 		// We assume that there will be only one project in this table
 		const project = projects[0];
+		project.path = projectPath;
 		return project as ProjectDTO;
 	}
 
