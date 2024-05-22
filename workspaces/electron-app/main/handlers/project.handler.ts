@@ -241,9 +241,6 @@ export class ProjectHandler extends BaseHandler {
 
 		// We assume that there will be only one project in this table
 		const project = await projectService.getProjectByPath(projectPath);
-		if (!await this.getProjects().then((ps) => ps.some(x => x.projPath === projectPath))) {
-			await this.addProjectToAppData({projName: project.name, projPath: project.path, datasetPath: project.dataPath});
-		}
 
 		if (! await projectService.projectDataValid(projectPath)) {
 			throw new Error('Project data is invalid!')	;
@@ -258,6 +255,9 @@ export class ProjectHandler extends BaseHandler {
 					path: projectPath
 				})
 				.where(eq(projectTbl.id, project.id));
+		}
+		if (!await this.getProjects().then((ps) => ps.some(x => x.projPath === projectPath))) {
+			await this.addProjectToAppData({projName: project.name, projPath: project.path, datasetPath: project.dataPath});
 		}
 		return project as ProjectDTO
 	}
