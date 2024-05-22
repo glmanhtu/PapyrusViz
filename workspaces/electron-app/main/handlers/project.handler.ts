@@ -356,7 +356,14 @@ export class ProjectHandler extends BaseHandler {
 			count += 1;
 		}
 
-		database.update(projectTbl).set({os: process.platform}).where(eq(projectTbl.id, project.id));
+		database.update(projectTbl)
+			.set({
+				os: process.platform,
+				dataPath: payload.dataPath,
+				name: payload.name,
+				path: payload.path
+			})
+			.where(eq(projectTbl.id, project.id));
 
 		const appData = await dataUtils.readAppData();
 		let found = false;
