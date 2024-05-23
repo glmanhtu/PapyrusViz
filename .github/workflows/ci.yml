@@ -55,7 +55,7 @@ jobs:
 
       - name: Install deps
         run: |
-          sudo -H pip install setuptools
+          brew install python-setuptools
         env:
           ARCH: ${{matrix.arch}}
 
