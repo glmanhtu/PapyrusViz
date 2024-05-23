@@ -19,7 +19,7 @@ jobs:
           fetch-depth: 0
 
       - name: Installing Node
-        uses: actions/setup-node@v3.7.0
+        uses: actions/setup-node@v3
         with:
           node-version: 20
 
@@ -36,8 +36,10 @@ jobs:
     strategy:
       matrix:
         include:
-          - arch: x86_64
-          - arch: arm64
+          - build-arch: x64
+            arch: x86-64
+          - build-arch: arm64
+            arch: arm64
       fail-fast: false
 
     steps:
@@ -47,7 +49,7 @@ jobs:
           fetch-depth: 0
 
       - name: Installing Node
-        uses: actions/setup-node@v3.7.0
+        uses: actions/setup-node@v3
         with:
           node-version: 20
 
@@ -99,7 +101,7 @@ jobs:
           fetch-depth: 0
 
       - name: Install Node
-        uses: actions/setup-node@v3.7.0
+        uses: actions/setup-node@v3
         with:
           node-version: 20
 
@@ -133,7 +135,8 @@ jobs:
     strategy:
       matrix:
         include:
-          - arch: x64
+          - build-arch: x64
+            arch: x64
       fail-fast: false
 
     steps:
@@ -143,7 +146,7 @@ jobs:
           fetch-depth: 0
 
       - name: Installing Node
-        uses: actions/setup-node@v3.7.0
+        uses: actions/setup-node@v3
         with:
           node-version: 20
 
