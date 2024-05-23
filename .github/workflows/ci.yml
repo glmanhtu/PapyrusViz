@@ -30,14 +30,65 @@ jobs:
       - name: Lint
         run: npm run lint
 
-  macOS-Build:
-    runs-on: macos-14
+  macOS-x64-Build:
+    runs-on: macos-13
     needs: Lint
     strategy:
       matrix:
         include:
           - build-arch: x64
             arch: x86-64
+      fail-fast: false
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Installing Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install deps
+        run: |
+          brew install python-setuptools
+        env:
+          ARCH: ${{matrix.arch}}
+
+      - name: Install npm_modules
+        run: |
+          npm ci
+
+      - name: Build packages without signing
+        run: npm run make
+
+      - name: Package artifacts
+        run: |
+          mkdir artifact-dmg
+          mv out/make/*.dmg artifact-dmg/
+          mkdir artifact-zip
+          mv out/make/zip/darwin/${{matrix.build-arch}}/*.zip artifact-zip/
+
+      - uses: actions/upload-artifact@master
+        name: Upload DMG
+        with:
+          name: macOS .dmg (${{matrix.arch}})
+          path: artifact-dmg
+
+      - uses: actions/upload-artifact@master
+        name: Upload ZIP
+        with:
+          name: macOS .zip (${{matrix.arch}})
+          path: artifact-zip
+
+  macOS-Arm-Build:
+    runs-on: macos-14
+    needs: Lint
+    strategy:
+      matrix:
+        include:
           - build-arch: arm64
             arch: arm64
       fail-fast: false
