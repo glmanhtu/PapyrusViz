@@ -31,7 +31,7 @@ jobs:
         run: npm run lint
 
   macOS-Build:
-    runs-on: macos-12
+    runs-on: macos-13
     needs: Lint
     strategy:
       matrix:
@@ -44,12 +44,12 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Installing Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 20
 
@@ -86,7 +86,7 @@ jobs:
           path: artifact-zip
 
   Linux-Build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs: Lint
     strategy:
       matrix:
@@ -96,12 +96,12 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Install Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 20
 
@@ -141,12 +141,12 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Installing Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 20
 
