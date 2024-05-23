@@ -16,7 +16,8 @@
   -->
 <div class="modal-header">
 </div>
-<div class="modal-body text-center">
+<div class="modal-body text-center" *ngIf="appInfo">
 		<h5>Papyrus Visualization</h5>
 		<p>Version {{appInfo.version}}</p>
+		Opensource project on <a href="https://github.com/glmanhtu/PapyrusViz" target="_blank">Github</a>
 </div>
