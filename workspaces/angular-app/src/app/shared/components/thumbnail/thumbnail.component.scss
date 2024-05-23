@@ -1,0 +1,42 @@
+/*!
+ * Copyright (C) 2024  Manh Tu VU
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+img {
+  max-height: 200px;
+  max-width: 200px;
+}
+
+figure .img-thumbnail {
+  border: none;
+  margin-bottom: 0;
+}
+
+figcaption {
+  margin-top: 0.5rem;
+  border-top: 1px solid #dee2e6;
+  text-align: left;
+  text-indent: 5px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.figure {
+  border: 1px solid #dee2e6;
+  cursor: pointer;
+  border-radius: 0.25rem;
+}

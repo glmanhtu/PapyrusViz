@@ -1,0 +1,59 @@
+<!--
+  ~ Copyright (C) 2024  Manh Tu VU
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<app-progress [title]="title" #progress (onComplete)="openProject(projectForm.controls.path.value!)"></app-progress>
+<form class="was-validated" [formGroup]="projectForm" *ngIf="!progress.showProgress" (ngSubmit)="onSubmit()">
+	<div class="modal-header text-center">
+		<h4 class="modal-title w-100">{{title}}</h4>
+	</div>
+	<div class="modal-body">
+		<div *ngIf="message" class="text-danger">{{message}}</div>
+			<div class="form-group row mt-3">
+				<label for="name" class="col-sm-3 col-form-label">Name</label>
+				<div class="col-sm-9">
+					<input type="text" class="form-control form-control-sm" id="name" placeholder="Project name"
+								 formControlName="name" required>
+				</div>
+			</div>
+			<div class="form-group row mt-2">
+				<label for="dataPath" class="col-sm-3 col-form-label">Image dataset</label>
+				<div class="col-sm-9">
+					<div class="input-group input-group-sm custom-file-button">
+						<input type="text" class="form-control form-control-sm disabled-input" id="dataPath" (click)="folderSelection($event)"
+									 formControlName="dataPath" required>
+						<label class="input-group-text" for="dataPath">Choose folder</label>
+					</div>
+				</div>
+			</div>
+
+			<div class="form-group row mt-2">
+				<label for="path" class="col-sm-3 col-form-label">Project location</label>
+				<div class="col-sm-9">
+						<div class="input-group input-group-sm custom-file-button">
+							<input type="text" class="form-control form-control-sm disabled-input" id="path" (click)="folderSelection($event, true, isUpdate)"
+										 formControlName="path" required [readOnly]="isUpdate">
+							<label class="input-group-text" for="path">Choose folder</label>
+						</div>
+				</div>
+			</div>
+	</div>
+	<div class="modal-footer">
+		<button type="submit" class="btn btn-papyrus btn-sm" *ngIf="!isUpdate" [disabled]="!projectForm.valid">Create</button>
+		<button type="button" (click)="updateProject()" class="btn btn-papyrus btn-sm" *ngIf="isUpdate" [disabled]="!projectForm.valid">Update</button>
+		<button type="button" class="btn btn-secondary btn-sm" (click)="cancel()">Cancel</button>
+	</div>
+</form>

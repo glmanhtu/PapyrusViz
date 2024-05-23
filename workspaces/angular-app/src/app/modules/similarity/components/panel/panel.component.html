@@ -1,0 +1,90 @@
+  <!--
+  ~ Copyright (C) 2024  Manh Tu VU
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<div class="card sidebar-content h-100" id="thumbnail-container" *ngIf="projectDto">
+		<div class="card-header text-center py-2">
+			Matching configuration
+		</div>
+		<div class="card-body h-100 overflow-auto container" #scrollContainer style="padding: 1.25rem .5rem 0 .5rem;" (scroll)="onScroll()">
+			<app-matching-button #matchingComponent [projectDto]="projectDto"></app-matching-button>
+
+<!--			<div class="mx-auto form-control mt-3">-->
+<!--				<div class="d-flex align-items-center">-->
+<!--					<label class="flex-shrink-0 me-3">Similarity Threshold</label>-->
+<!--					<input type="text" class="form-control form-control-sm flex-grow-1" [formControl]="threshold" [value]="threshold.value">-->
+<!--				</div>-->
+<!--				&lt;!&ndash;use value=1&ndash;&gt;-->
+<!--				<input type="range" class="form-range mt-2" [formControl]="threshold" [value]="threshold.value" min="0.5" max="1" step="0.01">-->
+<!--				<div class="d-flex justify-content-between">-->
+<!--					<span>0.5</span>-->
+<!--					<span>1</span>-->
+<!--				</div>-->
+<!--			</div>-->
+
+			<form class="mx-auto form-control mt-3" [formGroup]="forceControl" *ngIf="matchingComponent.activatedMatching">
+<!--				<div class="d-flex align-items-center">-->
+<!--					<label class="flex-shrink-0 me-3">Charge force</label>-->
+<!--					<input type="number" min="-400" max="0" step="10" class="form-control form-control-sm flex-grow-1" [formControl]="forceControl.controls.charge" [value]="forceControl.controls.charge.value">-->
+<!--				</div>-->
+
+				<fieldset class="form-group mt-3">
+					<div class="row">
+						<legend class="col-form-label col-sm-5 pt-0">Node type:</legend>
+						<div class="col-sm-7">
+							<div class="form-check">
+								<input class="me-2" type="radio" value="1" id="text-mode" formControlName="textMode">
+								<label for="text-mode">
+									Text
+								</label>
+							</div>
+							<div class="form-check">
+								<input class="me-2" type="radio" value="0" id="circle-mode" formControlName="textMode">
+								<label for="circle-mode">
+									Circle
+								</label>
+							</div>
+						</div>
+					</div>
+				</fieldset>
+
+				<fieldset class="form-group mt-3 row">
+						<legend class="col-form-label col-sm-3 pt-0">Auto color:</legend>
+						<div class="col-sm-9">
+<!--							<div class="form-check ps-0">-->
+<!--								<input class="me-2" type="radio" value="2" id="auto-color-community" formControlName="autoColor">-->
+<!--								<label for="auto-color-community">-->
+<!--									Community detection-->
+<!--								</label>-->
+<!--							</div>-->
+							<div class="form-check ps-0">
+								<input class="me-2" type="radio" value="1" id="auto-color-prefix" formControlName="autoColor">
+								<label for="auto-color-prefix">
+									Prefix name
+								</label>
+							</div>
+							<div class="form-check ps-0">
+								<input class="me-2" type="radio" value="0" id="auto-color-none" formControlName="autoColor">
+								<label for="auto-color-none">
+									None
+								</label>
+							</div>
+						</div>
+				</fieldset>
+			</form>
+
+		</div>
+	</div>

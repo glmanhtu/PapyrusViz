@@ -1,0 +1,34 @@
+{
+  "version": "5",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1712917272675,
+      "tag": "0000_known_living_tribunal",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1713349283895,
+      "tag": "0001_overrated_black_tom",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1714477351358,
+      "tag": "0002_medical_namor",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1714642506470,
+      "tag": "0003_misty_sebastian_shaw",
+      "breakpoints": true
+    }
+  ]
+}

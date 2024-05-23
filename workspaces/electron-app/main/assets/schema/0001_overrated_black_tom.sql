@@ -1,0 +1,1 @@
+ALTER TABLE assembling ADD `transforms` text;

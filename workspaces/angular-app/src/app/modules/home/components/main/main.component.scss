@@ -1,0 +1,47 @@
+/*!
+ * Copyright (C) 2024  Manh Tu VU
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+#assembling-tabs {
+    max-width: 100%;
+    display: block !important;
+    white-space: nowrap;
+    overflow-y: hidden;
+    overflow-x: scroll;
+    text-align: left;
+    flex-wrap: nowrap;
+}
+
+#assembling-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+#assembling-tabs .nav-item {
+    display: inline-block;
+}
+
+.card-header-tabs {
+    margin-bottom: calc(-1.7 * var(--bs-card-cap-padding-y));
+}
+
+#activated-image {
+    box-shadow: rgb(31, 193, 27) 0 0 0 2px;
+}
+
+.tab-content > .tab-pane {
+    width: 100% !important;
+    height: 100% !important;
+}

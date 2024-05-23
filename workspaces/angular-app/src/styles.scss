@@ -1,0 +1,161 @@
+/*!
+ * Copyright (C) 2024  Manh Tu VU
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+@import "bootstrap/scss/mixins/banner";
+@include bsBanner("");
+
+
+// scss-docs-start import-stack
+// Configuration
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/variables-dark";
+@import "bootstrap/scss/maps";
+@import "bootstrap/scss/mixins";
+@import "bootstrap/scss/utilities";
+@import "bootstrap/scss/root";
+
+
+$navbar-padding-y: 1rem * .2;
+$nav-link-padding-y: 0.4rem;
+$card-cap-padding-y:                1rem * .1;
+
+$papy-background-color: #2e3142;
+
+/* customize bg dark */
+$primary: #2e3142;
+
+:root {
+  --bs-primary: #{$primary};
+  --bs-primary-bg-subtle: #{$primary};
+  --bs-primary-bg-subtle-dark: #{$primary};
+
+  --bs-dark-rgb: #{to-rgb($primary)};
+  --bs-link-color: black;
+  --bs-form-valid-color: #{$papy-background-color};
+  --bs-form-valid-border-color: #{$papy-background-color};
+
+  .btn-primary {
+    --bs-btn-bg: #{$primary};
+  }
+}
+
+// Import all of Bootstrap's CSS
+// Layout & components
+@import "bootstrap/scss/reboot";
+@import "bootstrap/scss/type";
+@import "bootstrap/scss/images";
+@import "bootstrap/scss/containers";
+@import "bootstrap/scss/grid";
+@import "bootstrap/scss/tables";
+@import "bootstrap/scss/forms";
+@import "bootstrap/scss/buttons";
+@import "bootstrap/scss/transitions";
+@import "bootstrap/scss/dropdown";
+@import "bootstrap/scss/button-group";
+@import "bootstrap/scss/nav";
+@import "bootstrap/scss/navbar";
+@import "bootstrap/scss/card";
+//@import "bootstrap/scss/accordion";
+//@import "bootstrap/scss/breadcrumb";
+//@import "bootstrap/scss/pagination";
+//@import "bootstrap/scss/badge";
+//@import "bootstrap/scss/alert";
+@import "bootstrap/scss/progress";
+@import "bootstrap/scss/list-group";
+@import "bootstrap/scss/close";
+//@import "bootstrap/scss/toasts";
+@import "bootstrap/scss/modal";
+//@import "bootstrap/scss/tooltip";
+//@import "bootstrap/scss/popover";
+//@import "bootstrap/scss/carousel";
+@import "bootstrap/scss/spinners";
+//@import "bootstrap/scss/offcanvas";
+@import "bootstrap/scss/placeholders";
+
+// Helpers
+@import "bootstrap/scss/helpers";
+
+// Utilities
+@import "bootstrap/scss/utilities/api";
+// scss-docs-end import-stack
+
+
+
+.btn-papyrus {
+  @include button-variant(#e86950, #e86950, white, $active-color: white, $disabled-color: white, $hover-color: white);
+}
+
+.btn-outline-papyrus {
+    @include button-outline-variant(#e86950, white, $active-color: white);
+}
+
+/* You can add global styles to this file, and also import other style files */
+html, body {
+    margin: 0;
+    padding: 0;
+  
+    height: 100%;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+  
+  /* width */
+  ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+  }
+  
+  /* Track */
+  ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+  }
+  
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+      background: #bec4c4;
+  }
+  
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+      background: #555;
+  }
+
+.custom-file-button input {
+  margin-left: -2px !important;
+  cursor: pointer;
+}
+
+.custom-file-button:hover label {
+  background-color: #dde0e3;
+  cursor: pointer;
+}
+
+// CSS. Prevents clicking on the input and applies same style that Bootstrap
+// applies to disabled / readonly inputs.
+input.disabled-input {
+  pointer-events: none;
+  background-color: var(--bs-tertiary-bg);
+  opacity: 1;
+}
+
+.unselectable {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}

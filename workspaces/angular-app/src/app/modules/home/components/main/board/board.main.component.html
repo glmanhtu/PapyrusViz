@@ -1,0 +1,29 @@
+<!--
+  ~ Copyright (C) 2024  Manh Tu VU
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<div #panZoom class="h-100 w-100 position-relative" appPanZoom [container]="boardContainer"
+		 (dragover)="onDragOver($event)" (drop)="onDrop($event)"
+		 [hasFrameSelected]="selectedFrames.size > 0" [globalTransform]="assembling.transforms" (changes)="onGlobalTransform($event)">
+	<div class="h-100 w-100" style="position: absolute;" #boardContainer>
+		<div class="frame-anchor" #frameAnchor></div>
+		<app-frame *ngFor="let img of assemblingImages; index as i"
+							 [globalTransform]="assembling.transforms"
+							 [transforms]="img.transforms" [image]="img.img"
+							 (transformEvent)="onTransform(img, $event)" (contextMenuEvent)="handleContextMenu(i)">
+		</app-frame>
+	</div>
+</div>

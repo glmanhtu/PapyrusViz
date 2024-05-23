@@ -1,0 +1,101 @@
+/*!
+ * Copyright (C) 2024  Manh Tu VU
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+.frame-wrapper {
+  position: absolute;
+}
+
+img {
+  position: absolute;
+  cursor: grab;
+}
+
+.resizers {
+  box-sizing: border-box;
+  position: absolute;
+
+  .resizer {
+    opacity: 1;
+    width: 6px;
+    height: 6px;
+    border-radius: 1px;
+    background: white;
+    border: 1px solid forestgreen;
+    position: absolute;
+  }
+
+  .right {
+    top: 0;
+    right: -3px;
+    height: 100%;
+    cursor: ew-resize;
+  }
+
+  .bottom {
+    bottom: -3px;
+    left: 0;
+    width: 100%;
+    cursor: ns-resize;
+  }
+
+  .top {
+    top: -3px;
+    left: 0;
+    width: 100%;
+    cursor: ns-resize;
+  }
+
+  .left {
+    top: 0;
+    left: -3px;
+    height: 100%;
+    cursor: ew-resize;
+  }
+
+  .bottom-right {
+    right: -6px;
+    bottom: -6px;
+    width: 12px;
+    height: 12px;
+    cursor: nwse-resize;
+  }
+
+  .top-right {
+    right: -6px;
+    top: -6px;
+    width: 12px;
+    height: 12px;
+    cursor: nesw-resize;
+  }
+
+  .top-left {
+    left: -6px;
+    top: -6px;
+    width: 12px;
+    height: 12px;
+    cursor: nwse-resize;
+  }
+
+  .bottom-left {
+    left: -6px;
+    bottom: -6px;
+    width: 12px;
+    height: 12px;
+
+    cursor: nesw-resize;
+  }
+}

@@ -1,0 +1,44 @@
+<!--
+  ~ Copyright (C) 2024  Manh Tu VU
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<div #wrapper
+		 class="frame-wrapper"
+		 [style.top.px]="transforms.top"
+		 [style.left.px]="transforms.left">
+	<div class="resizers" *ngIf="showController"
+			 [style.width.px]="image.width * transforms.scale"
+			 [style.z-index]="transforms.zIndex"
+			 [style.transform]="'rotate(' + transforms.rotation + 'deg)'"
+			 [style.height.px]="image.height * transforms.scale">
+		<div (mousedown)="startResize($event)" class="resizer right"></div>
+		<div (mousedown)="startResize($event)" class="resizer left"></div>
+		<div (mousedown)="startResize($event)" class="resizer bottom"></div>
+		<div (mousedown)="startResize($event)" class="resizer top"></div>
+		<div (mousedown)="startRotate($event)" class="resizer top-right"></div>
+		<div (mousedown)="startRotate($event)" class="resizer top-left"></div>
+		<div (mousedown)="startRotate($event)" class="resizer bottom-left"></div>
+		<div #resizeCorner (mousedown)="startRotate($event)" class="resizer bottom-right"></div>
+	</div>
+	<img class="content-wrapper" #imgElement
+			 [style.width.px]="image.width * transforms.scale"
+			 [style.height.px]="image.height * transforms.scale"
+			 [style.z-index]="transforms.zIndex"
+			 [style.transform]="'rotate(' + transforms.rotation + 'deg)'"
+			 [alt]="image.name"
+			 [title]="image.name"
+			 [src]="image.fragment !== '' ? image.fragment : image.path">
+</div>

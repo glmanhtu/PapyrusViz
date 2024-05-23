@@ -1,0 +1,40 @@
+<!--
+  ~ Copyright (C) 2024  Manh Tu VU
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<div class="card text-center h-100" *ngIf="projectDto">
+	<div class="card-header">
+		<ul class="nav nav-tabs card-header-tabs" id="assembling-tabs" ngbNav #nav="ngbNav"
+				[(activeId)]="active" (navChange)="onNavChange($event)"
+			onWheel="this.scrollLeft+=event.deltaY>0?100:-100">
+
+			<li class="nav-item" role="presentation">
+				<button type="button" class="nav-link" (click)="add($event)">+</button>
+			</li>
+
+			@for (assembling of assemblings; track assembling; let  i = $index) {
+				<li [ngbNavItem]="assembling.id" class="nav-item" >
+					<app-nav-main [assembling]="assembling" [projectDto]="projectDto" (closeAssembling)="assemblings.splice(i, 1)"></app-nav-main>
+					<ng-template ngbNavContent>
+						<app-board-main (segmentImage)="imageChange($event)" [assembling]="assembling" [projectDto]="projectDto" (queryImage)="findMatching($event)"></app-board-main>
+					</ng-template>
+				</li>
+			}
+		</ul>
+	</div>
+	<div class="card-body h-100 overflow-hidden" [ngbNavOutlet]="nav">
+	</div>
+</div>

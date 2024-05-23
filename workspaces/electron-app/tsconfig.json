@@ -1,0 +1,9 @@
+{
+	"extends": "../../tsconfig.json",
+	"references": [{ "path": "../shared-lib" }],
+	"include": [
+		"./main/**/*.ts",
+		"./renderer/**/*.ts",
+		"./@typings/*.d.ts"
+	]
+}

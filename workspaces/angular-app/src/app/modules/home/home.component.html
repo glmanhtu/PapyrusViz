@@ -1,0 +1,24 @@
+<!--
+  ~ Copyright (C) 2024  Manh Tu VU
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+<app-nav [mainComponent]="main"></app-nav>
+<div class="flex-fill d-flex flex-row overflow-auto">
+	<app-panel #panel [mainComponent]="main" id="thumbnail-column" class="sidebar d-flex p-1 flex-column"></app-panel>
+	<app-main #main id="board-column" [panel]="panel" class="main flex-fill p-1" style="width: 75%;"></app-main>
+</div>
+<!--<div class="flex-shrink-1 bg-primary text-white p-1">-->
+<!--	<span>Bottom Bar</span>-->
+<!--</div>-->
