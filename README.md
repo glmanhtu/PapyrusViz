@@ -5,6 +5,7 @@ For the full version, please checkout the main branch of this repository,
 
 ## Build release
 ```bash
+npm install
 npm run package:angular-app
 ```
 The release distribution HTML code will be generated at `workspaces/angular-app/.dist/angular-app`
