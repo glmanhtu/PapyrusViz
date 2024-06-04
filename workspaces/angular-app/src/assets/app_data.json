@@ -117,8 +117,8 @@
         {
           "id": 1,
           "name": "0567a_r_CL",
-          "path": "atom:///home/mvu/Downloads/IRCLView/dataset/CL/0567a_r_CL.JPG",
-          "fragment": "atom:///home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/CL/0567a_r_CL.webp",
+          "path": "/dataset/CL/0567a_r_CL.JPG",
+          "fragment": "assets/images/CL/0567a_r_CL.webp",
           "width": 1753,
           "height": 4255,
           "status": 1,
@@ -141,13 +141,13 @@
             }
           ],
           "categoryId": 1,
-          "thumbnail": "atom:///home/mvu/.config/papyviz/thumbnails/home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/CL/0567a_r_CL.jpg"
+          "thumbnail": "assets/thumbnails/CL/0567a_r_CL.jpg"
         },
         {
           "id": 11,
           "name": "0567a_r_IR",
-          "path": "atom:///home/mvu/Downloads/IRCLView/dataset/IR/0567a_r_IR.JPG",
-          "fragment": "atom:///home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/IR/0567a_r_IR.webp",
+          "path": "/dataset/IR/0567a_r_IR.JPG",
+          "fragment": "assets/images/IR/0567a_r_IR.webp",
           "width": 1699,
           "height": 4411,
           "status": 1,
@@ -160,15 +160,15 @@
             }
           ],
           "categoryId": 2,
-          "thumbnail": "atom:///home/mvu/.config/papyviz/thumbnails/home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/IR/0567a_r_IR.jpg"
+          "thumbnail": "assets/thumbnails/IR/0567a_r_IR.jpg"
         },
         {
           "id": 2,
           "name": "0567e_r_CL",
-          "path": "atom:///home/mvu/Downloads/IRCLView/dataset/CL/0567e_r_CL.JPG",
-          "fragment": "atom:///home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/CL/0567e_r_CL.webp",
-          "width": 1879,
-          "height": 2291,
+          "path": "/dataset/CL/0567e_r_CL.JPG",
+          "fragment": "assets/images/CL/0567e_r_CL.webp",
+          "width": 1876,
+          "height": 1697,
           "status": 1,
           "format": "jpeg",
           "segmentationPoints": [
@@ -189,13 +189,13 @@
             }
           ],
           "categoryId": 1,
-          "thumbnail": "atom:///home/mvu/.config/papyviz/thumbnails/home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/CL/0567e_r_CL.jpg"
+          "thumbnail": "assets/thumbnails/CL/0567e_r_CL.jpg"
         },
         {
           "id": 12,
           "name": "0567e_r_IR",
-          "path": "atom:///home/mvu/Downloads/IRCLView/dataset/IR/0567e_r_IR.JPG",
-          "fragment": "atom:///home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/IR/0567e_r_IR.webp",
+          "path": "/dataset/IR/0567e_r_IR.JPG",
+          "fragment": "assets/images/IR/0567e_r_IR.webp",
           "width": 2085,
           "height": 1933,
           "status": 1,
@@ -223,13 +223,13 @@
             }
           ],
           "categoryId": 2,
-          "thumbnail": "atom:///home/mvu/.config/papyviz/thumbnails/home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/IR/0567e_r_IR.jpg"
+          "thumbnail": "assets/thumbnails/IR/0567e_r_IR.jpg"
         },
         {
           "id": 3,
           "name": "0567i_r_CL",
-          "path": "atom:///home/mvu/Downloads/IRCLView/dataset/CL/0567i_r_CL.JPG",
-          "fragment": "atom:///home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/CL/0567i_r_CL.webp",
+          "path": "/dataset/CL/0567i_r_CL.JPG",
+          "fragment": "assets/images/CL/0567i_r_CL.webp",
           "width": 1769,
           "height": 735,
           "status": 1,
@@ -242,13 +242,13 @@
             }
           ],
           "categoryId": 1,
-          "thumbnail": "atom:///home/mvu/.config/papyviz/thumbnails/home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/CL/0567i_r_CL.jpg"
+          "thumbnail": "assets/thumbnails/CL/0567i_r_CL.jpg"
         },
         {
           "id": 13,
           "name": "0567i_r_IR",
-          "path": "atom:///home/mvu/Downloads/IRCLView/dataset/IR/0567i_r_IR.JPG",
-          "fragment": "atom:///home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/IR/0567i_r_IR.webp",
+          "path": "/dataset/IR/0567i_r_IR.JPG",
+          "fragment": "assets/images/IR/0567i_r_IR.webp",
           "width": 1858,
           "height": 765,
           "status": 1,
@@ -261,13 +261,13 @@
             }
           ],
           "categoryId": 2,
-          "thumbnail": "atom:///home/mvu/.config/papyviz/thumbnails/home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/IR/0567i_r_IR.jpg"
+          "thumbnail": "assets/thumbnails/IR/0567i_r_IR.jpg"
         },
         {
           "id": 4,
           "name": "0567j_r_CL",
-          "path": "atom:///home/mvu/Downloads/IRCLView/dataset/CL/0567j_r_CL.JPG",
-          "fragment": "atom:///home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/CL/0567j_r_CL.webp",
+          "path": "/dataset/CL/0567j_r_CL.JPG",
+          "fragment": "assets/images/CL/0567j_r_CL.webp",
           "width": 1759,
           "height": 1933,
           "status": 1,
@@ -280,13 +280,13 @@
             }
           ],
           "categoryId": 1,
-          "thumbnail": "atom:///home/mvu/.config/papyviz/thumbnails/home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/CL/0567j_r_CL.jpg"
+          "thumbnail": "assets/thumbnails/CL/0567j_r_CL.jpg"
         },
         {
           "id": 14,
           "name": "0567j_r_IR",
-          "path": "atom:///home/mvu/Downloads/IRCLView/dataset/IR/0567j_r_IR.JPG",
-          "fragment": "atom:///home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/IR/0567j_r_IR.webp",
+          "path": "/dataset/IR/0567j_r_IR.JPG",
+          "fragment": "assets/images/IR/0567j_r_IR.webp",
           "width": 1847,
           "height": 2009,
           "status": 1,
@@ -299,13 +299,13 @@
             }
           ],
           "categoryId": 2,
-          "thumbnail": "atom:///home/mvu/.config/papyviz/thumbnails/home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/IR/0567j_r_IR.jpg"
+          "thumbnail": "assets/thumbnails/IR/0567j_r_IR.jpg"
         },
         {
           "id": 5,
           "name": "0786_r_CL",
-          "path": "atom:///home/mvu/Downloads/IRCLView/dataset/CL/0786_r_CL.JPG",
-          "fragment": "atom:///home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/CL/0786_r_CL.webp",
+          "path": "/dataset/CL/0786_r_CL.JPG",
+          "fragment": "assets/images/CL/0786_r_CL.webp",
           "width": 2174,
           "height": 1880,
           "status": 1,
@@ -318,13 +318,13 @@
             }
           ],
           "categoryId": 1,
-          "thumbnail": "atom:///home/mvu/.config/papyviz/thumbnails/home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/CL/0786_r_CL.jpg"
+          "thumbnail": "assets/thumbnails/CL/0786_r_CL.jpg"
         },
         {
           "id": 15,
           "name": "0786_r_IR",
-          "path": "atom:///home/mvu/Downloads/IRCLView/dataset/IR/0786_r_IR.JPG",
-          "fragment": "atom:///home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/IR/0786_r_IR.webp",
+          "path": "/dataset/IR/0786_r_IR.JPG",
+          "fragment": "assets/images/IR/0786_r_IR.webp",
           "width": 2240,
           "height": 1951,
           "status": 1,
@@ -337,13 +337,13 @@
             }
           ],
           "categoryId": 2,
-          "thumbnail": "atom:///home/mvu/.config/papyviz/thumbnails/home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/IR/0786_r_IR.jpg"
+          "thumbnail": "assets/thumbnails/IR/0786_r_IR.jpg"
         },
         {
           "id": 6,
           "name": "0812a_r_CL",
-          "path": "atom:///home/mvu/Downloads/IRCLView/dataset/CL/0812a_r_CL.JPG",
-          "fragment": "atom:///home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/CL/0812a_r_CL.webp",
+          "path": "/dataset/CL/0812a_r_CL.JPG",
+          "fragment": "assets/images/CL/0812a_r_CL.webp",
           "width": 1859,
           "height": 1376,
           "status": 1,
@@ -356,13 +356,13 @@
             }
           ],
           "categoryId": 1,
-          "thumbnail": "atom:///home/mvu/.config/papyviz/thumbnails/home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/CL/0812a_r_CL.jpg"
+          "thumbnail": "assets/thumbnails/CL/0812a_r_CL.jpg"
         },
         {
           "id": 16,
           "name": "0812a_r_IR",
-          "path": "atom:///home/mvu/Downloads/IRCLView/dataset/IR/0812a_r_IR.JPG",
-          "fragment": "atom:///home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/IR/0812a_r_IR.webp",
+          "path": "/dataset/IR/0812a_r_IR.JPG",
+          "fragment": "assets/images/IR/0812a_r_IR.webp",
           "width": 1981,
           "height": 1464,
           "status": 1,
@@ -375,13 +375,13 @@
             }
           ],
           "categoryId": 2,
-          "thumbnail": "atom:///home/mvu/.config/papyviz/thumbnails/home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/IR/0812a_r_IR.jpg"
+          "thumbnail": "assets/thumbnails/IR/0812a_r_IR.jpg"
         },
         {
           "id": 7,
           "name": "0812b_r_CL",
-          "path": "atom:///home/mvu/Downloads/IRCLView/dataset/CL/0812b_r_CL.JPG",
-          "fragment": "atom:///home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/CL/0812b_r_CL.webp",
+          "path": "/dataset/CL/0812b_r_CL.JPG",
+          "fragment": "assets/images/CL/0812b_r_CL.webp",
           "width": 1759,
           "height": 2440,
           "status": 1,
@@ -394,13 +394,13 @@
             }
           ],
           "categoryId": 1,
-          "thumbnail": "atom:///home/mvu/.config/papyviz/thumbnails/home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/CL/0812b_r_CL.jpg"
+          "thumbnail": "assets/thumbnails/CL/0812b_r_CL.jpg"
         },
         {
           "id": 17,
           "name": "0812b_r_IR",
-          "path": "atom:///home/mvu/Downloads/IRCLView/dataset/IR/0812b_r_IR.JPG",
-          "fragment": "atom:///home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/IR/0812b_r_IR.webp",
+          "path": "/dataset/IR/0812b_r_IR.JPG",
+          "fragment": "assets/images/IR/0812b_r_IR.webp",
           "width": 1853,
           "height": 2593,
           "status": 1,
@@ -413,13 +413,13 @@
             }
           ],
           "categoryId": 2,
-          "thumbnail": "atom:///home/mvu/.config/papyviz/thumbnails/home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/IR/0812b_r_IR.jpg"
+          "thumbnail": "assets/thumbnails/IR/0812b_r_IR.jpg"
         },
         {
           "id": 8,
           "name": "1189_r_CL",
-          "path": "atom:///home/mvu/Downloads/IRCLView/dataset/CL/1189_r_CL.JPG",
-          "fragment": "atom:///home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/CL/1189_r_CL.webp",
+          "path": "/dataset/CL/1189_r_CL.JPG",
+          "fragment": "assets/images/CL/1189_r_CL.webp",
           "width": 1612,
           "height": 4561,
           "status": 1,
@@ -447,13 +447,13 @@
             }
           ],
           "categoryId": 1,
-          "thumbnail": "atom:///home/mvu/.config/papyviz/thumbnails/home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/CL/1189_r_CL.jpg"
+          "thumbnail": "assets/thumbnails/CL/1189_r_CL.jpg"
         },
         {
           "id": 18,
           "name": "1189_r_IR",
-          "path": "atom:///home/mvu/Downloads/IRCLView/dataset/IR/1189_r_IR.JPG",
-          "fragment": "atom:///home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/IR/1189_r_IR.webp",
+          "path": "/dataset/IR/1189_r_IR.JPG",
+          "fragment": "assets/images/IR/1189_r_IR.webp",
           "width": 1516,
           "height": 4500,
           "status": 1,
@@ -476,13 +476,13 @@
             }
           ],
           "categoryId": 2,
-          "thumbnail": "atom:///home/mvu/.config/papyviz/thumbnails/home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/IR/1189_r_IR.jpg"
+          "thumbnail": "assets/thumbnails/IR/1189_r_IR.jpg"
         },
         {
           "id": 9,
           "name": "1243_r_CL",
-          "path": "atom:///home/mvu/Downloads/IRCLView/dataset/CL/1243_r_CL.JPG",
-          "fragment": "atom:///home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/CL/1243_r_CL.webp",
+          "path": "/dataset/CL/1243_r_CL.JPG",
+          "fragment": "assets/images/CL/1243_r_CL.webp",
           "width": 2189,
           "height": 2629,
           "status": 1,
@@ -505,13 +505,13 @@
             }
           ],
           "categoryId": 1,
-          "thumbnail": "atom:///home/mvu/.config/papyviz/thumbnails/home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/CL/1243_r_CL.jpg"
+          "thumbnail": "assets/thumbnails/CL/1243_r_CL.jpg"
         },
         {
           "id": 19,
           "name": "1243_r_IR",
-          "path": "atom:///home/mvu/Downloads/IRCLView/dataset/IR/1243_r_IR.JPG",
-          "fragment": "atom:///home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/IR/1243_r_IR.webp",
+          "path": "/dataset/IR/1243_r_IR.JPG",
+          "fragment": "assets/images/IR/1243_r_IR.webp",
           "width": 2284,
           "height": 2695,
           "status": 1,
@@ -524,13 +524,13 @@
             }
           ],
           "categoryId": 2,
-          "thumbnail": "atom:///home/mvu/.config/papyviz/thumbnails/home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/IR/1243_r_IR.jpg"
+          "thumbnail": "assets/thumbnails/IR/1243_r_IR.jpg"
         },
         {
           "id": 10,
           "name": "2275_r_CL",
-          "path": "atom:///home/mvu/Downloads/IRCLView/dataset/CL/2275_r_CL.JPG",
-          "fragment": "atom:///home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/CL/2275_r_CL.webp",
+          "path": "/dataset/CL/2275_r_CL.JPG",
+          "fragment": "assets/images/CL/2275_r_CL.webp",
           "width": 1901,
           "height": 3900,
           "status": 1,
@@ -543,13 +543,13 @@
             }
           ],
           "categoryId": 1,
-          "thumbnail": "atom:///home/mvu/.config/papyviz/thumbnails/home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/CL/2275_r_CL.jpg"
+          "thumbnail": "assets/thumbnails/CL/2275_r_CL.jpg"
         },
         {
           "id": 20,
           "name": "2275_r_IR",
-          "path": "atom:///home/mvu/Downloads/IRCLView/dataset/IR/2275_r_IR.JPG",
-          "fragment": "atom:///home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/IR/2275_r_IR.webp",
+          "path": "/dataset/IR/2275_r_IR.JPG",
+          "fragment": "assets/images/IR/2275_r_IR.webp",
           "width": 1993,
           "height": 4144,
           "status": 1,
@@ -572,7 +572,7 @@
             }
           ],
           "categoryId": 2,
-          "thumbnail": "atom:///home/mvu/.config/papyviz/thumbnails/home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/IR/2275_r_IR.jpg"
+          "thumbnail": "assets/thumbnails/IR/2275_r_IR.jpg"
         }
       ]
     }

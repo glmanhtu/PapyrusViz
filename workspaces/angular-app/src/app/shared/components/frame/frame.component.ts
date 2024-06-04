@@ -101,7 +101,7 @@ export class FrameComponent {
     };
 
     // Start a timeout to distinguish between click and drag
-    dragTimeout = setTimeout(startDrag, 150); // 200ms delay to distinguish between click and drag
+    dragTimeout = setTimeout(startDrag, 100); // 200ms delay to distinguish between click and drag
     this._document.addEventListener('mouseup', finishDrag);
   }
 

@@ -30,13 +30,10 @@ import {
 import {
   AssemblingDTO,
   AssemblingImage,
-  AssemblingImageChangeRequest,
   AssemblingImageRequest,
-  ContextAction,
   GetAssemblingRequest,
   GlobalTransform,
   ImgDto,
-  PRequest,
   ProjectDTO,
   Transforms,
 } from 'shared-lib';
@@ -67,6 +64,7 @@ export class BoardMainComponent implements OnInit {
 
   assemblingImages: AssemblingImage[] = [];
   selectedFrames = new Map<number, FrameComponent>;
+  menuItems = ['To front', 'To back', 'Delete']
 
   constructor(
     private modalService: ModalService,
@@ -112,7 +110,7 @@ export class BoardMainComponent implements OnInit {
     // elem.style.transform = 'scale(1)';
     elem.style.left = '0';
     elem.style.top = '0';
-    panZoomElem.style.transformOrigin = '50% 50%';
+    panZoomElem.style.transformOrigin = '0 0';
   }
 
   commandListener(command: string) {
@@ -233,52 +231,21 @@ export class BoardMainComponent implements OnInit {
     });
   }
 
-  handleContextMenu(imgIdx: number): void {
+  handleContextMenu(imgIdx: number, command: string): void {
     const assemblingImage = this.assemblingImages[imgIdx];
-    this.eIpc.send<AssemblingImageRequest, ContextAction<AssemblingImage>>('menu:context:get-image-context', {
-      projectPath: this.projectDto.path,
-      imageId: assemblingImage.img.id,
-      assemblingId: this.assembling.id
-    }).then(x => {
-      switch (x.name) {
-        case 'replace':
-          this.assemblingImages[imgIdx] = x.data;
-          break
-        case 'delete':
-          this.deleteAssemblingImg(assemblingImage.img.id).then(() => {
-            this.assemblingImages = this.assemblingImages.filter((x) => x.img.id != assemblingImage.img.id)
-          })
-          break
-        case 'similarity':
-          this.queryImage.emit(assemblingImage.img);
-          break;
+    switch (command) {
+      case 'Delete':
+        this.assemblingImages = this.assemblingImages.filter((x) => x.img.id != assemblingImage.img.id)
+        break
 
-        case 'to_front':
-          this.toFront(assemblingImage);
-          break
+      case 'To front':
+        this.toFront(assemblingImage);
+        break
 
-        case 'to_back':
-          this.toBack(assemblingImage);
-          break
-
-        case 'open_file_location':
-          const imgPath = assemblingImage.img.fragment === '' ? assemblingImage.img.path : assemblingImage.img.fragment;
-          this.eIpc.send<string, void>('dialogs:open-file-location', imgPath.replace('atom://', ''));
-          break
-
-        case 'segment':
-          this.modalService.imageSegmentation(this.projectDto, assemblingImage.img.id).result.then((res: ImgDto) => {
-            if (res) {
-              const prevImgHeight = assemblingImage.img.height * assemblingImage.transforms.scale;
-              assemblingImage.img = res;
-              assemblingImage.transforms.scale = prevImgHeight / res.height;
-              this.onTransform(assemblingImage, assemblingImage.transforms);
-              this.segmentImage.emit(res);
-            }
-          })
-          break
-      }
-    })
+      case 'To back':
+        this.toBack(assemblingImage);
+        break
+    }
   }
 
   toFront(assemblingImg: AssemblingImage) {

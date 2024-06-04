@@ -20,10 +20,10 @@
 		 [hasFrameSelected]="selectedFrames.size > 0" [globalTransform]="assembling.transforms" (changes)="onGlobalTransform($event)">
 	<div class="h-100 w-100" style="position: absolute;" #boardContainer>
 		<div class="frame-anchor" #frameAnchor></div>
-		<app-frame *ngFor="let img of assemblingImages; index as i"
+		<app-frame appContextMenu [menuItems]="menuItems" (select)="handleContextMenu(i, $event)" *ngFor="let img of assemblingImages; index as i"
 							 [globalTransform]="assembling.transforms"
 							 [transforms]="img.transforms" [image]="img.img"
-							 (transformEvent)="onTransform(img, $event)" (contextMenuEvent)="handleContextMenu(i)">
+							 (transformEvent)="onTransform(img, $event)">
 		</app-frame>
 	</div>
 </div>

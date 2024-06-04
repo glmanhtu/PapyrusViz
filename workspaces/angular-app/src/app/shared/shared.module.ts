@@ -31,6 +31,7 @@ import { SegmentationComponent } from './components/segmentation/segmentation.co
 import { NoCommaPipe } from './directives/no-comma.directive';
 import { ViewLogsComponent } from './components/view-logs/view-logs.component';
 import { AboutModalComponent } from './components/about-modal/about-modal.component';
+import { ContextMenuDirective } from './directives/context-menu.directive';
 
 @NgModule({
 	declarations: [
@@ -45,7 +46,8 @@ import { AboutModalComponent } from './components/about-modal/about-modal.compon
 		NoCommaPipe,
 		SegmentationComponent,
 		ViewLogsComponent,
-		AboutModalComponent
+		AboutModalComponent,
+		ContextMenuDirective
   ],
 	imports: [
 		ReactiveFormsModule,
@@ -64,7 +66,8 @@ import { AboutModalComponent } from './components/about-modal/about-modal.compon
 		NoCommaPipe,
 		SegmentationComponent,
 		ViewLogsComponent,
-		AboutModalComponent
+		AboutModalComponent,
+		ContextMenuDirective
 	]
 })
 export class SharedModule {}
