@@ -18,9 +18,10 @@
 import { app, ipcMain, shell, protocol, net, BrowserWindow } from 'electron';
 import { Window } from './window';
 import { BaseHandler } from '../handlers/base.handler';
-import { IMessage, Message, WindowTask } from 'shared-lib';
+import { AppAPIData, IMessage, Message, WindowTask } from 'shared-lib';
 import { Logger } from '../utils/logger';
 import * as pathUtils from '../utils/path.utils';
+import fs from 'fs'
 
 export class App {
 	private static _windows = new Map<number, Window>();
@@ -52,6 +53,7 @@ export class App {
 
 	public static registerHandlers(handlers: BaseHandler[]) {
 		const combinedRouteMap = this.combineRoutes(...handlers);
+		const data = new Map<string, AppAPIData>;
 		ipcMain.on('ipc-request',  async (event, message: { type: string; payload: unknown; requestId: string }) => {
 			const { type, payload, requestId } = message;
 			Logger.debug('Message received: ', message)
@@ -59,6 +61,11 @@ export class App {
 			if (handlerFunction) {
 				handlerFunction(payload, event.sender.id)
 					.then((response) => {
+						data.set(type, {
+							request: payload,
+							response: response
+						})
+						fs.writeFileSync(pathUtils.fromRoot('app_data.json'), JSON.stringify(Object.fromEntries(data), null, 2));
 						event.reply(`ipc-response:${requestId}`, Message.success(response));
 					}).catch((err) => {
 						Logger.error('Error occurred, request: ', message, err)

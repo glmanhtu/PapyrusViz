@@ -16,27 +16,10 @@
   -->
 
 <div class="card text-center sidebar-content h-100" id="thumbnail-container" *ngIf="projectDto && categories">
-		<div class="card-header">
-			<ul ngbNav #nav="ngbNav" [(activeId)]="active" class="nav nav-tabs card-header-tabs thumbnail-tabs"
-					[destroyOnHide]="false">
-				<li [ngbNavItem]="1" class="nav-item">
-					<a ngbNavLink>Images</a>
-					<ng-template ngbNavContent>
-						<app-images-panel #thumbnails (openImage)="openImage($event)" [projectDto]="projectDto"
-															[categories]="categories" (queryImage)="findMatching({id: $event.id})"></app-images-panel>
-					</ng-template>
-				</li>
-				<li [ngbNavItem]="2" class="nav-item">
-					<a ngbNavLink>Similarity</a>
-					<ng-template ngbNavContent>
-						<app-matching-panel #matching (openImage)="openImage($event)" [projectDto]="projectDto"
-																[categories]="categories" [similarityCreationComponent]="similarityCreationComponent"></app-matching-panel>
-					</ng-template>
-				</li>
-			</ul>
-		</div>
-		<div class="card-body h-100 overflow-auto" #scrollContainer style="padding: 1.25rem .5rem 0 .5rem;" (scroll)="onScroll()">
-			<div class="tab-content h-100" [ngbNavOutlet]="nav">
+		<div class="card-body h-100 overflow-auto" #scrollContainer style="padding: 1.25rem .5rem 0 .5rem;">
+			<div class="tab-content h-100">
+				<app-images-panel #thumbnails (openImage)="openImage($event)" [projectDto]="projectDto"
+													[categories]="categories" (queryImage)="findMatching({id: $event.id})"></app-images-panel>
 			</div>
 		</div>
 	</div>

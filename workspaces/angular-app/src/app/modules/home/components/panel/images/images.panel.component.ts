@@ -87,7 +87,7 @@ export class ImagesPanelComponent implements OnInit, AfterViewInit {
       categoryId: this.category.value!,
       filter: this.filter.value!,
       page: page,
-      perPage: 20
+      perPage: 999
     }
     this.eIpc.send<ThumbnailRequest, ThumbnailResponse>('image:get-thumbnails', thumbnailRequest).then((result) => {
       if (reset) {

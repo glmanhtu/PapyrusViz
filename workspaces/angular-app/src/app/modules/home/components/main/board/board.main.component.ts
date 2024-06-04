@@ -183,10 +183,8 @@ export class BoardMainComponent implements OnInit {
       left = left - (thumbnail.width * imgScale / 2);
     }
 
-    this.eIpc.send<AssemblingImageChangeRequest, AssemblingImage>('assembling:create-assembling-img', {
-      projectPath: this.projectDto.path,
-      assemblingId: this.assembling.id,
-      imageId: thumbnail.id,
+    const x: AssemblingImage = {
+      img: thumbnail,
       transforms: {
         zIndex: 1 + this.assemblingImages.reduce((acc, x) => Math.max(acc, x.transforms.zIndex), 0),
         top: top,
@@ -194,9 +192,9 @@ export class BoardMainComponent implements OnInit {
         scale: imgScale,
         rotation: 0
       }
-    }).then((x) => {
-      this.assemblingImages.push(x);
-    })
+    };
+
+    this.assemblingImages.push(x);
   }
 
   @HostListener('document:mousedown', ['$event'])
@@ -304,23 +302,9 @@ export class BoardMainComponent implements OnInit {
   }
 
   onGlobalTransform(globalTransform: GlobalTransform) {
-    this.eIpc.debounce<PRequest<AssemblingDTO>>(1000, this.projectDto.path, this.assembling.id.toString())('assembling:update-assembling', {
-      projectPath: this.projectDto.path,
-      payload: {
-        ...this.assembling,
-        transforms: globalTransform
-      }
-    });
-
     this.assembling.transforms = globalTransform;
   }
 
   onTransform(assemblingImage: AssemblingImage, transforms: Transforms) {
-    return this.eIpc.debounce<AssemblingImageChangeRequest>(1000, this.projectDto.path, this.assembling.id.toString(), assemblingImage.img.id.toString())('assembling:update-assembling-img', {
-      projectPath: this.projectDto.path,
-      assemblingId: this.assembling.id,
-      imageId: assemblingImage.img.id,
-      transforms: transforms
-    });
   }
 }

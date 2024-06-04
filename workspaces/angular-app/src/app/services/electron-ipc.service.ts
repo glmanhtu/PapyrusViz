@@ -16,7 +16,10 @@
  */
 
 import { Injectable, NgZone } from '@angular/core';
-import { ExtrasChannels, IMessage, WindowApi } from 'shared-lib';
+import { ExtrasChannels, IMessage, ThumbnailRequest, ThumbnailResponse, WindowApi } from 'shared-lib';
+import * as jsonData from "../../assets/app_data.json";
+import { parseInt } from 'lodash';
+
 
 @Injectable({
 	providedIn: 'root',
@@ -25,7 +28,7 @@ export class ElectronIpcService {
 
 	// See workspaces/electron-app/renderer/preload.ts for the implementation of WindowApi
 	private _api!: WindowApi;
-	private debounceTimeouts = new Map<string, number>();
+	private data = jsonData as any;
 
 	constructor(private ngZone: NgZone) {
 		if (window && (window as Window).api) {
@@ -37,22 +40,31 @@ export class ElectronIpcService {
 	}
 
 	public send<P, R>(type: string, payload: P): Promise<R> {
+		if (this.data[type] !== undefined) {
+			return new Promise((resolve, _) => {
+				switch (type) {
+					case 'image:get-thumbnails':
+						const results = this.data[type]['response'] as ThumbnailResponse;
+						const request = payload as ThumbnailRequest;
+						const requestCategory = parseInt(`${request.categoryId}`)
+						const thumbnails = results.thumbnails.filter(x => {
+							let result = true;
+							if (request.filter.length > 0) {
+								result = result && x.name.includes(request.filter);
+							}
+							if (requestCategory !== 3) {
+								result = result && x.categoryId === requestCategory;
+							}
+							return result;
+						})
+						resolve({thumbnails: thumbnails} as R)
+						break
+					default:
+						resolve(this.data[type]['response']);
+				}
+			});
+		}
 		return this._api.send<P, R>(type, payload);
-	}
-
-	public debounce<P>(delay: number, ...keys: string[]) {
-		return (type: string, payload: P) => {
-			const key = type + '::' + keys.join('-');
-			let timerId = this.debounceTimeouts.get(key)
-			if (timerId) {
-				clearTimeout(timerId);
-			}
-			timerId = setTimeout(() => {
-				this.send<P, unknown>(type, payload)
-				this.debounceTimeouts.delete(key)
-			}, delay);
-			this.debounceTimeouts.set(key, timerId);
-		};
 	}
 
 	public sendAndListen<P, R>(type: string, payload: P, listener: (message: IMessage<R>) => void): void {

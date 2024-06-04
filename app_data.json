@@ -1,0 +1,594 @@
+{
+  "app:get-task": {
+    "response": {
+      "projectPath": "",
+      "task": "default"
+    }
+  },
+  "project:get-projects": {
+    "response": [
+      {
+        "projName": "Papyrus",
+        "projPath": "/home/mvu/Downloads/IRCLView/project",
+        "datasetPath": "/home/mvu/Downloads/IRCLView/dataset"
+      },
+      {
+        "projName": "Gesham",
+        "projPath": "/home/mvu/Downloads/GeshaemTestFromWin/GeshaemTest",
+        "datasetPath": "/media/mvu/MVu/datasets/Geshaem6/IR_CL_Segmented_PNG/IR_CL_Segmented_PNG"
+      },
+      {
+        "projName": "Geshaem Raw 3",
+        "projPath": "/home/mvu/Downloads/GeshaemRaw3",
+        "datasetPath": "/media/mvu/MVu/datasets/Geshaem/IR_CL"
+      },
+      {
+        "projName": "Geshaem Raw 2",
+        "projPath": "/home/mvu/Downloads/GeshaemRaw2",
+        "datasetPath": "/media/mvu/MVu/datasets/Geshaem/IR_CL"
+      },
+      {
+        "projName": "Geshaem Raw",
+        "projPath": "/home/mvu/Downloads/GeshaemRaw",
+        "datasetPath": "/media/mvu/MVu/datasets/Geshaem/IR_CL"
+      },
+      {
+        "projName": "Geshaem Test",
+        "projPath": "/home/mvu/Downloads/ASDsaf",
+        "datasetPath": "/media/mvu/MVu/datasets/Geshaem6/IR_CL_Segmented_PNG/IR_CL_Segmented_PNG"
+      }
+    ]
+  },
+  "project:load-project": {
+    "request": "/home/mvu/Downloads/IRCLView/project",
+    "response": {
+      "id": 1,
+      "name": "Papyrus",
+      "path": "/home/mvu/Downloads/IRCLView/project",
+      "dataPath": "/home/mvu/Downloads/IRCLView/dataset",
+      "os": "linux",
+      "createdAt": "2024-06-03 13:45:17"
+    }
+  },
+  "category:get-categories": {
+    "request": "/home/mvu/Downloads/IRCLView/project",
+    "response": [
+      {
+        "id": 4,
+        "name": "Achieved",
+        "path": "",
+        "isActivated": false,
+        "projectId": 1
+      },
+      {
+        "id": 3,
+        "name": "All images",
+        "path": "",
+        "isActivated": true,
+        "projectId": 1
+      },
+      {
+        "id": 1,
+        "name": "CL",
+        "path": "/home/mvu/Downloads/IRCLView/dataset/CL",
+        "isActivated": false,
+        "projectId": 1
+      },
+      {
+        "id": 2,
+        "name": "IR",
+        "path": "/home/mvu/Downloads/IRCLView/dataset/IR",
+        "isActivated": false,
+        "projectId": 1
+      }
+    ]
+  },
+  "assembling:get-assemblings": {
+    "request": "/home/mvu/Downloads/IRCLView/project",
+    "response": [
+      {
+        "id": 1,
+        "name": "Main board",
+        "group": "default",
+        "status": 1,
+        "transforms": {
+          "origin": {
+            "x": 120,
+            "y": 224.3125
+          },
+          "scale": 0.4,
+          "last": {
+            "x": 376,
+            "y": 112
+          }
+        },
+        "createdAt": "2024-06-03 13:45:17",
+        "projectId": 1
+      }
+    ]
+  },
+  "assembling:get-activated-assembling-id": {
+    "request": "/home/mvu/Downloads/IRCLView/project",
+    "response": 1
+  },
+  "image:get-thumbnails": {
+    "request": {
+      "projectPath": "/home/mvu/Downloads/IRCLView/project",
+      "categoryId": 3,
+      "filter": "",
+      "page": 0,
+      "perPage": 999
+    },
+    "response": {
+      "thumbnails": [
+        {
+          "id": 1,
+          "name": "0567a_r_CL",
+          "path": "atom:///home/mvu/Downloads/IRCLView/dataset/CL/0567a_r_CL.JPG",
+          "fragment": "atom:///home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/CL/0567a_r_CL.webp",
+          "width": 1753,
+          "height": 4255,
+          "status": 1,
+          "format": "jpeg",
+          "segmentationPoints": [
+            {
+              "x": 1336.0122258810343,
+              "y": 2270.7966089819943,
+              "type": 1
+            },
+            {
+              "x": 865.4462621733343,
+              "y": 3695.38737476354,
+              "type": 1
+            },
+            {
+              "x": 511.7266517200308,
+              "y": 889.2117985006656,
+              "type": 1
+            }
+          ],
+          "categoryId": 1,
+          "thumbnail": "atom:///home/mvu/.config/papyviz/thumbnails/home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/CL/0567a_r_CL.jpg"
+        },
+        {
+          "id": 11,
+          "name": "0567a_r_IR",
+          "path": "atom:///home/mvu/Downloads/IRCLView/dataset/IR/0567a_r_IR.JPG",
+          "fragment": "atom:///home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/IR/0567a_r_IR.webp",
+          "width": 1699,
+          "height": 4411,
+          "status": 1,
+          "format": "jpeg",
+          "segmentationPoints": [
+            {
+              "x": 1174.0946866984243,
+              "y": 1370.3481128618541,
+              "type": 1
+            }
+          ],
+          "categoryId": 2,
+          "thumbnail": "atom:///home/mvu/.config/papyviz/thumbnails/home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/IR/0567a_r_IR.jpg"
+        },
+        {
+          "id": 2,
+          "name": "0567e_r_CL",
+          "path": "atom:///home/mvu/Downloads/IRCLView/dataset/CL/0567e_r_CL.JPG",
+          "fragment": "atom:///home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/CL/0567e_r_CL.webp",
+          "width": 1879,
+          "height": 2291,
+          "status": 1,
+          "format": "jpeg",
+          "segmentationPoints": [
+            {
+              "x": 3043.098279049922,
+              "y": 2250.340492106386,
+              "type": 1
+            },
+            {
+              "x": 2523.3793201536055,
+              "y": 1994.7410041245912,
+              "type": 1
+            },
+            {
+              "x": 3358.3376475608025,
+              "y": 640.0637178210782,
+              "type": 0
+            }
+          ],
+          "categoryId": 1,
+          "thumbnail": "atom:///home/mvu/.config/papyviz/thumbnails/home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/CL/0567e_r_CL.jpg"
+        },
+        {
+          "id": 12,
+          "name": "0567e_r_IR",
+          "path": "atom:///home/mvu/Downloads/IRCLView/dataset/IR/0567e_r_IR.JPG",
+          "fragment": "atom:///home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/IR/0567e_r_IR.webp",
+          "width": 2085,
+          "height": 1933,
+          "status": 1,
+          "format": "jpeg",
+          "segmentationPoints": [
+            {
+              "x": 2949.3784667899304,
+              "y": 1841.3813113355143,
+              "type": 1
+            },
+            {
+              "x": 1407.2615559664346,
+              "y": 682.6636324847107,
+              "type": 0
+            },
+            {
+              "x": 1373.1816242355285,
+              "y": 767.8634618119756,
+              "type": 0
+            },
+            {
+              "x": 1654.3410610155029,
+              "y": 767.8634618119756,
+              "type": 0
+            }
+          ],
+          "categoryId": 2,
+          "thumbnail": "atom:///home/mvu/.config/papyviz/thumbnails/home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/IR/0567e_r_IR.jpg"
+        },
+        {
+          "id": 3,
+          "name": "0567i_r_CL",
+          "path": "atom:///home/mvu/Downloads/IRCLView/dataset/CL/0567i_r_CL.JPG",
+          "fragment": "atom:///home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/CL/0567i_r_CL.webp",
+          "width": 1769,
+          "height": 735,
+          "status": 1,
+          "format": "jpeg",
+          "segmentationPoints": [
+            {
+              "x": 2157.020054046366,
+              "y": 1526.1419428246338,
+              "type": 1
+            }
+          ],
+          "categoryId": 1,
+          "thumbnail": "atom:///home/mvu/.config/papyviz/thumbnails/home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/CL/0567i_r_CL.jpg"
+        },
+        {
+          "id": 13,
+          "name": "0567i_r_IR",
+          "path": "atom:///home/mvu/Downloads/IRCLView/dataset/IR/0567i_r_IR.JPG",
+          "fragment": "atom:///home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/IR/0567i_r_IR.webp",
+          "width": 1858,
+          "height": 765,
+          "status": 1,
+          "format": "jpeg",
+          "segmentationPoints": [
+            {
+              "x": 1918.4605319300242,
+              "y": 1364.2622671028305,
+              "type": 1
+            }
+          ],
+          "categoryId": 2,
+          "thumbnail": "atom:///home/mvu/.config/papyviz/thumbnails/home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/IR/0567i_r_IR.jpg"
+        },
+        {
+          "id": 4,
+          "name": "0567j_r_CL",
+          "path": "atom:///home/mvu/Downloads/IRCLView/dataset/CL/0567j_r_CL.JPG",
+          "fragment": "atom:///home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/CL/0567j_r_CL.webp",
+          "width": 1759,
+          "height": 1933,
+          "status": 1,
+          "format": "jpeg",
+          "segmentationPoints": [
+            {
+              "x": 2796.0187740008537,
+              "y": 2369.620253164557,
+              "type": 1
+            }
+          ],
+          "categoryId": 1,
+          "thumbnail": "atom:///home/mvu/.config/papyviz/thumbnails/home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/CL/0567j_r_CL.jpg"
+        },
+        {
+          "id": 14,
+          "name": "0567j_r_IR",
+          "path": "atom:///home/mvu/Downloads/IRCLView/dataset/IR/0567j_r_IR.JPG",
+          "fragment": "atom:///home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/IR/0567j_r_IR.webp",
+          "width": 1847,
+          "height": 2009,
+          "status": 1,
+          "format": "jpeg",
+          "segmentationPoints": [
+            {
+              "x": 2480.779405489973,
+              "y": 1159.7826767173945,
+              "type": 1
+            }
+          ],
+          "categoryId": 2,
+          "thumbnail": "atom:///home/mvu/.config/papyviz/thumbnails/home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/IR/0567j_r_IR.jpg"
+        },
+        {
+          "id": 5,
+          "name": "0786_r_CL",
+          "path": "atom:///home/mvu/Downloads/IRCLView/dataset/CL/0786_r_CL.JPG",
+          "fragment": "atom:///home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/CL/0786_r_CL.webp",
+          "width": 2174,
+          "height": 1880,
+          "status": 1,
+          "format": "jpeg",
+          "segmentationPoints": [
+            {
+              "x": 2497.819371355426,
+              "y": 1705.0615844118904,
+              "type": 1
+            }
+          ],
+          "categoryId": 1,
+          "thumbnail": "atom:///home/mvu/.config/papyviz/thumbnails/home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/CL/0786_r_CL.jpg"
+        },
+        {
+          "id": 15,
+          "name": "0786_r_IR",
+          "path": "atom:///home/mvu/Downloads/IRCLView/dataset/IR/0786_r_IR.JPG",
+          "fragment": "atom:///home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/IR/0786_r_IR.webp",
+          "width": 2240,
+          "height": 1951,
+          "status": 1,
+          "format": "jpeg",
+          "segmentationPoints": [
+            {
+              "x": 2506.3393542881527,
+              "y": 1517.6219598919074,
+              "type": 1
+            }
+          ],
+          "categoryId": 2,
+          "thumbnail": "atom:///home/mvu/.config/papyviz/thumbnails/home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/IR/0786_r_IR.jpg"
+        },
+        {
+          "id": 6,
+          "name": "0812a_r_CL",
+          "path": "atom:///home/mvu/Downloads/IRCLView/dataset/CL/0812a_r_CL.JPG",
+          "fragment": "atom:///home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/CL/0812a_r_CL.webp",
+          "width": 1859,
+          "height": 1376,
+          "status": 1,
+          "format": "jpeg",
+          "segmentationPoints": [
+            {
+              "x": 2940.858483857204,
+              "y": 1176.8226425828475,
+              "type": 1
+            }
+          ],
+          "categoryId": 1,
+          "thumbnail": "atom:///home/mvu/.config/papyviz/thumbnails/home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/CL/0812a_r_CL.jpg"
+        },
+        {
+          "id": 16,
+          "name": "0812a_r_IR",
+          "path": "atom:///home/mvu/Downloads/IRCLView/dataset/IR/0812a_r_IR.JPG",
+          "fragment": "atom:///home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/IR/0812a_r_IR.webp",
+          "width": 1981,
+          "height": 1464,
+          "status": 1,
+          "format": "jpeg",
+          "segmentationPoints": [
+            {
+              "x": 2676.7390129426826,
+              "y": 1628.3817380173518,
+              "type": 1
+            }
+          ],
+          "categoryId": 2,
+          "thumbnail": "atom:///home/mvu/.config/papyviz/thumbnails/home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/IR/0812a_r_IR.jpg"
+        },
+        {
+          "id": 7,
+          "name": "0812b_r_CL",
+          "path": "atom:///home/mvu/Downloads/IRCLView/dataset/CL/0812b_r_CL.JPG",
+          "fragment": "atom:///home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/CL/0812b_r_CL.webp",
+          "width": 1759,
+          "height": 2440,
+          "status": 1,
+          "format": "jpeg",
+          "segmentationPoints": [
+            {
+              "x": 1941.0545454545454,
+              "y": 2640.4363636363637,
+              "type": 1
+            }
+          ],
+          "categoryId": 1,
+          "thumbnail": "atom:///home/mvu/.config/papyviz/thumbnails/home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/CL/0812b_r_CL.jpg"
+        },
+        {
+          "id": 17,
+          "name": "0812b_r_IR",
+          "path": "atom:///home/mvu/Downloads/IRCLView/dataset/IR/0812b_r_IR.JPG",
+          "fragment": "atom:///home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/IR/0812b_r_IR.webp",
+          "width": 1853,
+          "height": 2593,
+          "status": 1,
+          "format": "jpeg",
+          "segmentationPoints": [
+            {
+              "x": 1333.6363636363637,
+              "y": 2776.581818181818,
+              "type": 1
+            }
+          ],
+          "categoryId": 2,
+          "thumbnail": "atom:///home/mvu/.config/papyviz/thumbnails/home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/IR/0812b_r_IR.jpg"
+        },
+        {
+          "id": 8,
+          "name": "1189_r_CL",
+          "path": "atom:///home/mvu/Downloads/IRCLView/dataset/CL/1189_r_CL.JPG",
+          "fragment": "atom:///home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/CL/1189_r_CL.webp",
+          "width": 1612,
+          "height": 4561,
+          "status": 1,
+          "format": "jpeg",
+          "segmentationPoints": [
+            {
+              "x": 1909.6363636363635,
+              "y": 2148.2181818181816,
+              "type": 1
+            },
+            {
+              "x": 1930.581818181818,
+              "y": 4368.436363636363,
+              "type": 1
+            },
+            {
+              "x": 370.1454545454545,
+              "y": 3153.6,
+              "type": 0
+            },
+            {
+              "x": 3009.2727272727275,
+              "y": 2891.7818181818184,
+              "type": 0
+            }
+          ],
+          "categoryId": 1,
+          "thumbnail": "atom:///home/mvu/.config/papyviz/thumbnails/home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/CL/1189_r_CL.jpg"
+        },
+        {
+          "id": 18,
+          "name": "1189_r_IR",
+          "path": "atom:///home/mvu/Downloads/IRCLView/dataset/IR/1189_r_IR.JPG",
+          "fragment": "atom:///home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/IR/1189_r_IR.webp",
+          "width": 1516,
+          "height": 4500,
+          "status": 1,
+          "format": "jpeg",
+          "segmentationPoints": [
+            {
+              "x": 1982.9454545454546,
+              "y": 2451.927272727273,
+              "type": 1
+            },
+            {
+              "x": 1909.6363636363635,
+              "y": 4598.836363636364,
+              "type": 1
+            },
+            {
+              "x": 2935.9636363636364,
+              "y": 1917.8181818181818,
+              "type": 0
+            }
+          ],
+          "categoryId": 2,
+          "thumbnail": "atom:///home/mvu/.config/papyviz/thumbnails/home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/IR/1189_r_IR.jpg"
+        },
+        {
+          "id": 9,
+          "name": "1243_r_CL",
+          "path": "atom:///home/mvu/Downloads/IRCLView/dataset/CL/1243_r_CL.JPG",
+          "fragment": "atom:///home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/CL/1243_r_CL.webp",
+          "width": 2189,
+          "height": 2629,
+          "status": 1,
+          "format": "jpeg",
+          "segmentationPoints": [
+            {
+              "x": 2889.738586260845,
+              "y": 1764.7014649409757,
+              "type": 1
+            },
+            {
+              "x": 2352.9796614990755,
+              "y": 3034.1789219172238,
+              "type": 1
+            },
+            {
+              "x": 1432.821504764614,
+              "y": 478.1840420992747,
+              "type": 0
+            }
+          ],
+          "categoryId": 1,
+          "thumbnail": "atom:///home/mvu/.config/papyviz/thumbnails/home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/CL/1243_r_CL.jpg"
+        },
+        {
+          "id": 19,
+          "name": "1243_r_IR",
+          "path": "atom:///home/mvu/Downloads/IRCLView/dataset/IR/1243_r_IR.JPG",
+          "fragment": "atom:///home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/IR/1243_r_IR.webp",
+          "width": 2284,
+          "height": 2695,
+          "status": 1,
+          "format": "jpeg",
+          "segmentationPoints": [
+            {
+              "x": 3060.138244915375,
+              "y": 1892.5012089318732,
+              "type": 1
+            }
+          ],
+          "categoryId": 2,
+          "thumbnail": "atom:///home/mvu/.config/papyviz/thumbnails/home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/IR/1243_r_IR.jpg"
+        },
+        {
+          "id": 10,
+          "name": "2275_r_CL",
+          "path": "atom:///home/mvu/Downloads/IRCLView/dataset/CL/2275_r_CL.JPG",
+          "fragment": "atom:///home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/CL/2275_r_CL.webp",
+          "width": 1901,
+          "height": 3900,
+          "status": 1,
+          "format": "jpeg",
+          "segmentationPoints": [
+            {
+              "x": 1658.290909090909,
+              "y": 3373.5272727272727,
+              "type": 1
+            }
+          ],
+          "categoryId": 1,
+          "thumbnail": "atom:///home/mvu/.config/papyviz/thumbnails/home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/CL/2275_r_CL.jpg"
+        },
+        {
+          "id": 20,
+          "name": "2275_r_IR",
+          "path": "atom:///home/mvu/Downloads/IRCLView/dataset/IR/2275_r_IR.JPG",
+          "fragment": "atom:///home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/IR/2275_r_IR.webp",
+          "width": 1993,
+          "height": 4144,
+          "status": 1,
+          "format": "jpeg",
+          "segmentationPoints": [
+            {
+              "x": 2035.3090909090909,
+              "y": 2640.4363636363637,
+              "type": 1
+            },
+            {
+              "x": 1658.290909090909,
+              "y": 2116.8,
+              "type": 1
+            },
+            {
+              "x": 3229.2,
+              "y": 1771.2,
+              "type": 0
+            }
+          ],
+          "categoryId": 2,
+          "thumbnail": "atom:///home/mvu/.config/papyviz/thumbnails/home/mvu/.config/papyviz/segmentation/home/mvu/Downloads/IRCLView/dataset/IR/2275_r_IR.jpg"
+        }
+      ]
+    }
+  },
+  "assembling:get-images": {
+    "request": {
+      "projectPath": "/home/mvu/Downloads/IRCLView/project",
+      "assemblingId": 1
+    },
+    "response": []
+  }
+}

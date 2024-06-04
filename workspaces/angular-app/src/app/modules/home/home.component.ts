@@ -15,8 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit } from '@angular/core';
-import { ModalService } from '../../services/modal.service';
+import { AfterViewInit, Component, Inject } from '@angular/core';
+import { ProjectDTO } from 'shared-lib';
+import { BroadcastService, PROJECT_BROADCAST_SERVICE_TOKEN } from '../../services/broadcast.service';
+import { ElectronIpcService } from '../../services/electron-ipc.service';
 
 @Component({
   selector: 'app-home',
@@ -26,12 +28,19 @@ import { ModalService } from '../../services/modal.service';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements AfterViewInit {
 
-  constructor(private modalService: ModalService) {
+  constructor(
+    @Inject(PROJECT_BROADCAST_SERVICE_TOKEN) private projectBroadcastService: BroadcastService<ProjectDTO>,
+    private electronIpc: ElectronIpcService) { }
+
+  ngAfterViewInit(): void {
+    this.electronIpc.send<string, ProjectDTO>('project:load-project', '/home/mvu/Downloads/IRCLView/project').then((project) => {
+      this.projectBroadcastService.publish(project);
+    })
   }
 
   ngOnInit(): void {
-    this.modalService.projectManagement();
+
   }
 }

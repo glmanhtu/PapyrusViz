@@ -36,28 +36,28 @@ global.appConfig =
 		: _.merge(defaultConfig, currentConfig);
 
 import { App } from './components/app';
-import { DialogHandler } from './handlers/dialog.handler';
-import { ProjectHandler } from './handlers/project.handler';
-import { CategoryHandler } from './handlers/category.handler';
-import { ImageHandler } from './handlers/image.handler';
-import { AssemblingHandler } from './handlers/assembling.handler';
-import { MenuHandler } from './handlers/menu.handler';
-import { MatchingHandler } from './handlers/matching.handler';
-import { AppHandler } from './handlers/app.handler';
+// import { DialogHandler } from './handlers/dialog.handler';
+// import { ProjectHandler } from './handlers/project.handler';
+// import { CategoryHandler } from './handlers/category.handler';
+// import { ImageHandler } from './handlers/image.handler';
+// import { AssemblingHandler } from './handlers/assembling.handler';
+// import { MenuHandler } from './handlers/menu.handler';
+// import { MatchingHandler } from './handlers/matching.handler';
+// import { AppHandler } from './handlers/app.handler';
 
 
-const handlers = [
-	new DialogHandler(),
-	new MenuHandler(),
-	new AppHandler(),
-	new ProjectHandler(),
-	new CategoryHandler(),
-	new ImageHandler(),
-	new AssemblingHandler(),
-	new MatchingHandler()
-]
+// const handlers = [
+// 	new DialogHandler(),
+// 	new MenuHandler(),
+// 	new AppHandler(),
+// 	new ProjectHandler(),
+// 	new CategoryHandler(),
+// 	new ImageHandler(),
+// 	new AssemblingHandler(),
+// 	new MatchingHandler()
+// ]
 
-App.registerHandlers(handlers);
+// App.registerHandlers(handlers);
 
 // Launch app
 App.launch();

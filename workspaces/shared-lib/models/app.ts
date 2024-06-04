@@ -18,3 +18,8 @@
 export type AppInfo = {
 	version: string
 }
+
+export type AppAPIData = {
+	request: string | unknown,
+	response: unknown
+}
