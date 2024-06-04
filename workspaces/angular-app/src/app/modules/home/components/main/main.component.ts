@@ -19,9 +19,7 @@ import { Component, Inject, Input, OnInit, QueryList, ViewChildren, ViewEncapsul
 import { BroadcastService, PROJECT_BROADCAST_SERVICE_TOKEN } from '../../../../services/broadcast.service';
 import {
   AssemblingDTO,
-  ExtrasChannels,
   GetAssemblingRequest,
-  IMessage,
   ImgDto,
   ProjectDTO,
 } from 'shared-lib';
@@ -59,19 +57,6 @@ export class MainComponent implements OnInit {
     this.projectBroadcastService.observe().subscribe((projectDto) => {
       this.initProject(projectDto);
     });
-    this.eIpc.listen<string>(ExtrasChannels.HOTKEY, this.hotKeyListener.bind(this));
-  }
-
-  hotKeyListener(message: IMessage<string>) {
-    let board: BoardMainComponent;
-    try {
-      board = this.getActivatedBoard()
-    } catch (err) {
-      // If an error is occurred here, it is likely that UI hasn't been loaded yet
-      // Therefore, it is okay to ignore this error.
-      return;
-    }
-    board.commandListener(message.payload);
   }
 
   getActivatedBoard(): BoardMainComponent {

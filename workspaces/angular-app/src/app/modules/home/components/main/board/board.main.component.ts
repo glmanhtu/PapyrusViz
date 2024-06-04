@@ -113,44 +113,6 @@ export class BoardMainComponent implements OnInit {
     panZoomElem.style.transformOrigin = '0 0';
   }
 
-  commandListener(command: string) {
-    switch (command) {
-      case "main:menu:img-delete":
-        this.selectedFrames.forEach((frame, key) => {
-          this.deleteAssemblingImg(frame.image.id).then(() => {
-            frame.showController = false;
-            this.assemblingImages = this.assemblingImages.filter((x) => x.img.id != frame.image.id)
-            this.selectedFrames.delete(key);
-          })
-        });
-        break;
-      case "main:menu:img-find-similarity":
-        if (this.selectedFrames.size > 1) {
-          this.modalService.info("Only one image can be selected to find similarity!");
-        } else if (this.selectedFrames.size === 1) {
-          this.selectedFrames.forEach((frame) => {
-            this.queryImage.emit(frame.image);
-          });
-        }
-        break;
-
-      case "main:menu:select-all":
-        this.frameComponents.forEach((item) => {
-          item.showController = true;
-          this.selectedFrames.set(item.image.id, item);
-        });
-        break;
-
-      case "main:menu:view-logs":
-        this.modalService.viewLogs();
-        break;
-
-      case "main:menu:about":
-        this.modalService.about();
-        break;
-    }
-  }
-
   addImage(thumbnail: ImgDto, top = 10, left= 10) {
     const imgHeights = []
     if (this.frameComponents.length === 0) {
@@ -251,13 +213,11 @@ export class BoardMainComponent implements OnInit {
   toFront(assemblingImg: AssemblingImage) {
     const maxZIndex = this.assemblingImages.reduce((acc, x) => Math.max(acc, x.transforms.zIndex), -9999999);
     assemblingImg.transforms.zIndex = maxZIndex + 1;
-    return this.onTransform(assemblingImg, assemblingImg.transforms);
   }
 
   toBack(assemblingImg: AssemblingImage) {
     const minZIndex = this.assemblingImages.reduce((acc, x) => Math.min(acc, x.transforms.zIndex), 9999999);
     assemblingImg.transforms.zIndex = minZIndex - 1;
-    return this.onTransform(assemblingImg, assemblingImg.transforms);
   }
 
   deleteAssemblingImg(assemblingImgId: number) {
@@ -272,6 +232,6 @@ export class BoardMainComponent implements OnInit {
     this.assembling.transforms = globalTransform;
   }
 
-  onTransform(assemblingImage: AssemblingImage, transforms: Transforms) {
+  onTransform(_a: AssemblingImage, _t: Transforms) {
   }
 }
