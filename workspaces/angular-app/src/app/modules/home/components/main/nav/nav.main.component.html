@@ -17,7 +17,7 @@
 
 <button ngbNavLink class="nav-link unselectable" role="tab" (contextmenu)="tabContextMenu()" *ngIf="!isEditModel">
 	{{ assembling.name }}
-	<span class="btn-close ms-3 fw-light" (click)="close()"></span>
+<!--	<span class="btn-close ms-3 fw-light" (click)="close()"></span>-->
 </button>
 
 <input type="text" class="form-control form-control-sm" *ngIf="isEditModel" [formControl]="assemblingName" (keyup)="rename($event)" autofocus>
