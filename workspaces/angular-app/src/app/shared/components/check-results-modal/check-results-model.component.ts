@@ -15,16 +15,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export type AppInfo = {
-	version: string
-}
+import { Component, Input } from '@angular/core';
+import { VerifyItem } from 'shared-lib';
 
-export type AppAPIData = {
-	request: string | unknown,
-	response: unknown
-}
+@Component({
+  selector: 'app-info-modal',
+  templateUrl: './check-results-model.component.html',
+  styleUrls: [ './check-results-model.component.scss' ],
+})
+export class CheckResultsModelComponent {
 
-export type VerifyItem = {
-	dataType: string,
-	pair: string[],
+  @Input()
+  correct: VerifyItem[];
+  incorrect: VerifyItem[];
+
+  constructor() { }
+
+  computeAssemblingScore() {
+    return this.correct.length * 100 / (this.correct.length + this.incorrect.length);
+  }
 }

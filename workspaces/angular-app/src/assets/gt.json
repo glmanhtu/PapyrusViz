@@ -1,0 +1,642 @@
+[
+  {
+    "img": {
+      "id": 1,
+      "name": "0567a_r_CL",
+      "path": "/dataset/CL/0567a_r_CL.JPG",
+      "fragment": "assets/images/CL/0567a_r_CL.webp",
+      "width": 1753,
+      "height": 4255,
+      "status": 1,
+      "format": "jpeg",
+      "segmentationPoints": [
+        {
+          "x": 1336.0122258810343,
+          "y": 2270.7966089819943,
+          "type": 1
+        },
+        {
+          "x": 865.4462621733343,
+          "y": 3695.38737476354,
+          "type": 1
+        },
+        {
+          "x": 511.7266517200308,
+          "y": 889.2117985006656,
+          "type": 1
+        }
+      ],
+      "categoryId": 1,
+      "thumbnail": "assets/thumbnails/CL/0567a_r_CL.jpg"
+    },
+    "transforms": {
+      "zIndex": 1,
+      "top": -280.55555555555554,
+      "left": -307.77777777777777,
+      "scale": 0.21442087892920095,
+      "rotation": 0
+    }
+  },
+  {
+    "img": {
+      "id": 3,
+      "name": "0567i_r_CL",
+      "path": "/dataset/CL/0567i_r_CL.JPG",
+      "fragment": "assets/images/CL/0567i_r_CL.webp",
+      "width": 1769,
+      "height": 735,
+      "status": 1,
+      "format": "jpeg",
+      "segmentationPoints": [
+        {
+          "x": 2157.020054046366,
+          "y": 1526.1419428246338,
+          "type": 1
+        }
+      ],
+      "categoryId": 1,
+      "thumbnail": "assets/thumbnails/CL/0567i_r_CL.jpg"
+    },
+    "transforms": {
+      "zIndex": 2,
+      "top": 611.7987772623695,
+      "left": -278.60298333200484,
+      "scale": 0.20062691743364014,
+      "rotation": -3.214482824865911
+    }
+  },
+  {
+    "img": {
+      "id": 4,
+      "name": "0567j_r_CL",
+      "path": "/dataset/CL/0567j_r_CL.JPG",
+      "fragment": "assets/images/CL/0567j_r_CL.webp",
+      "width": 1759,
+      "height": 1933,
+      "status": 1,
+      "format": "jpeg",
+      "segmentationPoints": [
+        {
+          "x": 2796.0187740008537,
+          "y": 2369.620253164557,
+          "type": 1
+        }
+      ],
+      "categoryId": 1,
+      "thumbnail": "assets/thumbnails/CL/0567j_r_CL.jpg"
+    },
+    "transforms": {
+      "zIndex": 3,
+      "top": 770.0237911448758,
+      "left": -276.7720147666259,
+      "scale": 0.2064921767166896,
+      "rotation": 0
+    }
+  },
+  {
+    "img": {
+      "id": 8,
+      "name": "1189_r_CL",
+      "path": "/dataset/CL/1189_r_CL.JPG",
+      "fragment": "assets/images/CL/1189_r_CL.webp",
+      "width": 1612,
+      "height": 4561,
+      "status": 1,
+      "format": "jpeg",
+      "segmentationPoints": [
+        {
+          "x": 1909.6363636363635,
+          "y": 2148.2181818181816,
+          "type": 1
+        },
+        {
+          "x": 1930.581818181818,
+          "y": 4368.436363636363,
+          "type": 1
+        },
+        {
+          "x": 370.1454545454545,
+          "y": 3153.6,
+          "type": 0
+        },
+        {
+          "x": 3009.2727272727275,
+          "y": 2891.7818181818184,
+          "type": 0
+        }
+      ],
+      "categoryId": 1,
+      "thumbnail": "assets/thumbnails/CL/1189_r_CL.jpg"
+    },
+    "transforms": {
+      "zIndex": 4,
+      "top": -284.515969774228,
+      "left": 300.05896483418326,
+      "scale": 0.2279793802868608,
+      "rotation": 0
+    }
+  },
+  {
+    "img": {
+      "id": 2,
+      "name": "0567e_r_CL",
+      "path": "/dataset/CL/0567e_r_CL.JPG",
+      "fragment": "assets/images/CL/0567e_r_CL.webp",
+      "width": 1876,
+      "height": 1697,
+      "status": 1,
+      "format": "jpeg",
+      "segmentationPoints": [
+        {
+          "x": 3043.098279049922,
+          "y": 2250.340492106386,
+          "type": 1
+        },
+        {
+          "x": 2523.3793201536055,
+          "y": 1994.7410041245912,
+          "type": 1
+        },
+        {
+          "x": 3358.3376475608025,
+          "y": 640.0637178210782,
+          "type": 0
+        }
+      ],
+      "categoryId": 1,
+      "thumbnail": "assets/thumbnails/CL/0567e_r_CL.jpg"
+    },
+    "transforms": {
+      "zIndex": 5,
+      "top": 729.2977444460101,
+      "left": 307.3719459508732,
+      "scale": 0.18592974765738382,
+      "rotation": 3.768204421221043
+    }
+  },
+  {
+    "img": {
+      "id": 5,
+      "name": "0786_r_CL",
+      "path": "/dataset/CL/0786_r_CL.JPG",
+      "fragment": "assets/images/CL/0786_r_CL.webp",
+      "width": 2174,
+      "height": 1880,
+      "status": 1,
+      "format": "jpeg",
+      "segmentationPoints": [
+        {
+          "x": 2497.819371355426,
+          "y": 1705.0615844118904,
+          "type": 1
+        }
+      ],
+      "categoryId": 1,
+      "thumbnail": "assets/thumbnails/CL/0786_r_CL.jpg"
+    },
+    "transforms": {
+      "zIndex": 6,
+      "top": -253.7849098504675,
+      "left": 865.8915362459959,
+      "scale": 0.19966856719046955,
+      "rotation": 0
+    }
+  },
+  {
+    "img": {
+      "id": 9,
+      "name": "1243_r_CL",
+      "path": "/dataset/CL/1243_r_CL.JPG",
+      "fragment": "assets/images/CL/1243_r_CL.webp",
+      "width": 2189,
+      "height": 2629,
+      "status": 1,
+      "format": "jpeg",
+      "segmentationPoints": [
+        {
+          "x": 2889.738586260845,
+          "y": 1764.7014649409757,
+          "type": 1
+        },
+        {
+          "x": 2352.9796614990755,
+          "y": 3034.1789219172238,
+          "type": 1
+        },
+        {
+          "x": 1432.821504764614,
+          "y": 478.1840420992747,
+          "type": 0
+        }
+      ],
+      "categoryId": 1,
+      "thumbnail": "assets/thumbnails/CL/1243_r_CL.jpg"
+    },
+    "transforms": {
+      "zIndex": 7,
+      "top": 115.83881023992211,
+      "left": 871.3461085347764,
+      "scale": 0.20221152804183284,
+      "rotation": 0
+    }
+  },
+  {
+    "img": {
+      "id": 6,
+      "name": "0812a_r_CL",
+      "path": "/dataset/CL/0812a_r_CL.JPG",
+      "fragment": "assets/images/CL/0812a_r_CL.webp",
+      "width": 1859,
+      "height": 1376,
+      "status": 1,
+      "format": "jpeg",
+      "segmentationPoints": [
+        {
+          "x": 2940.858483857204,
+          "y": 1176.8226425828475,
+          "type": 1
+        }
+      ],
+      "categoryId": 1,
+      "thumbnail": "assets/thumbnails/CL/0812a_r_CL.jpg"
+    },
+    "transforms": {
+      "zIndex": 8,
+      "top": -267.4945230934112,
+      "left": 1546.2233270452427,
+      "scale": 0.24339249854246292,
+      "rotation": 0
+    }
+  },
+  {
+    "img": {
+      "id": 10,
+      "name": "2275_r_CL",
+      "path": "/dataset/CL/2275_r_CL.JPG",
+      "fragment": "assets/images/CL/2275_r_CL.webp",
+      "width": 1901,
+      "height": 3900,
+      "status": 1,
+      "format": "jpeg",
+      "segmentationPoints": [
+        {
+          "x": 1658.290909090909,
+          "y": 3373.5272727272727,
+          "type": 1
+        }
+      ],
+      "categoryId": 1,
+      "thumbnail": "assets/thumbnails/CL/2275_r_CL.jpg"
+    },
+    "transforms": {
+      "zIndex": 9,
+      "top": 26.46627039997733,
+      "left": 1554.095324997872,
+      "scale": 0.24041544223566694,
+      "rotation": 0.49320830108345604
+    }
+  },
+  {
+    "img": {
+      "id": 7,
+      "name": "0812b_r_CL",
+      "path": "/dataset/CL/0812b_r_CL.JPG",
+      "fragment": "assets/images/CL/0812b_r_CL.webp",
+      "width": 1759,
+      "height": 2440,
+      "status": 1,
+      "format": "jpeg",
+      "segmentationPoints": [
+        {
+          "x": 1941.0545454545454,
+          "y": 2640.4363636363637,
+          "type": 1
+        }
+      ],
+      "categoryId": 1,
+      "thumbnail": "assets/thumbnails/CL/0812b_r_CL.jpg"
+    },
+    "transforms": {
+      "zIndex": 10,
+      "top": 874.0205513678027,
+      "left": 1575.99673101533,
+      "scale": 0.24224385245901642,
+      "rotation": 0
+    }
+  },
+  {
+    "img": {
+      "id": 11,
+      "name": "0567a_r_IR",
+      "path": "/dataset/IR/0567a_r_IR.JPG",
+      "fragment": "assets/images/IR/0567a_r_IR.webp",
+      "width": 1699,
+      "height": 4411,
+      "status": 1,
+      "format": "jpeg",
+      "segmentationPoints": [
+        {
+          "x": 1174.0946866984243,
+          "y": 1370.3481128618541,
+          "type": 1
+        }
+      ],
+      "categoryId": 2,
+      "thumbnail": "assets/thumbnails/IR/0567a_r_IR.jpg"
+    },
+    "transforms": {
+      "zIndex": 11,
+      "top": 1354.2913861875413,
+      "left": -275.5577329854884,
+      "scale": 0.2406478518292008,
+      "rotation": 0
+    }
+  },
+  {
+    "img": {
+      "id": 13,
+      "name": "0567i_r_IR",
+      "path": "/dataset/IR/0567i_r_IR.JPG",
+      "fragment": "assets/images/IR/0567i_r_IR.webp",
+      "width": 1858,
+      "height": 765,
+      "status": 1,
+      "format": "jpeg",
+      "segmentationPoints": [
+        {
+          "x": 1918.4605319300242,
+          "y": 1364.2622671028305,
+          "type": 1
+        }
+      ],
+      "categoryId": 2,
+      "thumbnail": "assets/thumbnails/IR/0567i_r_IR.jpg"
+    },
+    "transforms": {
+      "zIndex": 12,
+      "top": 2406.2035028490272,
+      "left": -256.0832667174696,
+      "scale": 0.21559674097949683,
+      "rotation": -3.017957514652636
+    }
+  },
+  {
+    "img": {
+      "id": 14,
+      "name": "0567j_r_IR",
+      "path": "/dataset/IR/0567j_r_IR.JPG",
+      "fragment": "assets/images/IR/0567j_r_IR.webp",
+      "width": 1847,
+      "height": 2009,
+      "status": 1,
+      "format": "jpeg",
+      "segmentationPoints": [
+        {
+          "x": 2480.779405489973,
+          "y": 1159.7826767173945,
+          "type": 1
+        }
+      ],
+      "categoryId": 2,
+      "thumbnail": "assets/thumbnails/IR/0567j_r_IR.jpg"
+    },
+    "transforms": {
+      "zIndex": 13,
+      "top": 2586.1737799412376,
+      "left": -248.253582879143,
+      "scale": 0.21015010994585667,
+      "rotation": 0
+    }
+  },
+  {
+    "img": {
+      "id": 18,
+      "name": "1189_r_IR",
+      "path": "/dataset/IR/1189_r_IR.JPG",
+      "fragment": "assets/images/IR/1189_r_IR.webp",
+      "width": 1516,
+      "height": 4500,
+      "status": 1,
+      "format": "jpeg",
+      "segmentationPoints": [
+        {
+          "x": 1982.9454545454546,
+          "y": 2451.927272727273,
+          "type": 1
+        },
+        {
+          "x": 1909.6363636363635,
+          "y": 4598.836363636364,
+          "type": 1
+        },
+        {
+          "x": 2935.9636363636364,
+          "y": 1917.8181818181818,
+          "type": 0
+        }
+      ],
+      "categoryId": 2,
+      "thumbnail": "assets/thumbnails/IR/1189_r_IR.jpg"
+    },
+    "transforms": {
+      "zIndex": 14,
+      "top": 1358.3891469070568,
+      "left": 307.7733284357996,
+      "scale": 0.2570219845513963,
+      "rotation": 0
+    }
+  },
+  {
+    "img": {
+      "id": 12,
+      "name": "0567e_r_IR",
+      "path": "/dataset/IR/0567e_r_IR.JPG",
+      "fragment": "assets/images/IR/0567e_r_IR.webp",
+      "width": 1959,
+      "height": 1771,
+      "status": 1,
+      "format": "jpeg",
+      "segmentationPoints": [
+        {
+          "x": 2949.3784667899304,
+          "y": 1841.3813113355143,
+          "type": 1
+        },
+        {
+          "x": 1407.2615559664346,
+          "y": 682.6636324847107,
+          "type": 0
+        },
+        {
+          "x": 1373.1816242355285,
+          "y": 767.8634618119756,
+          "type": 0
+        },
+        {
+          "x": 1654.3410610155029,
+          "y": 767.8634618119756,
+          "type": 0
+        }
+      ],
+      "categoryId": 2,
+      "thumbnail": "assets/thumbnails/IR/0567e_r_IR.jpg"
+    },
+    "transforms": {
+      "zIndex": 15,
+      "top": 2480.9543576465067,
+      "left": 298.0438315595747,
+      "scale": 0.19794030424640055,
+      "rotation": 3.69138598645128
+    }
+  },
+  {
+    "img": {
+      "id": 15,
+      "name": "0786_r_IR",
+      "path": "/dataset/IR/0786_r_IR.JPG",
+      "fragment": "assets/images/IR/0786_r_IR.webp",
+      "width": 2240,
+      "height": 1951,
+      "status": 1,
+      "format": "jpeg",
+      "segmentationPoints": [
+        {
+          "x": 2506.3393542881527,
+          "y": 1517.6219598919074,
+          "type": 1
+        }
+      ],
+      "categoryId": 2,
+      "thumbnail": "assets/thumbnails/IR/0786_r_IR.jpg"
+    },
+    "transforms": {
+      "zIndex": 16,
+      "top": 1364.90737841531,
+      "left": 949.8288459100509,
+      "scale": 0.1785010849331298,
+      "rotation": 0
+    }
+  },
+  {
+    "img": {
+      "id": 19,
+      "name": "1243_r_IR",
+      "path": "/dataset/IR/1243_r_IR.JPG",
+      "fragment": "assets/images/IR/1243_r_IR.webp",
+      "width": 2284,
+      "height": 2695,
+      "status": 1,
+      "format": "jpeg",
+      "segmentationPoints": [
+        {
+          "x": 3060.138244915375,
+          "y": 1892.5012089318732,
+          "type": 1
+        }
+      ],
+      "categoryId": 2,
+      "thumbnail": "assets/thumbnails/IR/1243_r_IR.jpg"
+    },
+    "transforms": {
+      "zIndex": 17,
+      "top": 1708.158122516744,
+      "left": 959.7953201706536,
+      "scale": 0.17506236000447056,
+      "rotation": 0
+    }
+  },
+  {
+    "img": {
+      "id": 16,
+      "name": "0812a_r_IR",
+      "path": "/dataset/IR/0812a_r_IR.JPG",
+      "fragment": "assets/images/IR/0812a_r_IR.webp",
+      "width": 1981,
+      "height": 1464,
+      "status": 1,
+      "format": "jpeg",
+      "segmentationPoints": [
+        {
+          "x": 2676.7390129426826,
+          "y": 1628.3817380173518,
+          "type": 1
+        }
+      ],
+      "categoryId": 2,
+      "thumbnail": "assets/thumbnails/IR/0812a_r_IR.jpg"
+    },
+    "transforms": {
+      "zIndex": 18,
+      "top": 1517.7373083808932,
+      "left": 1605.5096058849394,
+      "scale": 0.20183868260989943,
+      "rotation": 0
+    }
+  },
+  {
+    "img": {
+      "id": 20,
+      "name": "2275_r_IR",
+      "path": "/dataset/IR/2275_r_IR.JPG",
+      "fragment": "assets/images/IR/2275_r_IR.webp",
+      "width": 1993,
+      "height": 4144,
+      "status": 1,
+      "format": "jpeg",
+      "segmentationPoints": [
+        {
+          "x": 2035.3090909090909,
+          "y": 2640.4363636363637,
+          "type": 1
+        },
+        {
+          "x": 1658.290909090909,
+          "y": 2116.8,
+          "type": 1
+        },
+        {
+          "x": 3229.2,
+          "y": 1771.2,
+          "type": 0
+        }
+      ],
+      "categoryId": 2,
+      "thumbnail": "assets/thumbnails/IR/2275_r_IR.jpg"
+    },
+    "transforms": {
+      "zIndex": 19,
+      "top": 1776.934402579828,
+      "left": 1614.081034456368,
+      "scale": 0.2006233970146567,
+      "rotation": 0
+    }
+  },
+  {
+    "img": {
+      "id": 17,
+      "name": "0812b_r_IR",
+      "path": "/dataset/IR/0812b_r_IR.JPG",
+      "fragment": "assets/images/IR/0812b_r_IR.webp",
+      "width": 1853,
+      "height": 2593,
+      "status": 1,
+      "format": "jpeg",
+      "segmentationPoints": [
+        {
+          "x": 1333.6363636363637,
+          "y": 2776.581818181818,
+          "type": 1
+        }
+      ],
+      "categoryId": 2,
+      "thumbnail": "assets/thumbnails/IR/0812b_r_IR.jpg"
+    },
+    "transforms": {
+      "zIndex": 20,
+      "top": 2533.3309947152147,
+      "left": 1623.5787441847901,
+      "scale": 0.21578112803573166,
+      "rotation": 0
+    }
+  }
+]

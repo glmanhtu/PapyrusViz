@@ -81,7 +81,8 @@ export class NavComponent implements OnInit {
   }
 
   verifyAssembling() {
-
+    const currentBoard = this.mainComponent.getActivatedBoard();
+    currentBoard.verifyAssembling();
   }
 
   clearDrawing() {

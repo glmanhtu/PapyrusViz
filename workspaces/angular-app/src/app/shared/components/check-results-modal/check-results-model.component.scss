@@ -1,4 +1,4 @@
-/*
+/*!
  * Copyright (C) 2024  Manh Tu VU
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,16 +15,3 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export type AppInfo = {
-	version: string
-}
-
-export type AppAPIData = {
-	request: string | unknown,
-	response: unknown
-}
-
-export type VerifyItem = {
-	dataType: string,
-	pair: string[],
-}

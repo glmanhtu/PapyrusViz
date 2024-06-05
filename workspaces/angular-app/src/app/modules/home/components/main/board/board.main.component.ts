@@ -34,7 +34,7 @@ import {
   GlobalTransform,
   ImgDto,
   ProjectDTO,
-  Transforms,
+  Transforms, VerifyItem,
 } from 'shared-lib';
 import { ElectronIpcService } from '../../../../../services/electron-ipc.service';
 import { FrameComponent } from '../../../../../shared/components/frame/frame.component';
@@ -64,6 +64,15 @@ export class BoardMainComponent implements OnInit {
   assemblingImages: AssemblingImage[] = [];
   selectedFrames = new Map<number, FrameComponent>;
   menuItems = ['To front', 'To back', 'Delete']
+  gt = [
+    ['0567a_r', '0567i_r'],
+    ['0567i_r', '0567j_r'],
+    ['1189_r', '0567e_r'],
+    ['0786_r', '1243_r'],
+    ['0812a_r', '2275_r'],
+    ['2275_r', '0812b_r']
+  ]
+  checkThreshold = 0.2;
 
   constructor(
     private modalService: ModalService,
@@ -243,7 +252,35 @@ export class BoardMainComponent implements OnInit {
   }
 
   verifyAssembling() {
+    const assemblingMap = new Map<string, AssemblingImage>();
+    this.assemblingImages.forEach((x) => {
+      assemblingMap.set(x.img.name, x);
+    });
+    const correct: VerifyItem[] = [], incorrect: VerifyItem[] = [];
+    for (const dataType of ['CL', 'IR']) {
+      for (const pair of this.gt) {
+        const img1 = assemblingMap.get(pair[0] + '_' + dataType);
+        const img2 = assemblingMap.get(pair[1] + '_' + dataType);
+        if (!img1 || !img2) {
+          incorrect.push({dataType, pair});
+          continue;
+        }
+        const minHeight = Math.min(img1.img.height * img1.transforms.scale, img2.img.height * img2.transforms.scale);
+        const minWidth = Math.min(img1.img.width * img1.transforms.scale, img2.img.width * img2.transforms.scale);
+        const bottomDiff = Math.abs(img1.transforms.top + img1.img.height * img1.transforms.scale - img2.transforms.top) / minHeight;
+        const rightDiff = Math.abs(img1.transforms.left + img1.img.width * img1.transforms.scale - (img2.transforms.left + img2.img.width * img2.transforms.scale)) / minWidth;
+        const leftDiff = Math.abs(img1.transforms.left - img2.transforms.left) / minWidth;
 
+        if (bottomDiff < this.checkThreshold && rightDiff < this.checkThreshold && leftDiff < this.checkThreshold) {
+          correct.push({dataType, pair});
+        } else {
+          incorrect.push({dataType, pair});
+        }
+      }
+    }
+    console.log('Correct: ', correct);
+    console.log('Incorrect: ', incorrect);
+    this.modalService.verifyModal(correct, incorrect)
   }
 
   clearDrawing() {
