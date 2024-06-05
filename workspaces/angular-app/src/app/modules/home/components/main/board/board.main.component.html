@@ -22,7 +22,7 @@
 		<div class="frame-anchor" #frameAnchor></div>
 		<app-frame appContextMenu [menuItems]="menuItems" (select)="handleContextMenu(i, $event)" *ngFor="let img of assemblingImages; index as i"
 							 [globalTransform]="assembling.transforms"
-							 [transforms]="img.transforms" [image]="img.img"
+							 [transforms]="getTransform(img)" [image]="img.img"
 							 (transformEvent)="onTransform(img, $event)">
 		</app-frame>
 	</div>

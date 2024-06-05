@@ -30,7 +30,6 @@ import {
 import {
   AssemblingDTO,
   AssemblingImage,
-  AssemblingImageRequest,
   GetAssemblingRequest,
   GlobalTransform,
   ImgDto,
@@ -72,10 +71,18 @@ export class BoardMainComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.eIpc.send<GetAssemblingRequest, AssemblingImage[]>('assembling:get-images',
-      {projectPath: this.projectDto!.path, assemblingId: this.assembling.id}).then((items) => {
+    if (sessionStorage.getItem('assembling')) {
+      this.assemblingImages = JSON.parse(sessionStorage.getItem('assembling')!);
+    } else {
+      this.eIpc.send<GetAssemblingRequest, AssemblingImage[]>('assembling:get-images',
+        { projectPath: this.projectDto!.path, assemblingId: this.assembling.id }).then((items) => {
         this.assemblingImages = items;
-    });
+      });
+    }
+  }
+
+  saveSession() {
+    sessionStorage.setItem('assembling', JSON.stringify(this.assemblingImages));
   }
 
   onDragOver(event: DragEvent) {
@@ -155,6 +162,7 @@ export class BoardMainComponent implements OnInit {
     };
 
     this.assemblingImages.push(x);
+    this.saveSession();
   }
 
   @HostListener('document:mousedown', ['$event'])
@@ -213,19 +221,13 @@ export class BoardMainComponent implements OnInit {
   toFront(assemblingImg: AssemblingImage) {
     const maxZIndex = this.assemblingImages.reduce((acc, x) => Math.max(acc, x.transforms.zIndex), -9999999);
     assemblingImg.transforms.zIndex = maxZIndex + 1;
+    this.onTransform(assemblingImg, assemblingImg.transforms)
   }
 
   toBack(assemblingImg: AssemblingImage) {
     const minZIndex = this.assemblingImages.reduce((acc, x) => Math.min(acc, x.transforms.zIndex), 9999999);
     assemblingImg.transforms.zIndex = minZIndex - 1;
-  }
-
-  deleteAssemblingImg(assemblingImgId: number) {
-    return this.eIpc.send<AssemblingImageRequest, void>('assembling:delete-assembling-img', {
-      projectPath: this.projectDto.path,
-      assemblingId: this.assembling.id,
-      imageId: assemblingImgId
-    })
+    this.onTransform(assemblingImg, assemblingImg.transforms)
   }
 
   onGlobalTransform(globalTransform: GlobalTransform) {
@@ -233,5 +235,19 @@ export class BoardMainComponent implements OnInit {
   }
 
   onTransform(_a: AssemblingImage, _t: Transforms) {
+    this.saveSession();
+  }
+
+  getTransform(assemblingImage: AssemblingImage) {
+    return assemblingImage.transforms;
+  }
+
+  verifyAssembling() {
+
+  }
+
+  clearDrawing() {
+    sessionStorage.removeItem('assembling');
+    this.assemblingImages.length = 0;
   }
 }
