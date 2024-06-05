@@ -121,10 +121,10 @@ export class BoardMainComponent implements OnInit {
   }
 
   addImage(thumbnail: ImgDto, top = 10, left= 10) {
-    const imgHeights = []
+    const imgWidths = []
     if (this.frameComponents.length === 0) {
       const containerRect = this.boardContainer.nativeElement.getBoundingClientRect();
-      imgHeights.push(containerRect.height);
+      imgWidths.push(containerRect.width);
     }
     for (const frame of this.frameComponents) {
       if (frame.image.id === thumbnail.id) {
@@ -137,10 +137,10 @@ export class BoardMainComponent implements OnInit {
 
         return;
       }
-      imgHeights.push(frame.image.height * frame.transforms.scale)
+      imgWidths.push(frame.image.width * frame.transforms.scale)
     }
-    const avgHeight = imgHeights.reduce((p, c) => p + c, 0) / imgHeights.length;
-    let imgScale = (avgHeight / thumbnail.height);
+    const avgWidth = imgWidths.reduce((p, c) => p + c, 0) / imgWidths.length;
+    let imgScale = (avgWidth / thumbnail.width);
     if (imgScale === 0) {
       imgScale = 1;
     }
