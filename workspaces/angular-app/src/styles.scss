@@ -24,10 +24,6 @@
 @import "bootstrap/scss/functions";
 @import "bootstrap/scss/variables";
 @import "bootstrap/scss/variables-dark";
-@import "bootstrap/scss/maps";
-@import "bootstrap/scss/mixins";
-@import "bootstrap/scss/utilities";
-@import "bootstrap/scss/root";
 
 
 $navbar-padding-y: 1rem * .2;
@@ -37,7 +33,9 @@ $card-cap-padding-y:                1rem * .1;
 $papy-background-color: #2e3142;
 
 /* customize bg dark */
-$primary: #2e3142;
+$body-bg: #6FAB8D;
+$primary: shade-color($body-bg, 30%);
+$btn-color: #2C2C2C;
 
 :root {
   --bs-primary: #{$primary};
@@ -54,6 +52,10 @@ $primary: #2e3142;
   }
 }
 
+@import "bootstrap/scss/maps";
+@import "bootstrap/scss/mixins";
+@import "bootstrap/scss/utilities";
+@import "bootstrap/scss/root";
 // Import all of Bootstrap's CSS
 // Layout & components
 @import "bootstrap/scss/reboot";
@@ -97,11 +99,11 @@ $primary: #2e3142;
 
 
 .btn-papyrus {
-  @include button-variant(#e86950, #e86950, white, $active-color: white, $disabled-color: white, $hover-color: white);
+  @include button-variant($btn-color, $btn-color, white, $active-color: white, $disabled-color: white, $hover-color: white);
 }
 
 .btn-outline-papyrus {
-    @include button-outline-variant(#e86950, white, $active-color: white);
+    @include button-outline-variant($btn-color, white, $active-color: white);
 }
 
 /* You can add global styles to this file, and also import other style files */
