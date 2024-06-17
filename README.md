@@ -51,6 +51,9 @@ To build release:
 npm run make
 ```
 
+### Similarity matrix estimation
+Pytorch implementation of deep learning model to generate 
+similarity matrix can be found here: https://github.com/glmanhtu/papyrus
 
 ## License
 Licensed under the [GPLv3](https://github.com/glmanhtu/PapyrusViz/blob/main/LICENSE) license.
