@@ -25,6 +25,13 @@ curl -L https://github.com/glmanhtu/PapyrusViz/releases/download/v3.0.0/Papyviz-
 ```
 Distributed  .zip version can be dowloaded for Linux [here](https://github.com/glmanhtu/PapyrusViz/releases/download/v3.0.0/Papyviz-3.0.0-linux-x64.zip) and for Windows [here](https://github.com/glmanhtu/PapyrusViz/releases/download/v3.0.0/Papyviz-3.0.0-win32-x64.zip).
 
+## Web-only version 
+Web-only is a simplified version of this application which doesn't require to have backend in order to run.
+To obtain this version, simply checkout [for-web](https://github.com/glmanhtu/PapyrusViz/tree/for-web) branch
+
+```bash
+git checkout for-web
+```
 
 ## For developers
 ### Setup development environment

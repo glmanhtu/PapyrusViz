@@ -1,7 +1,7 @@
 {
 	"name": "papyviz",
 	"productName": "Papyrus Visualisation",
-	"version": "3.0.0",
+	"version": "3.0.2",
 	"description": "Visualize papyrus fragments and allow user to reassemble them",
 	"repository": "https://github.com/glmanhtu/PapyrusViz",
 	"author": "Manh Tu VU",
