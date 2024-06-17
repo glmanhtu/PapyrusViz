@@ -19,20 +19,19 @@ import { AppData } from '../models/app-data';
 import * as pathUtils from './path.utils';
 import { promises as fs } from 'fs';
 
+export async function writeAppData(appData: AppData): Promise<void> {
+	const dataFile = pathUtils.fromAppData('data.json');
+	await fs.writeFile(dataFile, JSON.stringify(appData));
+}
 
 export async function readAppData(): Promise<AppData> {
 	const dataFile = pathUtils.fromAppData('data.json');
 	if (!await pathUtils.isFile(dataFile)) {
-		await this.writeAppData({
+		await writeAppData({
 			'projects': []
 		});
 	}
 	return JSON.parse(await fs.readFile(dataFile, 'utf-8'));
-}
-
-export async function writeAppData(appData: AppData): Promise<void> {
-	const dataFile = pathUtils.fromAppData('data.json');
-	await fs.writeFile(dataFile, JSON.stringify(appData));
 }
 
 class UniqueConstraintError extends Error {
