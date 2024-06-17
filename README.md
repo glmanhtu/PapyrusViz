@@ -16,14 +16,14 @@ Papyrus Visualization is an application designed for managing and processing ima
 ## Installation
 Mac users using ARM chipset:
 ```bash
-curl -L https://github.com/glmanhtu/PapyrusViz/releases/download/v3.0.0/Papyviz-3.0.0-arm64.dmg -o ~/Downloads/Papyviz-3.0.0-arm64.dmg && open ~/Downloads/Papyviz-3.0.0-arm64.dmg
+curl -L https://github.com/glmanhtu/PapyrusViz/releases/download/v3.0.2/Papyviz-3.0.2-arm64.dmg -o ~/Downloads/Papyviz-3.0.2-arm64.dmg && open ~/Downloads/Papyviz-3.0.2-arm64.dmg
 ```
 
 Mac users usings Intel chipset:
 ```bash
-curl -L https://github.com/glmanhtu/PapyrusViz/releases/download/v3.0.0/Papyviz-3.0.0-x64.dmg -o ~/Downloads/Papyviz-3.0.0-x64.dmg && open ~/Downloads/Papyviz-3.0.0-x64.dmg
+curl -L https://github.com/glmanhtu/PapyrusViz/releases/download/v3.0.2/Papyviz-3.0.2-x64.dmg -o ~/Downloads/Papyviz-3.0.2-x64.dmg && open ~/Downloads/Papyviz-3.0.2-x64.dmg
 ```
-Distributed  .zip version can be dowloaded for Linux [here](https://github.com/glmanhtu/PapyrusViz/releases/download/v3.0.0/Papyviz-3.0.0-linux-x64.zip) and for Windows [here](https://github.com/glmanhtu/PapyrusViz/releases/download/v3.0.0/Papyviz-3.0.0-win32-x64.zip).
+Distributed  .zip version can be downloaded for Linux [here](https://github.com/glmanhtu/PapyrusViz/releases/download/v3.0.2/Papyviz-3.0.2-linux-x64.zip) and for Windows [here](https://github.com/glmanhtu/PapyrusViz/releases/download/v3.0.2/Papyviz-3.0.2-win32-x64.zip).
 
 ## Web-only version 
 Web-only is a simplified version of this application which doesn't require to have backend in order to run.
