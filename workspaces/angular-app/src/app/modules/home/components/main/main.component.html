@@ -29,7 +29,8 @@
 				<li [ngbNavItem]="assembling.id" class="nav-item" >
 					<app-nav-main [assembling]="assembling" [projectDto]="projectDto" (closeAssembling)="assemblings.splice(i, 1)"></app-nav-main>
 					<ng-template ngbNavContent>
-						<app-board-main (segmentImage)="imageChange($event)" [assembling]="assembling" [projectDto]="projectDto" (queryImage)="findMatching($event)"></app-board-main>
+						<app-board-main (segmentImage)="imageChange($event)" [assembling]="assembling" [projectDto]="projectDto"
+														(queryImage)="findMatching($event)" [panel]="panel"></app-board-main>
 					</ng-template>
 				</li>
 			}

@@ -33,6 +33,7 @@ import { ViewLogsComponent } from './components/view-logs/view-logs.component';
 import { AboutModalComponent } from './components/about-modal/about-modal.component';
 import { ContextMenuDirective } from './directives/context-menu.directive';
 import { CheckResultsModelComponent } from './components/check-results-modal/check-results-model.component';
+import { ShowSuggestionModelComponent } from './components/show-suggestion-modal/show-suggestion-model.component';
 
 @NgModule({
 	declarations: [
@@ -49,7 +50,8 @@ import { CheckResultsModelComponent } from './components/check-results-modal/che
 		ViewLogsComponent,
 		AboutModalComponent,
 		ContextMenuDirective,
-		CheckResultsModelComponent
+		CheckResultsModelComponent,
+		ShowSuggestionModelComponent
   ],
 	imports: [
 		ReactiveFormsModule,
@@ -70,7 +72,8 @@ import { CheckResultsModelComponent } from './components/check-results-modal/che
 		ViewLogsComponent,
 		AboutModalComponent,
 		ContextMenuDirective,
-		CheckResultsModelComponent
+		CheckResultsModelComponent,
+		ShowSuggestionModelComponent
 	]
 })
 export class SharedModule {}

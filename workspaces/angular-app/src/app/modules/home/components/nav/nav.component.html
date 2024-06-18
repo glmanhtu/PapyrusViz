@@ -16,14 +16,20 @@
   -->
 <nav class="navbar flex-shrink-1 p-1" id="proj-nav" *ngIf="projectDto">
   <div class="container-fluid">
-    <span class="navbar-brand mb-0 h1" id="proj-name">Project: {{projectDto.name}}</span>
+    <span class="navbar-brand mb-0 h1" id="proj-name">Projet: {{projectDto.name}}</span>
     <div class="d-flex">
+			<a class="btn btn-papyrus btn-sm ms-2" href="/index.html"><i class="fas fa-file-export"></i>
+				Retourner à la page d'accueil</a>
+			<button class="btn btn-papyrus btn-sm ms-2" (click)="showSuggestion()"><i class="fas fa-file-export"></i>
+				Suggestion de spectacle
+			</button>
+
 			<button class="btn btn-papyrus btn-sm ms-2" (click)="resetView()"><i class="fas fa-file-export"></i>
-				Reset View</button>
+				Réinitialiser la vue</button>
 			<button class="btn btn-papyrus btn-sm ms-2" (click)="clearDrawing()"><i class="fas fa-file-export"></i>
-				Clear</button>
+				Claire</button>
 			<button class="btn btn-papyrus btn-sm ms-2" (click)="verifyAssembling()"><i class="fas fa-file-export"></i>
-				Check results</button>
+				Vérifier les résultats</button>
     </div>
   </div>
 </nav>

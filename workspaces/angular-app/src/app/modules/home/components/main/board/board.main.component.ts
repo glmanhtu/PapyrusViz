@@ -39,6 +39,7 @@ import {
 import { ElectronIpcService } from '../../../../../services/electron-ipc.service';
 import { FrameComponent } from '../../../../../shared/components/frame/frame.component';
 import { ModalService } from '../../../../../services/modal.service';
+import { PanelComponent } from '../../panel/panel.component';
 
 @Component({
   selector: 'app-board-main',
@@ -52,6 +53,7 @@ export class BoardMainComponent implements OnInit {
 
   @Input() assembling: AssemblingDTO;
   @Input() projectDto: ProjectDTO;
+  @Input() panel: PanelComponent;
 
   @ViewChildren(FrameComponent) frameComponents!: QueryList<FrameComponent>;
   @Output() queryImage = new EventEmitter<ImgDto>();
@@ -63,7 +65,7 @@ export class BoardMainComponent implements OnInit {
 
   assemblingImages: AssemblingImage[] = [];
   selectedFrames = new Map<number, FrameComponent>;
-  menuItems = ['To front', 'To back', 'Delete']
+  menuItems = ['Vers l\'avant', 'Vers l\'arrière', 'Supprimer']
   gt = [
     ['0567a_r', '0567i_r'],
     ['0567i_r', '0567j_r'],
@@ -124,8 +126,26 @@ export class BoardMainComponent implements OnInit {
     const elem = this.boardContainer.nativeElement;
     const panZoomElem = this.panZoom.nativeElement;
     // elem.style.transform = 'scale(1)';
-    elem.style.left = '0';
-    elem.style.top = '0';
+    // this.assembling.transforms.scale = 1;
+
+    let minLeft = 99999;
+    let minTop = 9999999;
+    for (const frame of this.frameComponents) {
+      if (minLeft > frame.transforms.left) {
+        minLeft = frame.transforms.left
+        minTop = frame.transforms.top
+      }
+    }
+
+    for (const frame of this.frameComponents) {
+      frame.transforms.left -= minLeft
+      frame.transforms.top -= minTop
+    }
+
+
+    elem.style.left = `0`;
+    elem.style.top = `0`;
+
     panZoomElem.style.transformOrigin = '0 0';
   }
 
@@ -213,15 +233,15 @@ export class BoardMainComponent implements OnInit {
   handleContextMenu(imgIdx: number, command: string): void {
     const assemblingImage = this.assemblingImages[imgIdx];
     switch (command) {
-      case 'Delete':
+      case 'Supprimer':
         this.assemblingImages = this.assemblingImages.filter((x) => x.img.id != assemblingImage.img.id)
         break
 
-      case 'To front':
+      case 'Vers l\'avant':
         this.toFront(assemblingImage);
         break
 
-      case 'To back':
+      case 'Vers l\'arrière':
         this.toBack(assemblingImage);
         break
     }
@@ -252,30 +272,33 @@ export class BoardMainComponent implements OnInit {
   }
 
   verifyAssembling() {
+    const category = this.panel.thumbnailsPanel.category;
+    let dataType = "IR"
+    if (parseInt(`${category.value}`) === 1) {
+      dataType = "CL"
+    }
     const assemblingMap = new Map<string, AssemblingImage>();
     this.assemblingImages.forEach((x) => {
       assemblingMap.set(x.img.name, x);
     });
     const correct: VerifyItem[] = [], incorrect: VerifyItem[] = [];
-    for (const dataType of ['CL', 'IR']) {
-      for (const pair of this.gt) {
-        const img1 = assemblingMap.get(pair[0] + '_' + dataType);
-        const img2 = assemblingMap.get(pair[1] + '_' + dataType);
-        if (!img1 || !img2) {
-          incorrect.push({dataType, pair});
-          continue;
-        }
-        const minHeight = Math.min(img1.img.height * img1.transforms.scale, img2.img.height * img2.transforms.scale);
-        const minWidth = Math.min(img1.img.width * img1.transforms.scale, img2.img.width * img2.transforms.scale);
-        const bottomDiff = Math.abs(img1.transforms.top + img1.img.height * img1.transforms.scale - img2.transforms.top) / minHeight;
-        const rightDiff = Math.abs(img1.transforms.left + img1.img.width * img1.transforms.scale - (img2.transforms.left + img2.img.width * img2.transforms.scale)) / minWidth;
-        const leftDiff = Math.abs(img1.transforms.left - img2.transforms.left) / minWidth;
+    for (const pair of this.gt) {
+      const img1 = assemblingMap.get(pair[0] + '_' + dataType);
+      const img2 = assemblingMap.get(pair[1] + '_' + dataType);
+      if (!img1 || !img2) {
+        incorrect.push({dataType, pair});
+        continue;
+      }
+      const minHeight = Math.min(img1.img.height * img1.transforms.scale, img2.img.height * img2.transforms.scale);
+      const minWidth = Math.min(img1.img.width * img1.transforms.scale, img2.img.width * img2.transforms.scale);
+      const bottomDiff = Math.abs(img1.transforms.top + img1.img.height * img1.transforms.scale - img2.transforms.top) / minHeight;
+      const rightDiff = Math.abs(img1.transforms.left + img1.img.width * img1.transforms.scale - (img2.transforms.left + img2.img.width * img2.transforms.scale)) / minWidth;
+      const leftDiff = Math.abs(img1.transforms.left - img2.transforms.left) / minWidth;
 
-        if (bottomDiff < this.checkThreshold && rightDiff < this.checkThreshold && leftDiff < this.checkThreshold) {
-          correct.push({dataType, pair});
-        } else {
-          incorrect.push({dataType, pair});
-        }
+      if (bottomDiff < this.checkThreshold && rightDiff < this.checkThreshold && leftDiff < this.checkThreshold) {
+        correct.push({dataType, pair});
+      } else {
+        incorrect.push({dataType, pair});
       }
     }
     console.log('Correct: ', correct);

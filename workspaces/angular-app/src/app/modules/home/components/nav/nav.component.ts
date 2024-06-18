@@ -89,4 +89,13 @@ export class NavComponent implements OnInit {
     const currentBoard = this.mainComponent.getActivatedBoard();
     currentBoard.clearDrawing();
   }
+
+  showSuggestion() {
+    const category = this.mainComponent.panel.thumbnailsPanel.category;
+    let imgType = "IR"
+    if (parseInt(`${category.value}`) === 1) {
+      imgType = "CL"
+    }
+    this.modalService.showSuggestion(imgType)
+  }
 }

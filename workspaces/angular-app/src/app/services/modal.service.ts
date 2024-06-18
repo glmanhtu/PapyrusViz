@@ -12,6 +12,9 @@ import { ViewLogsComponent } from '../shared/components/view-logs/view-logs.comp
 import { ElectronIpcService } from './electron-ipc.service';
 import { AboutModalComponent } from '../shared/components/about-modal/about-modal.component';
 import { CheckResultsModelComponent } from '../shared/components/check-results-modal/check-results-model.component';
+import {
+	ShowSuggestionModelComponent
+} from '../shared/components/show-suggestion-modal/show-suggestion-model.component';
 
 @Injectable({
 	providedIn: 'root'
@@ -31,6 +34,13 @@ export class ModalService {
 		});
 		modalRef.componentInstance.correct = correct;
 		modalRef.componentInstance.incorrect = incorrect;
+	}
+
+	showSuggestion(imgType: string) {
+		const modalRef = this.modalService.open(ShowSuggestionModelComponent, {
+			size: 'lg'
+		});
+		modalRef.componentInstance.imgType = imgType;
 	}
 
 	about() {

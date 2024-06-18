@@ -17,7 +17,7 @@
 
 <form>
 	<div class="mb-3">
-		<input class="form-control form-control-sm mb-1" placeholder="Filter images" [formControl]="filter" (keyup)="getThumbnails()">
+		<input class="form-control form-control-sm mb-1" placeholder="Images filtrées" [formControl]="filter" (keyup)="getThumbnails()">
 		<select class="form-control form-control-sm" [formControl]="category" (change)="getThumbnails()">
 			<option *ngFor="let category of categories" value="{{category.id}}">{{category.name}}</option>
 		</select>

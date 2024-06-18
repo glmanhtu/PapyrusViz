@@ -54,22 +54,15 @@
     "request": "/home/mvu/Downloads/IRCLView/project",
     "response": [
       {
-        "id": 3,
-        "name": "All images",
-        "path": "",
+        "id": 1,
+        "name": "Couleur",
+        "path": "/home/mvu/Downloads/IRCLView/dataset/CL",
         "isActivated": true,
         "projectId": 1
       },
       {
-        "id": 1,
-        "name": "CL",
-        "path": "/home/mvu/Downloads/IRCLView/dataset/CL",
-        "isActivated": false,
-        "projectId": 1
-      },
-      {
         "id": 2,
-        "name": "IR",
+        "name": "Infrarouge",
         "path": "/home/mvu/Downloads/IRCLView/dataset/IR",
         "isActivated": false,
         "projectId": 1
@@ -81,7 +74,7 @@
     "response": [
       {
         "id": 1,
-        "name": "Main board",
+        "name": "Tableau de bord",
         "group": "default",
         "status": 1,
         "transforms": {
